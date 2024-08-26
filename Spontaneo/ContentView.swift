@@ -1,10 +1,3 @@
-//
-//  ContentView.swift
-//  Spontaneo
-//
-//  Created by Mughni Wibisono on 26/08/24.
-//
-
 import SwiftUI
 
 struct ContentView: View {
@@ -14,6 +7,10 @@ struct ContentView: View {
                 .imageScale(.large)
                 .foregroundStyle(.tint)
             Text("Hello, world!")
+            HStack {
+                Text("SPONTANEO")
+                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+            }
         }
         .padding()
     }
