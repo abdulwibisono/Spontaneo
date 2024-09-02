@@ -9,23 +9,22 @@ struct HeaderView: View {
     @State private var showSearchResults = false
     
     var body: some View {
-        VStack {
-            HStack {
-                Text("**Spontaneo**")
-                    .font(.system(size:30))
-                    .frame(width: 200)
-                    .padding(.leading, -20)
+        HStack {
+            VStack {
+                HStack {
+                    Text("**Spontaneo**")
+                        .font(.system(size:30))
+                        .frame(width: 200)
+                        .padding(.leading, -20)
+                    
+                    Spacer()
+                }
                 
-                Text("Explore THE **Universe**")
-                    .font(.system(size:30))
-                    .frame(width: 200)
-                    .padding(.leading, -20)
-                
-                Spacer()
-            }
+                CategoryListView
+            }.navigationBarBackButtonHidden(true)
             
-            CategoryListView
-        }.navigationBarBackButtonHidden(true)
+            
+        }
     }
     
     var CategoryListView: some View {

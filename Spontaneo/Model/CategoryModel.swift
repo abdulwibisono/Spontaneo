@@ -7,8 +7,8 @@ struct CategoryModel: Identifiable, Hashable {
 }
 
 var categoryList: [CategoryModel] = [
-    CategoryModel(icon: "storefront.fill", title: "Store"),
-    CategoryModel(icon: "fork.knife", title: "Restaurants"),
-    CategoryModel(icon: "cart.fill", title: "Convenience"),
-    CategoryModel(icon: "hands.and.sparkles.fill", title: "Place of Worship"),
+    CategoryModel(icon: "cup.and.saucer.fill", title: "Coffee"),
+    CategoryModel(icon: "book.fill", title: "Study"),
+    CategoryModel(icon: "gym.bag.fill", title: "Fitness"),
+    CategoryModel(icon: "gamecontroller.fill", title: "Game"),
 ]
