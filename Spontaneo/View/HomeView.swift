@@ -2,10 +2,38 @@ import SwiftUI
 
 struct HomeView: View {
     
+    @StateObject private var locationManager = LocationManager()
+    
     var body: some View {
+        
         HeaderView()
         
-        MapView(address: "13 Railway Tce, Milton, QLD 4064")
+        VStack {
+            if locationManager.authorizationStatus == .authorizedWhenInUse || locationManager.authorizationStatus == .authorizedAlways {
+                VStack {
+                    HStack {
+                        Image(systemName: "mappin.circle.fill")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                            .foregroundColor(.red)
+                            .padding(.leading)
+                        
+                        Text(locationManager.locationDescription)
+                            .fontWeight(.medium)
+                        Spacer()
+                    }
+                    
+                    Divider()
+                        .frame(width: 350)
+                        .frame(height: 2)
+                    
+                }
+            } else {
+                Text("Location access denied")
+            }
+        }
+        
+        MapView()
     }
 }
 

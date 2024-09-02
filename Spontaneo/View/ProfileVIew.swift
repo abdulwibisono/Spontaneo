@@ -1,15 +1,15 @@
 import SwiftUI
 
-struct Profile: View {
+struct ProfileView: View {
     
     var body: some View {
         HeaderView()
-        
+    
     }
 }
 
-struct HomeView_Previews: PreviewProvider {
+struct ProfileView_Preview: PreviewProvider {
     static var previews: some View {
-        HomeView()
+        ProfileView()
     }
 }

@@ -2,7 +2,7 @@ import SwiftUI
 import MapKit
 
 struct MapView: View {
-    var address: String
+    var address: String? = nil
     
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 34.011286, longitude: -116.166868),
@@ -16,7 +16,12 @@ struct MapView: View {
             MapPin(coordinate: annotation.coordinate, tint: .red)
         }
         .onAppear {
-            geocodeAddress(address)
+            if let address = address {
+                geocodeAddress(address)
+            } else {
+                // Set a default location if no address is provided
+                self.location = LocationAnnotation(coordinate: region.center)
+            }
         }
         .ignoresSafeArea()
     }
@@ -29,13 +34,12 @@ struct MapView: View {
                 return
             }
             if let location = placemarks?.first?.location {
-                    self.location = LocationAnnotation(coordinate: location.coordinate)
-                    self.region.center = location.coordinate
-                }
+                self.location = LocationAnnotation(coordinate: location.coordinate)
+                self.region.center = location.coordinate
             }
         }
     }
-
+}
 
 struct LocationAnnotation: Identifiable {
     let id = UUID()

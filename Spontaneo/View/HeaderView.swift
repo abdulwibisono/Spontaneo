@@ -15,15 +15,19 @@ struct HeaderView: View {
                     Text("**Spontaneo**")
                         .font(.system(size:30))
                         .frame(width: 200)
-                        .padding(.leading, -20)
+                        .padding(.leading, -10)
                     
                     Spacer()
+                    
+                    Image(systemName: "person.crop.circle.fill")
+                        .font(.system(size:30))
+                        .frame(width: 200)
+                        .padding(.trailing, -50)
                 }
                 
                 CategoryListView
+                
             }.navigationBarBackButtonHidden(true)
-            
-            
         }
     }
     
