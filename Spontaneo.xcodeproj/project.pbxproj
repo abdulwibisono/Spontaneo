@@ -8,11 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		933F48312C7CB628008FBB9A /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933F48302C7CB628008FBB9A /* HomeViewModel.swift */; };
-		933F48332C7CB659008FBB9A /* AcvtivityDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933F48322C7CB659008FBB9A /* AcvtivityDetailView.swift */; };
 		9357DC922C8588A4000C0B44 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC912C8588A4000C0B44 /* MapView.swift */; };
 		9357DC942C858B19000C0B44 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC932C858B19000C0B44 /* HomeView.swift */; };
 		9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC972C85F755000C0B44 /* ProfileView.swift */; };
 		9357DC9A2C85F845000C0B44 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC992C85F845000C0B44 /* LocationManager.swift */; };
+		9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC9E2C86045E000C0B44 /* EditProfileView.swift */; };
 		93CAD48D2C7CA88D00D0D340 /* SpontaneoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CAD48C2C7CA88D00D0D340 /* SpontaneoApp.swift */; };
 		93CAD4912C7CA88F00D0D340 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93CAD4902C7CA88F00D0D340 /* Assets.xcassets */; };
 		93CAD4942C7CA88F00D0D340 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93CAD4932C7CA88F00D0D340 /* Preview Assets.xcassets */; };
@@ -23,11 +23,11 @@
 
 /* Begin PBXFileReference section */
 		933F48302C7CB628008FBB9A /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
-		933F48322C7CB659008FBB9A /* AcvtivityDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcvtivityDetailView.swift; sourceTree = "<group>"; };
 		9357DC912C8588A4000C0B44 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		9357DC932C858B19000C0B44 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9357DC972C85F755000C0B44 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		9357DC992C85F845000C0B44 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
+		9357DC9E2C86045E000C0B44 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
 		93CAD4892C7CA88D00D0D340 /* Spontaneo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spontaneo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		93CAD48C2C7CA88D00D0D340 /* SpontaneoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpontaneoApp.swift; sourceTree = "<group>"; };
 		93CAD4902C7CA88F00D0D340 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -55,6 +55,32 @@
 				9357DC992C85F845000C0B44 /* LocationManager.swift */,
 			);
 			path = ViewModel;
+			sourceTree = "<group>";
+		};
+		9357DC9B2C860410000C0B44 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				9357DC972C85F755000C0B44 /* ProfileView.swift */,
+				9357DC9E2C86045E000C0B44 /* EditProfileView.swift */,
+			);
+			path = Profile;
+			sourceTree = "<group>";
+		};
+		9357DC9C2C86041F000C0B44 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				93CAD4A02C7CAEC200D0D340 /* HeaderView.swift */,
+				9357DC932C858B19000C0B44 /* HomeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		9357DC9D2C860437000C0B44 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				9357DC912C8588A4000C0B44 /* MapView.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 		93CAD4802C7CA88D00D0D340 = {
@@ -97,12 +123,10 @@
 		93CAD49A2C7CAE0900D0D340 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				9357DC932C858B19000C0B44 /* HomeView.swift */,
-				9357DC972C85F755000C0B44 /* ProfileView.swift */,
-				93CAD4A02C7CAEC200D0D340 /* HeaderView.swift */,
+				9357DC9D2C860437000C0B44 /* Services */,
+				9357DC9C2C86041F000C0B44 /* Home */,
+				9357DC9B2C860410000C0B44 /* Profile */,
 				93CAD4A62C7CB19800D0D340 /* MainView.swift */,
-				933F48322C7CB659008FBB9A /* AcvtivityDetailView.swift */,
-				9357DC912C8588A4000C0B44 /* MapView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -185,13 +209,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */,
 				93CAD4A72C7CB19800D0D340 /* MainView.swift in Sources */,
 				933F48312C7CB628008FBB9A /* HomeViewModel.swift in Sources */,
 				9357DC9A2C85F845000C0B44 /* LocationManager.swift in Sources */,
 				9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */,
 				9357DC942C858B19000C0B44 /* HomeView.swift in Sources */,
 				93CAD48D2C7CA88D00D0D340 /* SpontaneoApp.swift in Sources */,
-				933F48332C7CB659008FBB9A /* AcvtivityDetailView.swift in Sources */,
 				93CAD4A52C7CAFD100D0D340 /* CategoryModel.swift in Sources */,
 				9357DC922C8588A4000C0B44 /* MapView.swift in Sources */,
 				93CAD4A12C7CAEC200D0D340 /* HeaderView.swift in Sources */,

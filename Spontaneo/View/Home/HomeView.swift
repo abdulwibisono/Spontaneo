@@ -22,11 +22,6 @@ struct HomeView: View {
                             .fontWeight(.medium)
                         Spacer()
                     }
-                    
-                    Divider()
-                        .frame(width: 350)
-                        .frame(height: 2)
-                    
                 }
             } else {
                 Text("Location access denied")
