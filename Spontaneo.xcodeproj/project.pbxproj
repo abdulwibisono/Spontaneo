@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		933F48312C7CB628008FBB9A /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 933F48302C7CB628008FBB9A /* HomeViewModel.swift */; };
 		9357DC922C8588A4000C0B44 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC912C8588A4000C0B44 /* MapView.swift */; };
 		9357DC942C858B19000C0B44 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC932C858B19000C0B44 /* HomeView.swift */; };
 		9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC972C85F755000C0B44 /* ProfileView.swift */; };
@@ -22,7 +21,6 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		933F48302C7CB628008FBB9A /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
 		9357DC912C8588A4000C0B44 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		9357DC932C858B19000C0B44 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9357DC972C85F755000C0B44 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -48,15 +46,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		933F482F2C7CB61C008FBB9A /* ViewModel */ = {
-			isa = PBXGroup;
-			children = (
-				933F48302C7CB628008FBB9A /* HomeViewModel.swift */,
-				9357DC992C85F845000C0B44 /* LocationManager.swift */,
-			);
-			path = ViewModel;
-			sourceTree = "<group>";
-		};
 		9357DC9B2C860410000C0B44 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
@@ -78,6 +67,7 @@
 		9357DC9D2C860437000C0B44 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				9357DC992C85F845000C0B44 /* LocationManager.swift */,
 				9357DC912C8588A4000C0B44 /* MapView.swift */,
 			);
 			path = Services;
@@ -102,7 +92,6 @@
 		93CAD48B2C7CA88D00D0D340 /* Spontaneo */ = {
 			isa = PBXGroup;
 			children = (
-				933F482F2C7CB61C008FBB9A /* ViewModel */,
 				93CAD49D2C7CAE7600D0D340 /* Model */,
 				93CAD49A2C7CAE0900D0D340 /* View */,
 				93CAD48C2C7CA88D00D0D340 /* SpontaneoApp.swift */,
@@ -211,7 +200,6 @@
 			files = (
 				9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */,
 				93CAD4A72C7CB19800D0D340 /* MainView.swift in Sources */,
-				933F48312C7CB628008FBB9A /* HomeViewModel.swift in Sources */,
 				9357DC9A2C85F845000C0B44 /* LocationManager.swift in Sources */,
 				9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */,
 				9357DC942C858B19000C0B44 /* HomeView.swift in Sources */,
