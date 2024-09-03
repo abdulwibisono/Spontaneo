@@ -5,10 +5,9 @@ struct HomeView: View {
     @StateObject private var locationManager = LocationManager()
     
     var body: some View {
-        
-        HeaderView()
-        
         VStack {
+            HeaderView()
+            
             if locationManager.authorizationStatus == .authorizedWhenInUse || locationManager.authorizationStatus == .authorizedAlways {
                 VStack {
                     HStack {
@@ -26,9 +25,10 @@ struct HomeView: View {
             } else {
                 Text("Location access denied")
             }
+            
+            // Pass the location description as the address to MapView
+            MapView(address: locationManager.locationDescription)
         }
-        
-        MapView()
     }
 }
 

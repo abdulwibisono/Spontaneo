@@ -1,4 +1,5 @@
 import CoreLocation
+import Combine
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var locationManager = CLLocationManager()
@@ -20,6 +21,8 @@ class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
         
         if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
             locationManager.startUpdatingLocation()
+        } else {
+            locationDescription = "Location access denied"
         }
     }
     
