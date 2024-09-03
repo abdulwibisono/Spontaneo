@@ -10,15 +10,25 @@ struct ProfileView: View {
     
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
+            VStack(spacing: 0) {
                 profileHeader
-                infoSection
-                interestsSection
-                editProfileButton
+                    .background(
+                        LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                    )
+                
+                VStack(spacing: 20) {
+                    infoSection
+                    interestsSection
+                    editProfileButton
+                }
+                .padding()
+                .background(Color(.systemBackground))
+                .cornerRadius(30, corners: [.topLeft, .topRight])
+                .offset(y: -30)
             }
-            .padding()
         }
-        .navigationTitle("Profile")
+        .edgesIgnoringSafeArea(.top)
+        .navigationBarHidden(true)
         .sheet(isPresented: $showingEditProfile) {
             EditProfileView(viewModel: viewModel)
         }
@@ -26,6 +36,9 @@ struct ProfileView: View {
             Group {
                 if viewModel.isLoading {
                     ProgressView()
+                        .scaleEffect(1.5)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background(Color.black.opacity(0.4))
                 }
             }
         )
@@ -38,7 +51,7 @@ struct ProfileView: View {
     }
     
     private var profileHeader: some View {
-        VStack {
+        VStack(spacing: 16) {
             AsyncImage(url: viewModel.user.profileImageURL) { image in
                 image
                     .resizable()
@@ -46,43 +59,47 @@ struct ProfileView: View {
             } placeholder: {
                 Image(systemName: "person.circle.fill")
                     .resizable()
-                    .foregroundColor(.gray)
+                    .foregroundColor(.white.opacity(0.7))
             }
             .frame(width: 120, height: 120)
             .clipShape(Circle())
-            .overlay(Circle().stroke(Color.blue, lineWidth: 2))
-            .shadow(radius: 5)
+            .overlay(Circle().stroke(Color.white, lineWidth: 4))
+            .shadow(radius: 10)
             
             Text(viewModel.user.fullName)
-                .font(.title2)
-                .fontWeight(.bold)
+                .font(.system(size: 26, weight: .bold, design: .rounded))
+                .foregroundColor(.white)
             
             Text("@\(viewModel.user.username)")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+                .font(.system(size: 18, weight: .medium, design: .rounded))
+                .foregroundColor(.white.opacity(0.8))
         }
+        .padding(.top, 60)
+        .padding(.bottom, 50)
     }
     
     private var infoSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            InfoRow(icon: "envelope", title: "Email", value: viewModel.user.email)
+        VStack(alignment: .leading, spacing: 16) {
+            InfoRow(icon: "envelope.fill", title: "Email", value: viewModel.user.email)
             InfoRow(icon: "calendar", title: "Joined", value: viewModel.formattedJoinDate)
             InfoRow(icon: "text.quote", title: "Bio", value: viewModel.user.bio)
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
     }
     
     private var interestsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 12) {
             Text("Interests")
                 .font(.headline)
+                .foregroundColor(.secondary)
             
             FlowLayout(alignment: .leading, spacing: 8) {
                 ForEach(viewModel.user.interests, id: \.self) { interest in
                     Text(interest)
+                        .font(.system(size: 14, weight: .medium, design: .rounded))
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
                         .background(Color.blue.opacity(0.1))
@@ -92,9 +109,9 @@ struct ProfileView: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
     }
     
     private var editProfileButton: some View {
@@ -106,8 +123,11 @@ struct ProfileView: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.blue)
+                .background(
+                    LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .leading, endPoint: .trailing)
+                )
                 .cornerRadius(12)
+                .shadow(color: Color.blue.opacity(0.3), radius: 10, x: 0, y: 5)
         }
     }
 }
@@ -118,14 +138,14 @@ struct InfoRow: View {
     let value: String
     
     var body: some View {
-        HStack {
+        HStack(spacing: 12) {
             Image(systemName: icon)
                 .foregroundColor(.blue)
                 .frame(width: 30)
             
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text(title)
-                    .font(.caption)
+                    .font(.subheadline)
                     .foregroundColor(.secondary)
                 Text(value)
                     .font(.body)
@@ -207,9 +227,35 @@ struct ErrorWrapper: Identifiable {
     let id = UUID()
     let error: String
 }
+
+struct CornerRadiusStyle: ViewModifier {
+    var radius: CGFloat
+    var corners: UIRectCorner
+    
+    func body(content: Content) -> some View {
+        content
+            .clipShape(RoundedCorner(radius: radius, corners: corners))
+    }
+}
+
+struct RoundedCorner: Shape {
+    var radius: CGFloat = .infinity
+    var corners: UIRectCorner = .allCorners
+    
+    func path(in rect: CGRect) -> Path {
+        let path = UIBezierPath(roundedRect: rect, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+        return Path(path.cgPath)
+    }
+}
+
+extension View {
+    func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
+        ModifiedContent(content: self, modifier: CornerRadiusStyle(radius: radius, corners: corners))
+    }
+}
+
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        // Create a sample user with mock data
         let sampleUser = User(
             username: "johndoe",
             email: "john@example.com",
@@ -220,12 +266,8 @@ struct ProfileView_Previews: PreviewProvider {
             joinDate: Date()
         )
         
-        // Use the mock service for the preview
-        let viewModel = ProfileViewModel(user: sampleUser, userService: MockUserService())
-        
         return NavigationView {
             ProfileView(user: sampleUser)
         }
-        .environmentObject(viewModel)
     }
 }
