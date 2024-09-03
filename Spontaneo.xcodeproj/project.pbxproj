@@ -10,29 +10,27 @@
 		9357DC922C8588A4000C0B44 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC912C8588A4000C0B44 /* MapView.swift */; };
 		9357DC942C858B19000C0B44 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC932C858B19000C0B44 /* HomeView.swift */; };
 		9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC972C85F755000C0B44 /* ProfileView.swift */; };
-		9357DC9A2C85F845000C0B44 /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC992C85F845000C0B44 /* LocationManager.swift */; };
 		9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC9E2C86045E000C0B44 /* EditProfileView.swift */; };
+		9357DCA72C862CF7000C0B44 /* ContentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DCA62C862CF7000C0B44 /* ContentViewModel.swift */; };
 		93CAD48D2C7CA88D00D0D340 /* SpontaneoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CAD48C2C7CA88D00D0D340 /* SpontaneoApp.swift */; };
 		93CAD4912C7CA88F00D0D340 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93CAD4902C7CA88F00D0D340 /* Assets.xcassets */; };
 		93CAD4942C7CA88F00D0D340 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93CAD4932C7CA88F00D0D340 /* Preview Assets.xcassets */; };
 		93CAD4A12C7CAEC200D0D340 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CAD4A02C7CAEC200D0D340 /* HeaderView.swift */; };
 		93CAD4A52C7CAFD100D0D340 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CAD4A42C7CAFD100D0D340 /* CategoryModel.swift */; };
-		93CAD4A72C7CB19800D0D340 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CAD4A62C7CB19800D0D340 /* MainView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		9357DC912C8588A4000C0B44 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		9357DC932C858B19000C0B44 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9357DC972C85F755000C0B44 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
-		9357DC992C85F845000C0B44 /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		9357DC9E2C86045E000C0B44 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
+		9357DCA62C862CF7000C0B44 /* ContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewModel.swift; sourceTree = "<group>"; };
 		93CAD4892C7CA88D00D0D340 /* Spontaneo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spontaneo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		93CAD48C2C7CA88D00D0D340 /* SpontaneoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpontaneoApp.swift; sourceTree = "<group>"; };
 		93CAD4902C7CA88F00D0D340 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		93CAD4932C7CA88F00D0D340 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		93CAD4A02C7CAEC200D0D340 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		93CAD4A42C7CAFD100D0D340 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
-		93CAD4A62C7CB19800D0D340 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,7 +65,6 @@
 		9357DC9D2C860437000C0B44 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				9357DC992C85F845000C0B44 /* LocationManager.swift */,
 				9357DC912C8588A4000C0B44 /* MapView.swift */,
 			);
 			path = Services;
@@ -115,7 +112,6 @@
 				9357DC9D2C860437000C0B44 /* Services */,
 				9357DC9C2C86041F000C0B44 /* Home */,
 				9357DC9B2C860410000C0B44 /* Profile */,
-				93CAD4A62C7CB19800D0D340 /* MainView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -124,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				93CAD4A42C7CAFD100D0D340 /* CategoryModel.swift */,
+				9357DCA62C862CF7000C0B44 /* ContentViewModel.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -199,11 +196,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */,
-				93CAD4A72C7CB19800D0D340 /* MainView.swift in Sources */,
-				9357DC9A2C85F845000C0B44 /* LocationManager.swift in Sources */,
 				9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */,
 				9357DC942C858B19000C0B44 /* HomeView.swift in Sources */,
 				93CAD48D2C7CA88D00D0D340 /* SpontaneoApp.swift in Sources */,
+				9357DCA72C862CF7000C0B44 /* ContentViewModel.swift in Sources */,
 				93CAD4A52C7CAFD100D0D340 /* CategoryModel.swift in Sources */,
 				9357DC922C8588A4000C0B44 /* MapView.swift in Sources */,
 				93CAD4A12C7CAEC200D0D340 /* HeaderView.swift in Sources */,
@@ -340,8 +336,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Spontaneo/Preview Content\"";
+				DEVELOPMENT_TEAM = AZ3FM9MHX9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We want to access your location";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -368,8 +366,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Spontaneo/Preview Content\"";
+				DEVELOPMENT_TEAM = AZ3FM9MHX9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We want to access your location";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
