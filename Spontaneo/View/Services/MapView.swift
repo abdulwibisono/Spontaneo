@@ -12,7 +12,7 @@ struct MapView: View {
     @State private var location: LocationAnnotation?
 
     var body: some View {
-        Map(coordinateRegion: $region, annotationItems: [location].compactMap { $0 }) { annotation in
+        Map(coordinateRegion: $region, annotationItems: location != nil ? [location!] : []) { annotation in
             MapPin(coordinate: annotation.coordinate, tint: .red)
         }
         .onAppear {
@@ -29,13 +29,12 @@ struct MapView: View {
                 return
             }
             if let location = placemarks?.first?.location {
-                    self.location = LocationAnnotation(coordinate: location.coordinate)
-                    self.region.center = location.coordinate
-                }
+                self.location = LocationAnnotation(coordinate: location.coordinate)
+                self.region.center = location.coordinate
             }
         }
     }
-
+}
 
 struct LocationAnnotation: Identifiable {
     let id = UUID()

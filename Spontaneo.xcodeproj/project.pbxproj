@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		615390212C86068500E8EAEE /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615390202C86068500E8EAEE /* User.swift */; };
+		615390242C86D9EC00E8EAEE /*  ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615390232C86D9EC00E8EAEE /*  ProfileViewModel.swift */; };
 		9357DC922C8588A4000C0B44 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC912C8588A4000C0B44 /* MapView.swift */; };
 		9357DC942C858B19000C0B44 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC932C858B19000C0B44 /* HomeView.swift */; };
 		9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC972C85F755000C0B44 /* ProfileView.swift */; };
@@ -21,6 +23,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		615390202C86068500E8EAEE /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
+		615390232C86D9EC00E8EAEE /*  ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = " ProfileViewModel.swift"; sourceTree = "<group>"; };
 		9357DC912C8588A4000C0B44 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		9357DC932C858B19000C0B44 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9357DC972C85F755000C0B44 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -46,6 +50,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		615390222C86D9D600E8EAEE /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				615390232C86D9EC00E8EAEE /*  ProfileViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
 		9357DC9B2C860410000C0B44 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
@@ -92,6 +104,7 @@
 		93CAD48B2C7CA88D00D0D340 /* Spontaneo */ = {
 			isa = PBXGroup;
 			children = (
+				615390222C86D9D600E8EAEE /* ViewModels */,
 				93CAD49D2C7CAE7600D0D340 /* Model */,
 				93CAD49A2C7CAE0900D0D340 /* View */,
 				93CAD48C2C7CA88D00D0D340 /* SpontaneoApp.swift */,
@@ -124,6 +137,7 @@
 			isa = PBXGroup;
 			children = (
 				93CAD4A42C7CAFD100D0D340 /* CategoryModel.swift */,
+				615390202C86068500E8EAEE /* User.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -206,6 +220,8 @@
 				93CAD48D2C7CA88D00D0D340 /* SpontaneoApp.swift in Sources */,
 				93CAD4A52C7CAFD100D0D340 /* CategoryModel.swift in Sources */,
 				9357DC922C8588A4000C0B44 /* MapView.swift in Sources */,
+				615390212C86068500E8EAEE /* User.swift in Sources */,
+				615390242C86D9EC00E8EAEE /*  ProfileViewModel.swift in Sources */,
 				93CAD4A12C7CAEC200D0D340 /* HeaderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
