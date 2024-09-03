@@ -2,38 +2,96 @@ import SwiftUI
 
 struct HomeView: View {
     
-    @StateObject private var locationManager = LocationManager()
+    @State var selectedCategory = ""
     
     var body: some View {
-        VStack {
-            HeaderView()
+        
+        HeaderView()
+        
+        ZStack {
+            MapView().overlay(
+                CategoryListView
+                    .padding(.top, 20),
+                alignment: .top
+            )
             
-            if locationManager.authorizationStatus == .authorizedWhenInUse || locationManager.authorizationStatus == .authorizedAlways {
-                VStack {
+            VStack {
+                Spacer()
+                
+                HotSpots
+            }
+        }
+    }
+    
+    var HotSpots: some View {
+        VStack {
+            Text("What's in the Area")
+                .bold()
+            
+            HStack {
+                ScrollView(.horizontal, showsIndicators: false) {
                     HStack {
-                        Image(systemName: "mappin.circle.fill")
-                            .resizable()
-                            .frame(width: 25, height: 25)
-                            .foregroundColor(.red)
-                            .padding(.leading)
-                        
-                        Text(locationManager.locationDescription)
-                            .fontWeight(.medium)
-                        Spacer()
+                        HStack {
+                            ZStack {
+                                Rectangle()
+                                    .frame(width: 100, height: 100)
+                                    .background(Color.white)
+                                    .cornerRadius(15)
+                            }
+                            
+                            ZStack {
+                                Rectangle()
+                                    .frame(width: 100, height: 100)
+                                    .colorEffect(<#T##shader: Shader##Shader#>, isEnabled: true)
+                                    .cornerRadius(15)
+                            }
+                            
+                            ZStack {
+                                Rectangle()
+                                    .frame(width: 100, height: 100)
+                                    .background(Color.white)
+                                    .cornerRadius(15)
+                            }
+                            
+                            ZStack {
+                                Rectangle()
+                                    .frame(width: 100, height: 100)
+                                    .background(Color.white)
+                                    .cornerRadius(15)
+                            }
+                        }
+                        .padding(15)
                     }
                 }
-            } else {
-                Text("Location access denied")
             }
-            
-            // Pass the location description as the address to MapView
-            MapView(address: locationManager.locationDescription)
+        }
+    }
+    
+    var CategoryListView: some View {
+        HStack {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack {
+                    ForEach(categoryList, id: \.id) { item in
+                        HStack {
+                            Image(systemName: item.icon)
+                                .foregroundColor(selectedCategory == item.title ? .white : .black)
+                            
+                            Text(item.title)
+                                .foregroundColor(selectedCategory == item.title ? .white : .black)
+                        }
+                        .padding(15)
+                        .background(selectedCategory == item.title ? .cyan :
+                                .white)
+                        .clipShape(Capsule())
+                    }
+                }
+                .padding(.leading)
+                .padding(.trailing)
+            }
         }
     }
 }
 
-struct HomeView_Previews: PreviewProvider {
-    static var previews: some View {
-        HomeView()
-    }
+#Preview {
+    HomeView()
 }
