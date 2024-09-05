@@ -16,10 +16,12 @@ struct HeaderView: View {
                 
                 Spacer()
                 
-                Image(systemName: "person.crop.circle.fill")
-                    .font(.system(size:30))
-                    .frame(width: 200)
-                    .padding(.trailing, -40)
+                NavigationLink(destination: ProfileView(user: User.sampleUser)){
+                    Image(systemName: "person.crop.circle.fill")
+                        .font(.system(size:30))
+                        .frame(width: 200)
+                        .padding(.trailing, -40)
+                }
             }
         }
     }

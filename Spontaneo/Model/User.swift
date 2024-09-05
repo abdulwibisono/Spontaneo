@@ -31,4 +31,14 @@ struct User: Identifiable, Codable, Equatable {
         self.interests = interests
         self.joinDate = joinDate
     }
+    
+    static let sampleUser = User(
+        username: "johndoe",
+        email: "john@example.com",
+        fullName: "John Doe",
+        bio: "Software Developer with a passion for mobile apps.",
+        profileImageURL: URL(string: "https://example.com/profile.jpg"),
+        interests: ["Swift", "SwiftUI", "Combine"],
+        joinDate: Date()
+    )
 }
