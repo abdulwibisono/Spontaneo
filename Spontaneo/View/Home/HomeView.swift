@@ -1,21 +1,59 @@
 import SwiftUI
+import CoreLocation
+import MapKit
 
 struct HomeView: View {
     
     @State var selectedCategory = ""
+    @StateObject private var locationManager = LocationManager()
+    @State private var region = MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 37.3352, longitude: -122.0096),
+            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+        )
+    @State private var userTrackingMode: MapUserTrackingMode = .follow
     
     var body: some View {
         
         HeaderView()
         
         ZStack {
-            MapView().overlay(
-                CategoryListView
-                    .padding(.top, 20),
-                alignment: .top
+            Map(coordinateRegion: $region, showsUserLocation: true, userTrackingMode: $userTrackingMode)
+                .edgesIgnoringSafeArea(.all)
+                .onAppear {
+                    if let location = locationManager.location {
+                        region.center = location.coordinate
+                    }
+                }
+                .overlay(
+                    VStack {
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                if let location = locationManager.location {
+                                    withAnimation {
+                                        region.center = location.coordinate
+                                        userTrackingMode = .follow
+                                    }
+                                }
+                            }) {
+                                Image(systemName: "location.fill")
+                                    .padding()
+                                    .background(Color.white)
+                                    .clipShape(Circle())
+                                    .shadow(radius: 4)
+                            }
+                            .padding(.trailing)
+                        }
+                        .padding(.bottom)
+                        .padding(.top, 100)
+                        Spacer()
+                    }
             )
             
             VStack {
+                CategoryListView
+                .padding(.top, 20)
+                
                 Spacer()
                 
                 HotSpots
@@ -27,6 +65,8 @@ struct HomeView: View {
         VStack {
             Text("What's in the Area")
                 .bold()
+                .padding(.leading, -164)
+                .font(.system(size: 24))
             
             HStack {
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -34,29 +74,29 @@ struct HomeView: View {
                         HStack {
                             ZStack {
                                 Rectangle()
-                                    .frame(width: 100, height: 100)
-                                    .background(Color.white)
+                                    .frame(width: 200, height: 100)
+                                    .foregroundColor(.white)
                                     .cornerRadius(15)
                             }
                             
                             ZStack {
                                 Rectangle()
-                                    .frame(width: 100, height: 100)
-                                    .colorEffect(<#T##shader: Shader##Shader#>, isEnabled: true)
+                                    .frame(width: 200, height: 100)
+                                    .foregroundColor(.white)
                                     .cornerRadius(15)
                             }
                             
                             ZStack {
                                 Rectangle()
-                                    .frame(width: 100, height: 100)
-                                    .background(Color.white)
+                                    .frame(width: 200, height: 100)
+                                    .foregroundColor(.white)
                                     .cornerRadius(15)
                             }
                             
                             ZStack {
                                 Rectangle()
-                                    .frame(width: 100, height: 100)
-                                    .background(Color.white)
+                                    .frame(width: 200, height: 100)
+                                    .foregroundColor(.white)
                                     .cornerRadius(15)
                             }
                         }
