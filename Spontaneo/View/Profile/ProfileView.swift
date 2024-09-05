@@ -61,20 +61,20 @@ struct ProfileView: View {
                     .resizable()
                     .foregroundColor(.white.opacity(0.7))
             }
-            .frame(width: 120, height: 120)
+            .frame(width: 140, height: 140)
             .clipShape(Circle())
             .overlay(Circle().stroke(Color.white, lineWidth: 4))
-            .shadow(radius: 10)
+            .shadow(radius: 15)
             
             Text(viewModel.user.fullName)
-                .font(.system(size: 26, weight: .bold, design: .rounded))
+                .font(.system(size: 28, weight: .bold, design: .rounded))
                 .foregroundColor(.white)
             
             Text("@\(viewModel.user.username)")
                 .font(.system(size: 18, weight: .medium, design: .rounded))
                 .foregroundColor(.white.opacity(0.8))
         }
-        .padding(.top, 60)
+        .padding(.top, 80)
         .padding(.bottom, 50)
     }
     
@@ -86,8 +86,8 @@ struct ProfileView: View {
         }
         .padding()
         .background(Color(.secondarySystemBackground))
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
+        .cornerRadius(20)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
     private var interestsSection: some View {
@@ -96,7 +96,7 @@ struct ProfileView: View {
                 .font(.headline)
                 .foregroundColor(.secondary)
             
-            FlowLayout(alignment: .leading, spacing: 8) {
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 12) {
                 ForEach(viewModel.user.interests, id: \.self) { interest in
                     Text(interest)
                         .font(.system(size: 14, weight: .medium, design: .rounded))
@@ -110,8 +110,8 @@ struct ProfileView: View {
         }
         .padding()
         .background(Color(.secondarySystemBackground))
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.05), radius: 10, x: 0, y: 5)
+        .cornerRadius(20)
+        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
     private var editProfileButton: some View {
@@ -126,8 +126,8 @@ struct ProfileView: View {
                 .background(
                     LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .leading, endPoint: .trailing)
                 )
-                .cornerRadius(12)
-                .shadow(color: Color.blue.opacity(0.3), radius: 10, x: 0, y: 5)
+                .cornerRadius(15)
+                .shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 5)
         }
     }
 }
@@ -149,76 +149,8 @@ struct InfoRow: View {
                     .foregroundColor(.secondary)
                 Text(value)
                     .font(.body)
+                    .foregroundColor(.primary)
             }
-        }
-    }
-}
-
-struct FlowLayout: Layout {
-    var alignment: HorizontalAlignment = .center
-    var spacing: CGFloat = 8
-    
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let result = flowLayout(proposal.width ?? .infinity, subviews: subviews)
-        return result.size
-    }
-    
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        let result = flowLayout(bounds.width, subviews: subviews)
-        for (subview, position) in zip(subviews, result.positions) {
-            subview.place(at: position, anchor: .topLeading, proposal: .unspecified)
-        }
-    }
-    
-    private func flowLayout(_ width: CGFloat, subviews: Subviews) -> (size: CGSize, positions: [CGPoint]) {
-        var positions: [CGPoint] = []
-        var rowHeight: CGFloat = 0
-        var rowWidth: CGFloat = 0
-        var maxWidth: CGFloat = 0
-        var totalHeight: CGFloat = 0
-        var rowStartIndex = 0
-        
-        for (index, subview) in subviews.enumerated() {
-            let size = subview.sizeThatFits(.unspecified)
-            if rowWidth + size.width > width, !positions.isEmpty {
-                let rowXOffset = alignmentOffset(for: rowWidth, in: width)
-                for i in rowStartIndex..<index {
-                    positions[i].x += rowXOffset
-                }
-                
-                totalHeight += rowHeight + spacing
-                rowStartIndex = index
-                rowWidth = size.width
-                rowHeight = size.height
-            } else {
-                rowWidth += (index == rowStartIndex ? 0 : spacing) + size.width
-                rowHeight = max(rowHeight, size.height)
-            }
-            
-            positions.append(CGPoint(x: rowWidth - size.width, y: totalHeight))
-            maxWidth = max(maxWidth, rowWidth)
-        }
-        
-        let rowXOffset = alignmentOffset(for: rowWidth, in: width)
-        for i in rowStartIndex..<positions.count {
-            positions[i].x += rowXOffset
-        }
-        
-        totalHeight += rowHeight
-        
-        return (CGSize(width: maxWidth, height: totalHeight), positions)
-    }
-    
-    private func alignmentOffset(for rowWidth: CGFloat, in containerWidth: CGFloat) -> CGFloat {
-        switch alignment {
-        case .leading:
-            return 0
-        case .center:
-            return (containerWidth - rowWidth) / 2
-        case .trailing:
-            return containerWidth - rowWidth
-        default:
-            return 0
         }
     }
 }
@@ -251,5 +183,12 @@ struct RoundedCorner: Shape {
 extension View {
     func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
         ModifiedContent(content: self, modifier: CornerRadiusStyle(radius: radius, corners: corners))
+    }
+}
+
+struct ProfileView_Previews: PreviewProvider {
+    static var previews: some View {
+        ProfileView(user: User.sampleUser)
+            
     }
 }

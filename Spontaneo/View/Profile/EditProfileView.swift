@@ -148,8 +148,7 @@ struct EditProfileView: View {
     
     private func loadImage() {
         guard let inputImage = inputImage else { return }
-        print("Profile image updated")
-        // Implement your image update logic here
+        viewModel.updateProfileImage(inputImage)
     }
 }
 
