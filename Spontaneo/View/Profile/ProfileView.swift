@@ -253,21 +253,3 @@ extension View {
         ModifiedContent(content: self, modifier: CornerRadiusStyle(radius: radius, corners: corners))
     }
 }
-
-struct ProfileView_Previews: PreviewProvider {
-    static var previews: some View {
-        let sampleUser = User(
-            username: "johndoe",
-            email: "john@example.com",
-            fullName: "John Doe",
-            bio: "Software Developer with a passion for mobile apps.",
-            profileImageURL: URL(string: "https://example.com/profile.jpg"),
-            interests: ["Swift", "SwiftUI", "Combine"],
-            joinDate: Date()
-        )
-        
-        return NavigationView {
-            ProfileView(user: sampleUser)
-        }
-    }
-}
