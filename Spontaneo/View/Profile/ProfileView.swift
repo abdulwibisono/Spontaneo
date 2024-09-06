@@ -19,6 +19,7 @@ struct ProfileView: View {
                 VStack(spacing: 20) {
                     infoSection
                     interestsSection
+                    activityHistoryButton
                     editProfileButton
                 }
                 .padding()
@@ -128,6 +129,19 @@ struct ProfileView: View {
                 )
                 .cornerRadius(15)
                 .shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 5)
+        }
+    }
+    
+    private var activityHistoryButton: some View {
+        NavigationLink(destination: Text("Activity History View")) {
+            HStack {
+                Text("Activity History")
+                Spacer()
+                Image(systemName: "chevron.right")
+            }
+            .padding()
+            .background(Color(.secondarySystemBackground))
+            .cornerRadius(10)
         }
     }
 }

@@ -6,39 +6,33 @@ struct User: Identifiable, Codable, Equatable {
     var email: String
     var fullName: String
     var bio: String
-    var profileImageURL: URL?
     var interests: [String]
+    var profileImageURL: URL?
     var joinDate: Date
-    
-    enum CodingKeys: String, CodingKey {
-        case id, username, email, fullName, bio, profileImageURL, interests, joinDate
+    var activities: [ActivityReference]
+
+    struct ActivityReference: Codable, Equatable {
+        let id: String
+        let title: String
+        let date: Date
     }
-    
-    init(id: String = UUID().uuidString,
-         username: String,
-         email: String,
-         fullName: String,
-         bio: String = "",
-         profileImageURL: URL? = nil,
-         interests: [String] = [],
-         joinDate: Date = Date()) {
-        self.id = id
-        self.username = username
-        self.email = email
-        self.fullName = fullName
-        self.bio = bio
-        self.profileImageURL = profileImageURL
-        self.interests = interests
-        self.joinDate = joinDate
+
+    static func == (lhs: User, rhs: User) -> Bool {
+        return lhs.id == rhs.id
     }
-    
-    static let sampleUser = User(
-        username: "johndoe",
-        email: "john@example.com",
-        fullName: "John Doe",
-        bio: "Software Developer with a passion for mobile apps.",
-        profileImageURL: URL(string: "https://example.com/profile.jpg"),
-        interests: ["Swift", "SwiftUI", "Combine"],
-        joinDate: Date()
-    )
+
+    static var sampleUser: User {
+        User(id: "sample",
+             username: "johndoe",
+             email: "john@example.com",
+             fullName: "John Doe",
+             bio: "I love outdoor activities!",
+             interests: ["Hiking", "Photography", "Cooking"],
+             profileImageURL: URL(string: "https://example.com/profile.jpg"),
+             joinDate: Date(),
+             activities: [
+                ActivityReference(id: "act1", title: "Hiking Trip", date: Date()),
+                ActivityReference(id: "act2", title: "Cooking Class", date: Date())
+             ])
+    }
 }

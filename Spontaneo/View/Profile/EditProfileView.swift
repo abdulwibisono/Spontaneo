@@ -235,13 +235,15 @@ struct ImagePicker: UIViewControllerRepresentable {
 struct EditProfileView_Previews: PreviewProvider {
     static var previews: some View {
         let sampleUser = User(
+            id: UUID().uuidString,
             username: "johndoe",
             email: "john@example.com",
             fullName: "John Doe",
             bio: "Software Developer with a passion for mobile apps.",
-            profileImageURL: URL(string: "https://example.com/profile.jpg"),
             interests: ["Swift", "SwiftUI", "Combine"],
-            joinDate: Date()
+            profileImageURL: URL(string: "https://example.com/profile.jpg"),
+            joinDate: Date(),
+            activities: []
         )
         
         let viewModel = ProfileViewModel(user: sampleUser)
