@@ -13,9 +13,6 @@ struct HomeView: View {
     @State private var userTrackingMode: MapUserTrackingMode = .follow
     
     var body: some View {
-        
-        HeaderView()
-        
         ZStack {
             Map(coordinateRegion: $region, showsUserLocation: true, userTrackingMode: $userTrackingMode)
                 .edgesIgnoringSafeArea(.all)
@@ -45,7 +42,7 @@ struct HomeView: View {
                             .padding(.trailing)
                         }
                         .padding(.bottom)
-                        .padding(.top, 100)
+                        .padding(.top, 90)
                         Spacer()
                     }
             )
@@ -56,7 +53,7 @@ struct HomeView: View {
                 
                 Spacer()
                 
-                HotSpots
+                HeaderView()
             }
         }
     }

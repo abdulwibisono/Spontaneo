@@ -7,23 +7,44 @@ struct HeaderView: View {
     @State private var showSearchResults = false
     
     var body: some View {
-        VStack {
-            HStack {
-                Text("**Spontaneo**")
-                    .font(.system(size:30))
-                    .frame(width: 200)
-                    .padding(.leading, -5)
-                
-                Spacer()
-                
-                NavigationLink(destination: ProfileView(user: User.sampleUser)){
-                    Image(systemName: "person.crop.circle.fill")
-                        .font(.system(size:30))
-                        .frame(width: 200)
-                        .padding(.trailing, -40)
+        HStack {
+            Spacer()
+            
+            NavigationLink(destination: HomeView()){
+                VStack {
+                    Image(systemName: "gift.fill")
+                    Text("Home")
                 }
             }
+            
+            Spacer()
+            
+            NavigationLink(destination: RewardsView()){
+                VStack {
+                    Image(systemName: "gift.fill")
+                    Text("Rewards")
+                }
+            }
+            
+            Spacer()
+            
+            VStack {
+                Image(systemName: "gift.fill")
+                Text("Activity")
+            }
+            
+            Spacer()
+            
+            NavigationLink(destination: ProfileView(user: User.sampleUser)) {
+                VStack {
+                    Image(systemName: "gift.fill")
+                    Text("Profile")
+                }
+            }
+            
+            Spacer()
         }
+        .background(.blue)
     }
 }
 
