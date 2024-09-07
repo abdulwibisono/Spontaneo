@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		615390212C86068500E8EAEE /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615390202C86068500E8EAEE /* User.swift */; };
 		615390242C86D9EC00E8EAEE /*  ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615390232C86D9EC00E8EAEE /*  ProfileViewModel.swift */; };
+		6186D5332C8C15120003048F /* Rewards in Resources */ = {isa = PBXBuildFile; fileRef = 6186D5322C8C15120003048F /* Rewards */; };
+		6186D5352C8C15200003048F /* Reward.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6186D5342C8C15200003048F /* Reward.swift */; };
+		6186D5372C8C15600003048F /* RewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6186D5362C8C15600003048F /* RewardsView.swift */; };
 		932BF88C2C88AF5D001B1EFD /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932BF88B2C88AF5D001B1EFD /* LocationManager.swift */; };
 		9357DC942C858B19000C0B44 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC932C858B19000C0B44 /* HomeView.swift */; };
 		9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC972C85F755000C0B44 /* ProfileView.swift */; };
@@ -23,6 +26,9 @@
 /* Begin PBXFileReference section */
 		615390202C86068500E8EAEE /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		615390232C86D9EC00E8EAEE /*  ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = " ProfileViewModel.swift"; sourceTree = "<group>"; };
+		6186D5322C8C15120003048F /* Rewards */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Rewards; sourceTree = "<group>"; };
+		6186D5342C8C15200003048F /* Reward.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reward.swift; sourceTree = "<group>"; };
+		6186D5362C8C15600003048F /* RewardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RewardsView.swift; path = Spontaneo/View/Rewards/RewardsView.swift; sourceTree = "<group>"; };
 		932BF88B2C88AF5D001B1EFD /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		9357DC932C858B19000C0B44 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9357DC972C85F755000C0B44 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
@@ -92,6 +98,7 @@
 		93CAD4802C7CA88D00D0D340 = {
 			isa = PBXGroup;
 			children = (
+				6186D5362C8C15600003048F /* RewardsView.swift */,
 				93CAD48B2C7CA88D00D0D340 /* Spontaneo */,
 				93CAD48A2C7CA88D00D0D340 /* Products */,
 				932BF88A2C8725E7001B1EFD /* Recovered References */,
@@ -130,6 +137,7 @@
 		93CAD49A2C7CAE0900D0D340 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				6186D5322C8C15120003048F /* Rewards */,
 				9357DC9D2C860437000C0B44 /* Services */,
 				9357DC9C2C86041F000C0B44 /* Home */,
 				9357DC9B2C860410000C0B44 /* Profile */,
@@ -140,6 +148,7 @@
 		93CAD49D2C7CAE7600D0D340 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				6186D5342C8C15200003048F /* Reward.swift */,
 				93CAD4A42C7CAFD100D0D340 /* CategoryModel.swift */,
 				615390202C86068500E8EAEE /* User.swift */,
 			);
@@ -204,6 +213,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6186D5332C8C15120003048F /* Rewards in Resources */,
 				93CAD4942C7CA88F00D0D340 /* Preview Assets.xcassets in Resources */,
 				93CAD4912C7CA88F00D0D340 /* Assets.xcassets in Resources */,
 			);
@@ -216,10 +226,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6186D5372C8C15600003048F /* RewardsView.swift in Sources */,
 				9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */,
 				9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */,
 				932BF88C2C88AF5D001B1EFD /* LocationManager.swift in Sources */,
 				9357DC942C858B19000C0B44 /* HomeView.swift in Sources */,
+				6186D5352C8C15200003048F /* Reward.swift in Sources */,
 				93CAD48D2C7CA88D00D0D340 /* SpontaneoApp.swift in Sources */,
 				93CAD4A52C7CAFD100D0D340 /* CategoryModel.swift in Sources */,
 				615390212C86068500E8EAEE /* User.swift in Sources */,
