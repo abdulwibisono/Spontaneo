@@ -15,10 +15,14 @@
 		9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC972C85F755000C0B44 /* ProfileView.swift */; };
 		9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC9E2C86045E000C0B44 /* EditProfileView.swift */; };
 		93B5186A2C8C8706007EFF6C /* RewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B518692C8C8706007EFF6C /* RewardsView.swift */; };
+		93B5186F2C8CA37D007EFF6C /* AppTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B5186E2C8CA37D007EFF6C /* AppTabBarView.swift */; };
+		93B518712C8CA39E007EFF6C /* CustomTabBarContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B518702C8CA39D007EFF6C /* CustomTabBarContainerView.swift */; };
+		93B518732C8CA3BF007EFF6C /* CustomTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B518722C8CA3BF007EFF6C /* CustomTabBarView.swift */; };
+		93B518752C8CA3D2007EFF6C /* TabBarItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B518742C8CA3D2007EFF6C /* TabBarItem.swift */; };
+		93B518772C8CA3EA007EFF6C /* TabBarItemsPreferenceKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B518762C8CA3EA007EFF6C /* TabBarItemsPreferenceKey.swift */; };
 		93CAD48D2C7CA88D00D0D340 /* SpontaneoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CAD48C2C7CA88D00D0D340 /* SpontaneoApp.swift */; };
 		93CAD4912C7CA88F00D0D340 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93CAD4902C7CA88F00D0D340 /* Assets.xcassets */; };
 		93CAD4942C7CA88F00D0D340 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93CAD4932C7CA88F00D0D340 /* Preview Assets.xcassets */; };
-		93CAD4A12C7CAEC200D0D340 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CAD4A02C7CAEC200D0D340 /* HeaderView.swift */; };
 		93CAD4A52C7CAFD100D0D340 /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CAD4A42C7CAFD100D0D340 /* CategoryModel.swift */; };
 /* End PBXBuildFile section */
 
@@ -32,11 +36,15 @@
 		9357DC9E2C86045E000C0B44 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
 		9357DCA62C862CF7000C0B44 /* ContentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewModel.swift; sourceTree = "<group>"; };
 		93B518692C8C8706007EFF6C /* RewardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsView.swift; sourceTree = "<group>"; };
+		93B5186E2C8CA37D007EFF6C /* AppTabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTabBarView.swift; sourceTree = "<group>"; };
+		93B518702C8CA39D007EFF6C /* CustomTabBarContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBarContainerView.swift; sourceTree = "<group>"; };
+		93B518722C8CA3BF007EFF6C /* CustomTabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTabBarView.swift; sourceTree = "<group>"; };
+		93B518742C8CA3D2007EFF6C /* TabBarItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarItem.swift; sourceTree = "<group>"; };
+		93B518762C8CA3EA007EFF6C /* TabBarItemsPreferenceKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarItemsPreferenceKey.swift; sourceTree = "<group>"; };
 		93CAD4892C7CA88D00D0D340 /* Spontaneo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Spontaneo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		93CAD48C2C7CA88D00D0D340 /* SpontaneoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpontaneoApp.swift; sourceTree = "<group>"; };
 		93CAD4902C7CA88F00D0D340 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		93CAD4932C7CA88F00D0D340 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		93CAD4A02C7CAEC200D0D340 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		93CAD4A42C7CAFD100D0D340 /* CategoryModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -79,7 +87,6 @@
 		9357DC9C2C86041F000C0B44 /* Home */ = {
 			isa = PBXGroup;
 			children = (
-				93CAD4A02C7CAEC200D0D340 /* HeaderView.swift */,
 				9357DC932C858B19000C0B44 /* HomeView.swift */,
 			);
 			path = Home;
@@ -99,6 +106,18 @@
 				93B518692C8C8706007EFF6C /* RewardsView.swift */,
 			);
 			path = Rewards;
+			sourceTree = "<group>";
+		};
+		93B5186D2C8CA2E8007EFF6C /* NavBar */ = {
+			isa = PBXGroup;
+			children = (
+				93B5186E2C8CA37D007EFF6C /* AppTabBarView.swift */,
+				93B518702C8CA39D007EFF6C /* CustomTabBarContainerView.swift */,
+				93B518722C8CA3BF007EFF6C /* CustomTabBarView.swift */,
+				93B518742C8CA3D2007EFF6C /* TabBarItem.swift */,
+				93B518762C8CA3EA007EFF6C /* TabBarItemsPreferenceKey.swift */,
+			);
+			path = NavBar;
 			sourceTree = "<group>";
 		};
 		93CAD4802C7CA88D00D0D340 = {
@@ -142,6 +161,7 @@
 		93CAD49A2C7CAE0900D0D340 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				93B5186D2C8CA2E8007EFF6C /* NavBar */,
 				93B518682C8C86FD007EFF6C /* Rewards */,
 				9357DC9D2C860437000C0B44 /* Services */,
 				9357DC9C2C86041F000C0B44 /* Home */,
@@ -230,17 +250,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93B5186F2C8CA37D007EFF6C /* AppTabBarView.swift in Sources */,
 				9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */,
 				9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */,
 				932BF88C2C88AF5D001B1EFD /* LocationManager.swift in Sources */,
+				93B518752C8CA3D2007EFF6C /* TabBarItem.swift in Sources */,
 				9357DC942C858B19000C0B44 /* HomeView.swift in Sources */,
 				6186D5352C8C15200003048F /* Reward.swift in Sources */,
 				93B5186A2C8C8706007EFF6C /* RewardsView.swift in Sources */,
+				93B518712C8CA39E007EFF6C /* CustomTabBarContainerView.swift in Sources */,
+				93B518772C8CA3EA007EFF6C /* TabBarItemsPreferenceKey.swift in Sources */,
 				93CAD48D2C7CA88D00D0D340 /* SpontaneoApp.swift in Sources */,
+				93B518732C8CA3BF007EFF6C /* CustomTabBarView.swift in Sources */,
 				93CAD4A52C7CAFD100D0D340 /* CategoryModel.swift in Sources */,
 				615390212C86068500E8EAEE /* User.swift in Sources */,
 				615390242C86D9EC00E8EAEE /*  ProfileViewModel.swift in Sources */,
-				93CAD4A12C7CAEC200D0D340 /* HeaderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
