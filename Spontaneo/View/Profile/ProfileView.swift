@@ -15,13 +15,10 @@ struct ProfileView: View {
                 profileHeader
                 
                 CustomTabView(selectedTab: $selectedTab)
-                    .padding(.top) // Add top padding to the CustomTabView
+                    .padding(.top, 10)
+                    .padding(.horizontal)
                 
                 tabContent
-                    .padding()
-                    .background(Color(.systemBackground))
-                    .cornerRadius(30, corners: [.topLeft, .topRight])
-                    .padding(.top) // Add top padding to the tabContent
             }
         }
         .edgesIgnoringSafeArea(.top)
@@ -41,7 +38,7 @@ struct ProfileView: View {
     
     private var profileHeader: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.purple.opacity(0.7)]), startPoint: .topLeading, endPoint: .bottomTrailing)
             
             VStack(spacing: 20) {
                 AsyncImage(url: viewModel.user.profileImageURL) { image in
@@ -51,31 +48,56 @@ struct ProfileView: View {
                 } placeholder: {
                     Image(systemName: "person.circle.fill")
                         .resizable()
-                        .foregroundColor(.white.opacity(0.7))
+                        .foregroundColor(.white)
                 }
-                .frame(width: 120, height: 120)
+                .frame(width: 140, height: 140)
                 .clipShape(Circle())
                 .overlay(Circle().stroke(Color.white, lineWidth: 4))
                 .shadow(radius: 10)
+                .overlay(
+                    Image(systemName: "camera.circle.fill")
+                        .foregroundColor(.blue)
+                        .background(Color.white)
+                        .clipShape(Circle())
+                        .offset(x: 50, y: 50)
+                )
                 
-                VStack(spacing: 8) {
+                VStack(spacing: 4) {
                     Text(viewModel.user.fullName)
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundColor(.white)
                     
                     Text("@\(viewModel.user.username)")
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .font(.system(size: 18, weight: .medium, design: .rounded))
                         .foregroundColor(.white.opacity(0.9))
+                }
+                
+                HStack(spacing: 20) {
+                    Button(action: {}) {
+                        Label("Message", systemImage: "message.fill")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
+                    
+                    Button(action: {}) {
+                        Label("Follow", systemImage: "person.badge.plus")
+                    }
+                    .buttonStyle(PrimaryButtonStyle())
                 }
             }
             .padding(.top, 60)
             .padding(.bottom, 30)
         }
-        .frame(height: 300)
+        .frame(height: 380)
     }
     
     private var tabContent: some View {
-        VStack(spacing: 20) {
+        VStack(alignment: .leading, spacing: 20) {
+            Text(tabTitle)
+                .font(.headline)
+                .foregroundColor(.secondary)
+                .padding(.horizontal)
+                .padding(.top, 20)
+            
             switch selectedTab {
             case 0:
                 infoSection
@@ -87,7 +109,17 @@ struct ProfileView: View {
                 EmptyView()
             }
         }
-        .animation(.default, value: selectedTab)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.bottom, 20)
+    }
+    
+    private var tabTitle: String {
+        switch selectedTab {
+        case 0: return "Info"
+        case 1: return "Interests"
+        case 2: return "Activity"
+        default: return ""
+        }
     }
     
     private var infoSection: some View {
@@ -96,42 +128,26 @@ struct ProfileView: View {
             InfoRow(icon: "calendar", title: "Joined", value: viewModel.formattedJoinDate)
             InfoRow(icon: "text.quote", title: "Bio", value: viewModel.user.bio)
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        .padding(.horizontal)
     }
     
     private var interestsSection: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Interests")
-                .font(.headline)
-                .foregroundColor(.secondary)
-            
-            FlowLayout(alignment: .leading, spacing: 8) {
-                ForEach(viewModel.user.interests, id: \.self) { interest in
-                    Text(interest)
-                        .font(.system(size: 14, weight: .medium, design: .rounded))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.blue.opacity(0.1))
-                        .foregroundColor(.blue)
-                        .cornerRadius(20)
-                }
+        FlowLayout(alignment: .leading, spacing: 8) {
+            ForEach(viewModel.user.interests, id: \.self) { interest in
+                Text(interest)
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color.blue.opacity(0.1))
+                    .foregroundColor(.blue)
+                    .cornerRadius(20)
             }
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        .padding(.horizontal)
     }
     
     private var activityHistorySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("Recent Activity")
-                .font(.headline)
-                .foregroundColor(.secondary)
-            
             ForEach(viewModel.user.activities.prefix(3), id: \.id) { activity in
                 HStack {
                     Text(activity.title)
@@ -150,10 +166,7 @@ struct ProfileView: View {
                     .foregroundColor(.blue)
             }
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        .padding(.horizontal)
     }
     
     private var editProfileButton: some View {
@@ -203,31 +216,35 @@ struct ProfileView: View {
 
 struct CustomTabView: View {
     @Binding var selectedTab: Int
-    let tabs = ["Info", "Interests", "Activity"]
+    let tabs = [
+        ("Info", "info.circle"),
+        ("Interests", "star"),
+        ("Activity", "chart.bar")
+    ]
     
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             ForEach(0..<tabs.count, id: \.self) { index in
                 Button(action: {
                     withAnimation {
                         selectedTab = index
                     }
                 }) {
-                    Text(tabs[index])
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
-                        .padding(.vertical, 10)
-                        .padding(.horizontal, 20)
-                        .background(selectedTab == index ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTab == index ? .white : .primary)
-                        .cornerRadius(20)
+                    VStack(spacing: 4) {
+                        Image(systemName: tabs[index].1)
+                        Text(tabs[index].0)
+                    }
+                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity)
+                    .foregroundColor(selectedTab == index ? .white : .primary)
+                    .background(selectedTab == index ? Color.blue : Color.clear)
+                    .cornerRadius(20)
                 }
             }
         }
-        .padding(.vertical, 10)
-        .background(Color(.systemBackground))
-        .cornerRadius(25)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
-        .padding(.horizontal)
+        .padding(4)
+        .background(Color.clear)
     }
 }
 
@@ -286,7 +303,7 @@ extension View {
 }
 
 struct FlowLayout: Layout {
-    var alignment: HorizontalAlignment = .center
+    var alignment: HorizontalAlignment = .leading
     var spacing: CGFloat = 8
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
@@ -356,6 +373,27 @@ struct FlowLayout: Layout {
                 size.height += row.frame.height + (rows.count > 1 ? spacing : 0)
             }
         }
+    }
+}
+
+struct StandardSectionStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .padding(20)
+            .frame(height: 200)
+    }
+}
+
+struct PrimaryButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .padding(.vertical, 10)
+            .padding(.horizontal, 20)
+            .background(Color.white)
+            .foregroundColor(.blue)
+            .cornerRadius(20)
+            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+            .scaleEffect(configuration.isPressed ? 0.95 : 1)
     }
 }
 
