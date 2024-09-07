@@ -3,6 +3,7 @@ import SwiftUI
 struct ProfileView: View {
     @StateObject private var viewModel: ProfileViewModel
     @State private var showingEditProfile = false
+    @State private var selectedTab = 0
     
     init(user: User) {
         _viewModel = StateObject(wrappedValue: ProfileViewModel(user: user))
@@ -13,33 +14,23 @@ struct ProfileView: View {
             VStack(spacing: 0) {
                 profileHeader
                 
-                VStack(spacing: 20) {
-                    infoSection
-                    interestsSection
-                    activityHistorySection
-                    editProfileButton
-                }
-                .padding()
-                .background(Color(.systemBackground))
-                .cornerRadius(30, corners: [.topLeft, .topRight])
-                .offset(y: -30)
+                CustomTabView(selectedTab: $selectedTab)
+                    .padding(.top) // Add top padding to the CustomTabView
+                
+                tabContent
+                    .padding()
+                    .background(Color(.systemBackground))
+                    .cornerRadius(30, corners: [.topLeft, .topRight])
+                    .padding(.top) // Add top padding to the tabContent
             }
         }
         .edgesIgnoringSafeArea(.top)
         .navigationBarHidden(true)
+        .overlay(editProfileButton, alignment: .bottomTrailing)
         .sheet(isPresented: $showingEditProfile) {
             EditProfileView(viewModel: viewModel)
         }
-        .overlay(
-            Group {
-                if viewModel.isLoading {
-                    ProgressView()
-                        .scaleEffect(1.5)
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .background(Color.black.opacity(0.4))
-                }
-            }
-        )
+        .overlay(loadingOverlay)
         .alert(item: Binding(
             get: { viewModel.errorMessage.map { ErrorWrapper(error: $0) } },
             set: { _ in viewModel.errorMessage = nil }
@@ -49,36 +40,54 @@ struct ProfileView: View {
     }
     
     private var profileHeader: some View {
-        VStack(spacing: 20) {
-            AsyncImage(url: viewModel.user.profileImageURL) { image in
-                image
-                    .resizable()
-                    .scaledToFill()
-            } placeholder: {
-                Image(systemName: "person.circle.fill")
-                    .resizable()
-                    .foregroundColor(.white.opacity(0.7))
-            }
-            .frame(width: 160, height: 160)
-            .clipShape(Circle())
-            .overlay(Circle().stroke(Color.white, lineWidth: 4))
-            .shadow(radius: 10)
+        ZStack {
+            LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .topLeading, endPoint: .bottomTrailing)
             
-            VStack(spacing: 8) {
-                Text(viewModel.user.fullName)
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundColor(.white)
+            VStack(spacing: 20) {
+                AsyncImage(url: viewModel.user.profileImageURL) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                } placeholder: {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .foregroundColor(.white.opacity(0.7))
+                }
+                .frame(width: 120, height: 120)
+                .clipShape(Circle())
+                .overlay(Circle().stroke(Color.white, lineWidth: 4))
+                .shadow(radius: 10)
                 
-                Text("@\(viewModel.user.username)")
-                    .font(.system(size: 18, weight: .medium, design: .rounded))
-                    .foregroundColor(.white.opacity(0.9))
+                VStack(spacing: 8) {
+                    Text(viewModel.user.fullName)
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    
+                    Text("@\(viewModel.user.username)")
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .foregroundColor(.white.opacity(0.9))
+                }
+            }
+            .padding(.top, 60)
+            .padding(.bottom, 30)
+        }
+        .frame(height: 300)
+    }
+    
+    private var tabContent: some View {
+        VStack(spacing: 20) {
+            switch selectedTab {
+            case 0:
+                infoSection
+            case 1:
+                interestsSection
+            case 2:
+                activityHistorySection
+            default:
+                EmptyView()
             }
         }
-        .padding(.top, 60)
-        .padding(.bottom, 30)
-        .background(
-            LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .topLeading, endPoint: .bottomTrailing)
-        )
+        .animation(.default, value: selectedTab)
     }
     
     private var infoSection: some View {
@@ -147,29 +156,78 @@ struct ProfileView: View {
         .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
+    private var editProfileButton: some View {
+        Button(action: {
+            showingEditProfile = true
+        }) {
+            HStack {
+                Image(systemName: "pencil")
+                    .font(.system(size: 16, weight: .semibold))
+                Text("Edit Profile")
+                    .font(.system(size: 16, weight: .semibold))
+            }
+            .foregroundColor(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(
+                LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing)
+            )
+            .cornerRadius(20)
+            .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
+        }
+        .padding(.trailing, 20)
+        .padding(.bottom, 20)
+    }
+    
+    private var loadingOverlay: some View {
+        Group {
+            if viewModel.isLoading {
+                Color.black.opacity(0.4)
+                    .edgesIgnoringSafeArea(.all)
+                    .overlay(
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    )
+            }
+        }
+    }
+    
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter.string(from: date)
     }
+}
+
+struct CustomTabView: View {
+    @Binding var selectedTab: Int
+    let tabs = ["Info", "Interests", "Activity"]
     
-    private var editProfileButton: some View {
-        Button(action: {
-            showingEditProfile = true
-        }) {
-            Text("Edit Profile")
-                .font(.headline)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .leading, endPoint: .trailing)
-                )
-                .cornerRadius(15)
-                .shadow(color: Color.blue.opacity(0.4), radius: 10, x: 0, y: 5)
+    var body: some View {
+        HStack {
+            ForEach(0..<tabs.count, id: \.self) { index in
+                Button(action: {
+                    withAnimation {
+                        selectedTab = index
+                    }
+                }) {
+                    Text(tabs[index])
+                        .font(.system(size: 16, weight: .medium, design: .rounded))
+                        .padding(.vertical, 10)
+                        .padding(.horizontal, 20)
+                        .background(selectedTab == index ? Color.blue : Color.clear)
+                        .foregroundColor(selectedTab == index ? .white : .primary)
+                        .cornerRadius(20)
+                }
+            }
         }
-        .padding(.top, 20)
+        .padding(.vertical, 10)
+        .background(Color(.systemBackground))
+        .cornerRadius(25)
+        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .padding(.horizontal)
     }
 }
 
