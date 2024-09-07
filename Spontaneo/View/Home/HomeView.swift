@@ -15,6 +15,7 @@ struct HomeView: View {
     var body: some View {
         ZStack {
             Map(coordinateRegion: $region, showsUserLocation: true, userTrackingMode: $userTrackingMode)
+                .edgesIgnoringSafeArea(.all)
                 .onAppear {
                     if let location = locationManager.location {
                         region.center = location.coordinate
@@ -122,7 +123,7 @@ struct HomeView: View {
                 .padding(.leading)
                 .padding(.trailing)
             }
-        }
+        }.padding(.top, 40)
     }
 }
 
