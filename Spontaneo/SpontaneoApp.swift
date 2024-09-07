@@ -6,16 +6,23 @@ struct SpontaneoApp: App {
         WindowGroup {
             TabView {
                 HomeView()
-                    .tabItem {
-                        Label("Home", systemImage: "house")
+                    .tabItem{
+                        Label("", systemImage: "house.fill")
                     }
+                
                 RewardsView()
-                    .tabItem {
-                        Label("Rewards", systemImage: "gift")
+                    .tabItem{
+                        Label("", systemImage: "gift.fill")
                     }
+                
                 ProfileView(user: User.sampleUser)
-                    .tabItem {
-                        Label("Profile", systemImage: "person")
+                    .tabItem{
+                        Label("", systemImage: "person.fill")
+                    }
+                
+                ProfileView(user: User.sampleUser)
+                    .tabItem{
+                        Label("", systemImage: "person.fill")
                     }
             }
         }
