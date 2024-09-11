@@ -4,37 +4,45 @@ struct RewardsView: View {
     @State private var rewards = sampleRewards
     @State private var selectedReward: Reward?
     @State private var showingRewardDetail = false
+    @State private var totalPoints = 1250 // Example total points
+    @State private var nextRewardPoints = 2000 // Example points needed for next reward
     
     var body: some View {
         NavigationView {
             ScrollView {
-                VStack(spacing: 20) {
+                VStack(spacing: 0) {
                     headerView
                     
-                    VStack(spacing: 20) {
+                    VStack(spacing: 24) {
+                        pointsProgressView
                         availableRewardsSection
                         rewardHistorySection
                         howToEarnSection
                     }
-                    .padding()
+                    .padding(.horizontal)
+                    .padding(.top, 30)
                     .background(Color(.systemBackground))
                     .cornerRadius(30, corners: [.topLeft, .topRight])
                     .offset(y: -30)
                 }
             }
             .background(
-                LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]),
+                               startPoint: .topLeading,
+                               endPoint: .bottomTrailing)
+                    .ignoresSafeArea()
             )
-            .edgesIgnoringSafeArea(.top)
             .navigationBarHidden(true)
         }
         .sheet(item: $selectedReward) { reward in
-            RewardDetailView(reward: reward)
+            NavigationView {
+                RewardDetailView(reward: reward)
+            }
         }
     }
     
     private var headerView: some View {
-        VStack {
+        VStack(spacing: 16) {
             Text("Rewards")
                 .font(.system(size: 36, weight: .bold, design: .rounded))
                 .foregroundColor(.white)
@@ -43,7 +51,31 @@ struct RewardsView: View {
                 .foregroundColor(.white.opacity(0.8))
         }
         .padding(.top, 60)
-        .padding(.bottom, 30)
+        .padding(.bottom, 50)
+    }
+    
+    private var pointsProgressView: some View {
+        VStack(spacing: 12) {
+            HStack {
+                Text("\(totalPoints) pts")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                Spacer()
+                Text("\(nextRewardPoints) pts")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+            }
+            
+            ProgressView(value: Float(totalPoints), total: Float(nextRewardPoints))
+                .progressViewStyle(RoundedRectProgressViewStyle())
+            
+            Text("You're \(nextRewardPoints - totalPoints) points away from your next reward!")
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(20)
     }
     
     private var availableRewardsSection: some View {
@@ -51,7 +83,6 @@ struct RewardsView: View {
             Text("Available Rewards")
                 .font(.title2)
                 .fontWeight(.bold)
-                .foregroundColor(.primary)
             
             ForEach(rewards.filter { !$0.isRedeemed }) { reward in
                 RewardRow(reward: reward)
@@ -60,10 +91,6 @@ struct RewardsView: View {
                     }
             }
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
     private var rewardHistorySection: some View {
@@ -71,19 +98,14 @@ struct RewardsView: View {
             Text("Reward History")
                 .font(.title2)
                 .fontWeight(.bold)
-                .foregroundColor(.primary)
             
             ForEach(rewards.filter { $0.isRedeemed }) { reward in
-                RewardRow(reward: reward)
+                RewardRow(reward: reward, isHistory: true)
                     .onTapGesture {
                         selectedReward = reward
                     }
             }
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
     private var howToEarnSection: some View {
@@ -91,38 +113,44 @@ struct RewardsView: View {
             Text("How to Earn")
                 .font(.title2)
                 .fontWeight(.bold)
-                .foregroundColor(.primary)
             
-            HStack(alignment: .top, spacing: 20) {
-                earnMethodView(icon: "person.2.fill", title: "Join Activities", description: "Participate in group events")
-                earnMethodView(icon: "star.fill", title: "Host Events", description: "Create and lead your own activities")
-                earnMethodView(icon: "hand.thumbsup.fill", title: "Get Likes", description: "Receive likes on your posts")
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 20) {
+                earnMethodView(icon: "person.2.fill", title: "Join Activities", description: "Participate in group events", points: "+50 pts")
+                earnMethodView(icon: "star.fill", title: "Host Events", description: "Create and lead your own activities", points: "+100 pts")
+                earnMethodView(icon: "hand.thumbsup.fill", title: "Get Likes", description: "Receive likes on your posts", points: "+5 pts")
+                earnMethodView(icon: "calendar", title: "Daily Check-in", description: "Open the app daily", points: "+10 pts")
             }
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(20)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
-    private func earnMethodView(icon: String, title: String, description: String) -> some View {
-        VStack(spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 30))
-                .foregroundColor(.blue)
+    private func earnMethodView(icon: String, title: String, description: String, points: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Image(systemName: icon)
+                    .font(.title2)
+                    .foregroundColor(.blue)
+                Spacer()
+                Text(points)
+                    .font(.caption)
+                    .fontWeight(.bold)
+                    .foregroundColor(.green)
+            }
             Text(title)
                 .font(.headline)
             Text(description)
                 .font(.caption)
                 .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
+                .lineLimit(2)
         }
-        .frame(maxWidth: .infinity)
+        .padding()
+        .background(Color(.secondarySystemBackground))
+        .cornerRadius(15)
     }
 }
 
 struct RewardRow: View {
     let reward: Reward
+    var isHistory: Bool = false
     
     var body: some View {
         HStack(spacing: 16) {
@@ -148,11 +176,11 @@ struct RewardRow: View {
             
             VStack(alignment: .trailing, spacing: 4) {
                 Text(reward.discount)
-                    .font(.title2)
+                    .font(.title3)
                     .fontWeight(.bold)
-                    .foregroundColor(.green)
+                    .foregroundColor(isHistory ? .secondary : .green)
                 
-                if reward.isRedeemed {
+                if isHistory {
                     Text("Redeemed")
                         .font(.caption)
                         .padding(4)
@@ -169,6 +197,20 @@ struct RewardRow: View {
         .background(Color(.systemBackground))
         .cornerRadius(15)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
+    }
+}
+
+struct RoundedRectProgressViewStyle: ProgressViewStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        ZStack(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 14)
+                .frame(height: 20)
+                .foregroundColor(Color.blue.opacity(0.2))
+            
+            RoundedRectangle(cornerRadius: 14)
+                .frame(width: CGFloat(configuration.fractionCompleted ?? 0) * UIScreen.main.bounds.width - 40, height: 20)
+                .foregroundColor(.blue)
+        }
     }
 }
 
