@@ -3,14 +3,14 @@ import CoreLocation
 import MapKit
 
 struct HomeView: View {
-    
     @State var selectedCategory = ""
     @StateObject private var locationManager = LocationManager()
     @State private var region = MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 37.3352, longitude: -122.0096),
-            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-        )
+        center: CLLocationCoordinate2D(latitude: 37.3352, longitude: -122.0096),
+        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+    )
     @State private var userTrackingMode: MapUserTrackingMode = .follow
+    @State private var isHotSpotsPresented = false
     
     var body: some View {
         ZStack {
@@ -45,60 +45,28 @@ struct HomeView: View {
                         .padding(.top, 120)
                         Spacer()
                     }
-            )
+                )
             
             VStack {
                 CategoryListView
-                .padding(.top, 20)
+                    .padding(.top, 20)
                 
                 Spacer()
-            }
-        }
-    }
-    
-    var HotSpots: some View {
-        VStack {
-            Text("What's in the Area")
-                .bold()
-                .padding(.leading, -164)
-                .font(.system(size: 24))
-            
-            HStack {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack {
-                        HStack {
-                            ZStack {
-                                Rectangle()
-                                    .frame(width: 200, height: 100)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(15)
-                            }
-                            
-                            ZStack {
-                                Rectangle()
-                                    .frame(width: 200, height: 100)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(15)
-                            }
-                            
-                            ZStack {
-                                Rectangle()
-                                    .frame(width: 200, height: 100)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(15)
-                            }
-                            
-                            ZStack {
-                                Rectangle()
-                                    .frame(width: 200, height: 100)
-                                    .foregroundColor(.white)
-                                    .cornerRadius(15)
-                            }
-                        }
-                        .padding(15)
-                    }
+                
+                Button(action: {
+                    isHotSpotsPresented.toggle()
+                }) {
+                    Text("What's in the Area")
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(20)
+                        .shadow(radius: 5)
                 }
+                .padding(.bottom, 100)
             }
+            
+            HotSpotsSlideUpView(isPresented: $isHotSpotsPresented)
+                .edgesIgnoringSafeArea(.bottom)
         }
     }
     
@@ -115,18 +83,16 @@ struct HomeView: View {
                                 .foregroundColor(selectedCategory == item.title ? .white : .black)
                         }
                         .padding(15)
-                        .background(selectedCategory == item.title ? .cyan :
-                                .white)
+                        .background(selectedCategory == item.title ? .cyan : .white)
                         .clipShape(Capsule())
                     }
                 }
-                .padding(.leading)
-                .padding(.trailing)
+                .padding(.horizontal)
             }
         }.padding(.top, 40)
     }
 }
 
-#Preview {
+#Preview{
     HomeView()
 }
