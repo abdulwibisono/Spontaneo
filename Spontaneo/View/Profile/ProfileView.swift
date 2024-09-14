@@ -4,6 +4,7 @@ struct ProfileView: View {
     @StateObject private var viewModel: ProfileViewModel
     @State private var showingEditProfile = false
     @State private var selectedTab = 0
+    @State private var showingSettings = false
     
     init(user: User) {
         _viewModel = StateObject(wrappedValue: ProfileViewModel(user: user))
@@ -34,6 +35,9 @@ struct ProfileView: View {
         )) { errorWrapper in
             Alert(title: Text("Error"), message: Text(errorWrapper.error))
         }
+        .sheet(isPresented: $showingSettings) {
+            SettingView()
+        }
     }
     
     private var profileHeader: some View {
@@ -41,6 +45,22 @@ struct ProfileView: View {
             LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.purple.opacity(0.7)]), startPoint: .topLeading, endPoint: .bottomTrailing)
             
             VStack(spacing: 20) {
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        showingSettings = true
+                    }) {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundColor(.white)
+                            .font(.system(size: 22))
+                            .padding(8)
+                            .background(Color.black.opacity(0.3))
+                            .clipShape(Circle())
+                    }
+                    .padding(.top, 40)
+                    .padding(.trailing, 20)
+                }
+                
                 AsyncImage(url: viewModel.user.profileImageURL) { image in
                     image
                         .resizable()
@@ -84,10 +104,10 @@ struct ProfileView: View {
                     .buttonStyle(PrimaryButtonStyle())
                 }
             }
-            .padding(.top, 60)
+            .padding(.top, 20)
             .padding(.bottom, 30)
         }
-        .frame(height: 380)
+        .frame(height: 420)
     }
     
     private var tabContent: some View {
