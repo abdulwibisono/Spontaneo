@@ -16,6 +16,19 @@ struct HomeView: View {
         ZStack {
             Map(coordinateRegion: $region, showsUserLocation: true, userTrackingMode: $userTrackingMode)
                 .edgesIgnoringSafeArea(.all)
+                .bottomSheet(presentationDetents: [.medium, .large, .height(70)], isPresented: .constant(true), sheetCornerRadius: 20) {
+                    ScrollView (.vertical, showsIndicators: false) {
+                        VStack (spacing: 15) {
+                            Text("What's in the Area")
+                                .padding(.vertical, 10)
+                                .padding(.horizontal)
+                            
+                            HotSpot()
+                        }
+                        .padding()
+                        .padding(.top)
+                    }
+                } onDismiss: {}
                 .onAppear {
                     if let location = locationManager.location {
                         region.center = location.coordinate
@@ -52,22 +65,34 @@ struct HomeView: View {
                     .padding(.top, 20)
                 
                 Spacer()
+            }
+        }
+    }
+    
+    @ViewBuilder
+    func HotSpot() -> some View {
+        VStack {
+            HStack {
+                Rectangle()
+                    .foregroundColor(.gray)
+                    .frame(width: 70, height:50)
                 
-                Button(action: {
-                    isHotSpotsPresented.toggle()
-                }) {
-                    Text("What's in the Area")
-                        .padding()
-                        .background(Color.white)
-                        .cornerRadius(20)
-                        .shadow(radius: 5)
-                }
-                .padding(.bottom, 100)
+                Rectangle()
+                    .foregroundColor(.gray)
+                    .frame(width: 70, height:50)
             }
             
-            HotSpotsSlideUpView(isPresented: $isHotSpotsPresented)
-                .edgesIgnoringSafeArea(.bottom)
+            HStack {
+                Rectangle()
+                    .foregroundColor(.gray)
+                    .frame(width: 70, height:50)
+                
+                Rectangle()
+                    .foregroundColor(.gray)
+                    .frame(width: 70, height:50)
+            }
         }
+        .padding(.top, 20)
     }
     
     var CategoryListView: some View {

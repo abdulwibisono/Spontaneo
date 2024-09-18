@@ -1,54 +1,109 @@
 import SwiftUI
 
 struct HotSpotsSlideUpView: View {
-    @Binding var isPresented: Bool
+    
+    @State var offset: CGFloat = 0
+    @State var lastOffset: CGFloat = 0
+    @GestureState var gestureOffset: CGFloat = 0
     
     var body: some View {
-        VStack {
-            Handle()
-            
-            Text("What's in the Area")
-                .bold()
-                .font(.system(size: 24))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.leading)
-            
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 15) {
-                    ForEach(0..<4) { _ in
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.white)
-                            .frame(width: 200, height: 100)
-                            .shadow(radius: 5)
-                    }
-                }
-                .padding(.horizontal)
+        ZStack {
+            GeometryReader { proxy in
             }
+            .blur(radius: getBlurRadius())
+            .ignoresSafeArea()
             
-            Spacer()
-        }
-        .frame(height: UIScreen.main.bounds.height * 0.4)
-        .background(Color(.systemBackground))
-        .cornerRadius(20)
-        .shadow(radius: 10)
-        .offset(y: isPresented ? 0 : UIScreen.main.bounds.height)
-        .animation(.spring(), value: isPresented)
-        .gesture(
-            DragGesture()
-                .onEnded { gesture in
-                    if gesture.translation.height > 50 {
-                        isPresented = false
+            
+            GeometryReader { proxy -> AnyView in
+                let height = proxy.frame(in: .global).height
+                
+                return AnyView(
+                    ZStack {
+                        BlurView(style: .systemThinMaterialLight)
+                            .clipShape(CustomCorner(corners: [.topLeft, .topRight], radius: 30))
+                        
+                        VStack {
+                            Capsule()
+                                .fill(Color.gray)
+                                .frame(width: 80, height: 4)
+                                .padding(.top)
+                            
+                            Text("What's in the Area")
+                                .padding(.vertical, 10)
+                                .padding(.horizontal)
+                                .foregroundColor(.black)
+                            
+                            HotSpotContent()
+                        }
+                        .padding(.horizontal)
+                        .frame(maxHeight: .infinity, alignment: .top)
                     }
-                }
-        )
+                    .offset(y: height - 200)
+                    .offset(y: -offset > 0 ? -offset <= (height - 100) ? offset: -(height - 100): 0)
+                    .gesture(
+                        DragGesture()
+                            .updating($gestureOffset, body: { value, out, _ in
+                                out = value.translation.height
+                            })
+                            .onEnded { value in
+                                let maxHeight = height - 100
+                                withAnimation {
+                                    if -offset > 100 && -offset < maxHeight / 2 {
+                                        offset = -(maxHeight / 3)
+                                    } else if -offset > maxHeight / 2 {
+                                        offset = -maxHeight
+                                    } else {
+                                        offset = 0
+                                    }
+                                }
+                                lastOffset = offset
+                            }
+                    )
+                )
+            }
+        }
+    }
+    
+    func onChange() {
+        DispatchQueue.main.async {
+            self.offset = gestureOffset
+        }
+    }
+    
+    func getBlurRadius() -> CGFloat {
+        let progress = -offset / (UIScreen.main.bounds.height - 100)
+        
+        return progress * 30
     }
 }
 
-struct Handle: View {
+struct HotSpotContent: View {
     var body: some View {
-        RoundedRectangle(cornerRadius: 5)
-            .fill(Color.secondary)
-            .frame(width: 40, height: 5)
-            .padding()
+        VStack {
+            HStack {
+                Rectangle()
+                    .foregroundColor(.white)
+                    .frame(width: 70, height:50)
+                
+                Rectangle()
+                    .foregroundColor(.white)
+                    .frame(width: 70, height:50)
+            }
+            
+            HStack {
+                Rectangle()
+                    .foregroundColor(.white)
+                    .frame(width: 70, height:50)
+                
+                Rectangle()
+                    .foregroundColor(.white)
+                    .frame(width: 70, height:50)
+            }
+        }
+        .padding(.top, 20)
     }
+}
+
+#Preview {
+    HotSpotsSlideUpView()
 }
