@@ -26,14 +26,14 @@ extension View {
 //                                UIWindowScene else {
 //                                return
 //                        }
-//                        
+//
 //                        if let controller =
 //                            windows.windows.first?.rootViewController?
 //                            .presentedViewController, let sheet +
 //                            controller.presentationController as? UISheetPresentationController {
 //                            sheet.largestUndimmedDetentIdentifier = largestUndimmedIdentifier
 //                            sheet.preferredCornerRadius = sheetCornerRadius
-//                            
+//
 //                        } else {
 //                            print("No Controller Found")
 //                        }
