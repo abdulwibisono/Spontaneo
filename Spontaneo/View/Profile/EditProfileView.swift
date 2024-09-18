@@ -21,18 +21,19 @@ struct EditProfileView: View {
                 Color(.systemGroupedBackground).edgesIgnoringSafeArea(.all)
                 
                 ScrollView {
-                    VStack(spacing: 32) { // Increased spacing
+                    VStack(spacing: 24) {
                         profileImagePicker
                         personalInfoSection
                         interestsSection
                     }
                     .padding(.horizontal)
-                    .padding(.vertical, 24) // Added vertical padding
+                    .padding(.vertical, 24)
                 }
             }
-            .navigationBarTitle("Edit Profile", displayMode: .large) // Changed to large display mode
+            .navigationBarTitle("Edit Profile", displayMode: .inline)
             .navigationBarItems(leading: cancelButton, trailing: saveButton)
         }
+        .accentColor(.blue)
         .sheet(isPresented: $showingImagePicker, onDismiss: loadImage) {
             ImagePicker(image: $inputImage)
         }
@@ -50,63 +51,55 @@ struct EditProfileView: View {
                         .resizable()
                         .foregroundColor(.gray)
                 }
-                .frame(width: 150, height: 150) // Increased size
+                .frame(width: 120, height: 120)
                 .clipShape(Circle())
                 .overlay(Circle().stroke(Color.blue, lineWidth: 2))
                 .shadow(radius: 5)
                 
                 Image(systemName: "camera.circle.fill")
                     .resizable()
-                    .frame(width: 40, height: 40)
+                    .frame(width: 30, height: 30)
                     .foregroundColor(.white)
                     .background(Color.blue)
                     .clipShape(Circle())
-                    .offset(x: 50, y: 50)
+                    .offset(x: 40, y: 40)
             }
             
             Button(action: {
                 showingImagePicker = true
             }) {
-                Label("Change Photo", systemImage: "photo")
+                Text("Change Photo")
                     .font(.headline)
-                    .foregroundColor(.white)
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 16)
-                    .background(Color.blue)
-                    .cornerRadius(20)
+                    .foregroundColor(.blue)
             }
-            .padding(.top, 16)
+            .padding(.top, 8)
         }
+        .padding()
+        .background(Color(.secondarySystemGroupedBackground))
+        .cornerRadius(16)
+        .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 2)
     }
     
     private var personalInfoSection: some View {
-        VStack(alignment: .leading, spacing: 24) {
+        VStack(alignment: .leading, spacing: 16) {
             SectionHeader(title: "Personal Information")
             
-            VStack(spacing: 24) {
-                CustomTextField(placeholder: "Full Name", text: $fullName, icon: "person.fill")
+            CustomTextField(placeholder: "Full Name", text: $fullName, icon: "person.fill")
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Bio")
+                    .font(.headline)
+                    .foregroundColor(.primary)
                 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Bio")
-                        .font(.headline)
-                        .foregroundColor(.primary)
-                    
-                    TextEditor(text: $bio)
-                        .frame(height: 120)
-                        .padding(12)
-                        .background(Color(.systemBackground))
-                        .cornerRadius(12)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(Color.blue.opacity(0.5), lineWidth: 1)
-                        )
-                        .overlay(
-                            Image(systemName: "pencil")
-                                .foregroundColor(.blue)
-                                .padding(8),
-                            alignment: .topTrailing
-                        )
-                }
+                TextEditor(text: $bio)
+                    .frame(height: 100)
+                    .padding(8)
+                    .background(Color(.systemBackground))
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.blue.opacity(0.5), lineWidth: 1)
+                    )
             }
         }
         .padding()
@@ -119,7 +112,7 @@ struct EditProfileView: View {
         VStack(alignment: .leading, spacing: 16) {
             SectionHeader(title: "Interests")
             
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 120))], alignment: .leading, spacing: 12) {
+            FlowLayout(alignment: .leading, spacing: 8) {
                 ForEach(viewModel.user.interests, id: \.self) { interest in
                     InterestTag(interest: interest) {
                         viewModel.user.interests.removeAll { $0 == interest }
@@ -155,8 +148,7 @@ struct EditProfileView: View {
     
     private var saveButton: some View {
         Button("Save") {
-            viewModel.user.fullName = fullName
-            viewModel.user.bio = bio
+            viewModel.updateProfile(fullName: fullName, bio: bio)
             presentationMode.wrappedValue.dismiss()
         }
         .fontWeight(.bold)
@@ -165,7 +157,7 @@ struct EditProfileView: View {
     private func addInterest() {
         let trimmedInterest = newInterest.trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmedInterest.isEmpty {
-            viewModel.user.interests.append(trimmedInterest)
+            viewModel.addInterest(trimmedInterest)
             newInterest = ""
         }
     }
