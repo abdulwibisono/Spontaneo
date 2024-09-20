@@ -44,6 +44,7 @@
 		615390242C86D9EC00E8EAEE /*  ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615390232C86D9EC00E8EAEE /*  ProfileViewModel.swift */; };
 		6186D5352C8C15200003048F /* Reward.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6186D5342C8C15200003048F /* Reward.swift */; };
 		618CA4112C9D57F0007B3D79 /* ActivityDetailedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618CA4102C9D57F0007B3D79 /* ActivityDetailedView.swift */; };
+		618CA41F2C9DCAAD007B3D79 /* CreateActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618CA41E2C9DCAAD007B3D79 /* CreateActivityView.swift */; };
 		619FEE262C958112008175F0 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619FEE252C958112008175F0 /* SettingView.swift */; };
 		932BF88C2C88AF5D001B1EFD /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932BF88B2C88AF5D001B1EFD /* LocationManager.swift */; };
 		93407DDB2C9D4E2100AB721F /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93407DDA2C9D4E2000AB721F /* Activity.swift */; };
@@ -75,6 +76,7 @@
 		615390232C86D9EC00E8EAEE /*  ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = " ProfileViewModel.swift"; sourceTree = "<group>"; };
 		6186D5342C8C15200003048F /* Reward.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reward.swift; sourceTree = "<group>"; };
 		618CA4102C9D57F0007B3D79 /* ActivityDetailedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailedView.swift; sourceTree = "<group>"; };
+		618CA41E2C9DCAAD007B3D79 /* CreateActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateActivityView.swift; sourceTree = "<group>"; };
 		619FEE252C958112008175F0 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		932BF88B2C88AF5D001B1EFD /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		93407DDA2C9D4E2000AB721F /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
@@ -202,6 +204,7 @@
 			children = (
 				939A83462C8EB5F400007615 /* ActivityView.swift */,
 				618CA4102C9D57F0007B3D79 /* ActivityDetailedView.swift */,
+				618CA41E2C9DCAAD007B3D79 /* CreateActivityView.swift */,
 			);
 			path = Activity;
 			sourceTree = "<group>";
@@ -404,6 +407,7 @@
 				9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */,
 				9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */,
 				619FEE262C958112008175F0 /* SettingView.swift in Sources */,
+				618CA41F2C9DCAAD007B3D79 /* CreateActivityView.swift in Sources */,
 				932BF88C2C88AF5D001B1EFD /* LocationManager.swift in Sources */,
 				93B518752C8CA3D2007EFF6C /* TabBarItem.swift in Sources */,
 				939A83472C8EB5F400007615 /* ActivityView.swift in Sources */,
