@@ -20,19 +20,10 @@ struct User: Identifiable, Codable, Equatable {
     static func == (lhs: User, rhs: User) -> Bool {
         return lhs.id == rhs.id
     }
+}
 
+extension User {
     static var sampleUser: User {
-        User(id: "sample",
-             username: "johndoe",
-             email: "john@example.com",
-             fullName: "John Doe",
-             bio: "I love outdoor activities!",
-             interests: ["Hiking", "Photography", "Cooking"],
-             profileImageURL: URL(string: "https://example.com/profile.jpg"),
-             joinDate: Date(),
-             activities: [
-                ActivityReference(id: "act1", title: "Hiking Trip", date: Date()),
-                ActivityReference(id: "act2", title: "Cooking Class", date: Date())
-             ])
+        User(id: UUID().uuidString, username: "sampleuser", email: "sample@example.com", fullName: "Sample User", bio: "This is a sample user", interests: ["Coding", "SwiftUI"], profileImageURL: nil, joinDate: Date(), activities: [])
     }
 }
