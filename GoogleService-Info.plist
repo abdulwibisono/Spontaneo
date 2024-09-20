@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyDjGk7Dy92nRdQBr2jyCVGl540bEjUmKKU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>313743756338</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>spontaneo.Spontaneo</string>
+	<key>PROJECT_ID</key>
+	<string>spontaneo-f7f91</string>
+	<key>STORAGE_BUCKET</key>
+	<string>spontaneo-f7f91.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:313743756338:ios:5e8aa16450bdef9d1c802b</string>
+</dict>
+</plist>

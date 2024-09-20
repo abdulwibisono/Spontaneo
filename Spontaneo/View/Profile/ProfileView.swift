@@ -4,6 +4,7 @@ struct ProfileView: View {
     @StateObject private var viewModel: ProfileViewModel
     @State private var showingEditProfile = false
     @State private var selectedTab = 0
+    @EnvironmentObject var authService: AuthenticationService
     @State private var showingSettings = false
     
     init(user: User) {
@@ -20,6 +21,8 @@ struct ProfileView: View {
                     .padding(.horizontal)
                 
                 tabContent
+                
+                signOutButton
             }
         }
         .edgesIgnoringSafeArea(.top)
@@ -38,6 +41,21 @@ struct ProfileView: View {
         .sheet(isPresented: $showingSettings) {
             SettingView()
         }
+    }
+    
+    private var signOutButton: some View {
+        Button(action: {
+            authService.signOut()
+        }) {
+            Text("Sign Out")
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.red)
+                .cornerRadius(10)
+        }
+        .padding()
     }
     
     private var profileHeader: some View {
