@@ -13,12 +13,12 @@ struct HomeView: View {
     @State private var isHotSpotsPresented = false
     @State private var bottomSheetOffset: CGFloat = 0
     @State private var lastDragValue: CGFloat = 0
-    @State private var bottomSheetHeight: CGFloat = 150 // Adjust this value as needed
+    @State private var bottomSheetHeight: CGFloat = 150
 
     // Add these state variables
     @State private var collapsedOffset: CGFloat = 0
     @State private var expandedOffset: CGFloat = 0
-    let desiredExpandedHeight: CGFloat = 300 // Adjust as needed
+    let desiredExpandedHeight: CGFloat = 500
 
     var body: some View {
         GeometryReader { geometry in
@@ -155,8 +155,15 @@ struct HomeView: View {
                 .padding(.top, -14)
                 .fontWeight(.bold)
             
-            // Add content to the bottom sheet as needed
             Spacer()
+            
+            VStack {
+                HStack {
+                    ZStack {
+                        Rectangle()
+                    }
+                }
+            }
         }
         .frame(maxWidth: .infinity)
         .background(Color.white)
