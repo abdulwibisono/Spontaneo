@@ -4,6 +4,7 @@ struct ProfileView: View {
     @StateObject private var viewModel: ProfileViewModel
     @State private var showingEditProfile = false
     @State private var selectedTab = 0
+    @EnvironmentObject var authService: AuthenticationService
     
     init(user: User) {
         _viewModel = StateObject(wrappedValue: ProfileViewModel(user: user))
@@ -19,6 +20,8 @@ struct ProfileView: View {
                     .padding(.horizontal)
                 
                 tabContent
+                
+                signOutButton
             }
         }
         .edgesIgnoringSafeArea(.top)
@@ -34,6 +37,21 @@ struct ProfileView: View {
         )) { errorWrapper in
             Alert(title: Text("Error"), message: Text(errorWrapper.error))
         }
+    }
+    
+    private var signOutButton: some View {
+        Button(action: {
+            authService.signOut()
+        }) {
+            Text("Sign Out")
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding()
+                .background(Color.red)
+                .cornerRadius(10)
+        }
+        .padding()
     }
     
     private var profileHeader: some View {
