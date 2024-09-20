@@ -46,10 +46,10 @@
 		618CA4112C9D57F0007B3D79 /* ActivityDetailedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618CA4102C9D57F0007B3D79 /* ActivityDetailedView.swift */; };
 		619FEE262C958112008175F0 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619FEE252C958112008175F0 /* SettingView.swift */; };
 		932BF88C2C88AF5D001B1EFD /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932BF88B2C88AF5D001B1EFD /* LocationManager.swift */; };
-		93407DD92C9AA8AA00AB721F /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93407DD82C9AA8AA00AB721F /* Extensions.swift */; };
 		93407DDB2C9D4E2100AB721F /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93407DDA2C9D4E2000AB721F /* Activity.swift */; };
 		93407DDE2C9D4E6C00AB721F /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93407DDD2C9D4E6C00AB721F /* ChatView.swift */; };
 		93407DE02C9D4E8400AB721F /* InviteFriendsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93407DDF2C9D4E8400AB721F /* InviteFriendsView.swift */; };
+		93407DFB2C9D639200AB721F /* CategoryModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93CAD4A42C7CAFD100D0D340 /* CategoryModel.swift */; };
 		9357DC942C858B19000C0B44 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC932C858B19000C0B44 /* HomeView.swift */; };
 		9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC972C85F755000C0B44 /* ProfileView.swift */; };
 		9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC9E2C86045E000C0B44 /* EditProfileView.swift */; };
@@ -77,7 +77,6 @@
 		618CA4102C9D57F0007B3D79 /* ActivityDetailedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDetailedView.swift; sourceTree = "<group>"; };
 		619FEE252C958112008175F0 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		932BF88B2C88AF5D001B1EFD /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
-		93407DD82C9AA8AA00AB721F /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		93407DDA2C9D4E2000AB721F /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
 		93407DDD2C9D4E6C00AB721F /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		93407DDF2C9D4E8400AB721F /* InviteFriendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFriendsView.swift; sourceTree = "<group>"; };
@@ -186,7 +185,6 @@
 			isa = PBXGroup;
 			children = (
 				9357DC932C858B19000C0B44 /* HomeView.swift */,
-				93407DD82C9AA8AA00AB721F /* Extensions.swift */,
 			);
 			path = Home;
 			sourceTree = "<group>";
@@ -397,6 +395,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				93407DFB2C9D639200AB721F /* CategoryModel.swift in Sources */,
 				43EFC22A2C9D559600F01213 /* AuthenticationService.swift in Sources */,
 				43EFC22C2C9D559600F01213 /* AuthenticationViewModel.swift in Sources */,
 				43EFC2302C9D559600F01213 /* LoginView.swift in Sources */,
@@ -409,7 +408,6 @@
 				93B518752C8CA3D2007EFF6C /* TabBarItem.swift in Sources */,
 				939A83472C8EB5F400007615 /* ActivityView.swift in Sources */,
 				618CA4112C9D57F0007B3D79 /* ActivityDetailedView.swift in Sources */,
-				93407DD92C9AA8AA00AB721F /* Extensions.swift in Sources */,
 				9357DC942C858B19000C0B44 /* HomeView.swift in Sources */,
 				93407DDB2C9D4E2100AB721F /* Activity.swift in Sources */,
 				6186D5352C8C15200003048F /* Reward.swift in Sources */,
@@ -419,7 +417,6 @@
 				93B518772C8CA3EA007EFF6C /* TabBarItemsPreferenceKey.swift in Sources */,
 				93CAD48D2C7CA88D00D0D340 /* SpontaneoApp.swift in Sources */,
 				93B518732C8CA3BF007EFF6C /* CustomTabBarView.swift in Sources */,
-				93CAD4A52C7CAFD100D0D340 /* CategoryModel.swift in Sources */,
 				615390212C86068500E8EAEE /* User.swift in Sources */,
 				615390242C86D9EC00E8EAEE /*  ProfileViewModel.swift in Sources */,
 				93407DE02C9D4E8400AB721F /* InviteFriendsView.swift in Sources */,
