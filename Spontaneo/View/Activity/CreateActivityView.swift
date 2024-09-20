@@ -22,89 +22,178 @@ struct CreateActivityView: View {
     
     var body: some View {
         NavigationView {
-            Form {
-                Section(header: Text("Basic Information")) {
-                    TextField("Title", text: $title)
-                        .padding(.vertical, 8)
+            ScrollView {
+                VStack(spacing: 24) {
+                    imageSection
                     
-                    Picker("Category", selection: $category) {
-                        ForEach(categories, id: \.self) { category in
-                            Text(category).tag(category)
-                        }
+                    VStack(alignment: .leading, spacing: 24) {
+                        titleSection
+                        categorySection
+                        descriptionSection
+                        dateSection
+                        locationSection
+                        detailsSection
                     }
-                    .pickerStyle(MenuPickerStyle())
-                    .padding(.vertical, 8)
-                    
-                    TextEditor(text: $description)
-                        .frame(height: 100)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.gray.opacity(0.2), lineWidth: 1)
-                        )
-                        .padding(.vertical, 8)
+                    .padding(.horizontal, 20)
                 }
-                
-                Section(header: Text("Date and Time")) {
-                    DatePicker("Date and Time", selection: $date, in: Date()...)
-                        .datePickerStyle(GraphicalDatePickerStyle())
-                        .padding(.vertical, 8)
-                }
-                
-                Section(header: Text("Location")) {
-                    TextField("Location", text: $location)
-                        .padding(.vertical, 8)
-                    
-                    Map(coordinateRegion: $region)
-                        .frame(height: 200)
-                        .cornerRadius(12)
-                        .padding(.vertical, 8)
-                }
-                
-                Section(header: Text("Participants")) {
-                    Stepper("Max Participants: \(maxParticipants)", value: $maxParticipants, in: 2...100)
-                        .padding(.vertical, 8)
-                }
-                
-                Section(header: Text("Privacy")) {
-                    Toggle("Public Activity", isOn: $isPublic)
-                        .padding(.vertical, 8)
-                }
-                
-                Section(header: Text("Image")) {
-                    Button(action: {
-                        showingImagePicker = true
-                    }) {
-                        HStack {
-                            Image(systemName: "photo")
-                            Text("Select Image")
-                        }
-                    }
-                    .padding(.vertical, 8)
-                    
-                    if let image = image {
-                        image
-                            .resizable()
-                            .scaledToFit()
-                            .frame(height: 200)
-                            .cornerRadius(12)
-                            .padding(.vertical, 8)
-                    }
-                }
+                .padding(.vertical, 20)
+                .padding(.bottom, 80) // Add extra padding at the bottom
             }
+            .background(Color("NeutralLight"))
             .navigationTitle("Create Activity")
+            .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
                 leading: Button("Cancel") {
                     presentationMode.wrappedValue.dismiss()
-                },
+                }
+                .foregroundColor(Color("AccentColor")),
                 trailing: Button("Create") {
                     createActivity()
                 }
                 .disabled(title.isEmpty || category.isEmpty || location.isEmpty)
+                .foregroundColor(title.isEmpty || category.isEmpty || location.isEmpty ? Color("NeutralDark").opacity(0.4) : Color("AccentColor"))
             )
         }
-        .accentColor(.blue)
+        .accentColor(Color("AccentColor"))
+        .edgesIgnoringSafeArea(.bottom) // Ignore safe area at the bottom
         .sheet(isPresented: $showingImagePicker, onDismiss: loadImage) {
             ImagePicker(image: $inputImage)
+        }
+    }
+    
+    private var imageSection: some View {
+        ZStack {
+            if let image = image {
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 200)
+                    .clipped()
+                    .cornerRadius(16)
+            } else {
+                Rectangle()
+                    .fill(Color("NeutralLight"))
+                    .frame(height: 200)
+                    .cornerRadius(16)
+                    .overlay(
+                        VStack {
+                            Image(systemName: "camera.fill")
+                                .foregroundColor(Color("NeutralDark").opacity(0.4))
+                                .font(.largeTitle)
+                            Text("Add Photo")
+                                .foregroundColor(Color("NeutralDark").opacity(0.4))
+                                .font(.headline)
+                        }
+                    )
+            }
+            
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        showingImagePicker = true
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(Color("NeutralLight"))
+                            .background(Color("AccentColor"))
+                            .clipShape(Circle())
+                            .shadow(color: Color("NeutralDark").opacity(0.3), radius: 5, x: 0, y: 2)
+                    }
+                    .padding()
+                }
+            }
+        }
+    }
+    
+    private var titleSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Title", systemImage: "pencil")
+                .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
+            TextField("Enter activity title", text: $title)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .foregroundColor(Color("NeutralDark"))
+        }
+    }
+    
+    private var categorySection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Category", systemImage: "tag")
+                .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
+            Picker("Category", selection: $category) {
+                ForEach(categories, id: \.self) { category in
+                    Text(category).tag(category)
+                }
+            }
+            .pickerStyle(SegmentedPickerStyle())
+            .background(Color("NeutralLight"))
+        }
+    }
+    
+    private var descriptionSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Description", systemImage: "text.alignleft")
+                .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
+            TextEditor(text: $description)
+                .frame(height: 100)
+                .foregroundColor(Color("NeutralDark"))
+                .background(Color("NeutralLight"))
+                .cornerRadius(8)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color("NeutralDark").opacity(0.1), lineWidth: 1)
+                )
+        }
+    }
+    
+    private var dateSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Date and Time", systemImage: "calendar")
+                .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
+            DatePicker("", selection: $date, in: Date()..., displayedComponents: [.date, .hourAndMinute])
+                .datePickerStyle(GraphicalDatePickerStyle())
+                .accentColor(Color("AccentColor"))
+        }
+    }
+    
+    private var locationSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Location", systemImage: "mappin.and.ellipse")
+                .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
+            TextField("Enter location", text: $location)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .foregroundColor(Color("NeutralDark"))
+            Map(coordinateRegion: $region)
+                .frame(height: 200)
+                .cornerRadius(16)
+                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color("NeutralLight"), lineWidth: 1))
+                .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
+        }
+    }
+    
+    private var detailsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Max Participants", systemImage: "person.3")
+                    .font(.headline)
+                    .foregroundColor(Color("NeutralDark"))
+                Stepper("Max Participants: \(maxParticipants)", value: $maxParticipants, in: 2...100)
+                    .foregroundColor(Color("NeutralDark"))
+            }
+            
+            VStack(alignment: .leading, spacing: 8) {
+                Label("Visibility", systemImage: "eye")
+                    .font(.headline)
+                    .foregroundColor(Color("NeutralDark"))
+                Toggle("Public Activity", isOn: $isPublic)
+                    .toggleStyle(SwitchToggleStyle(tint: Color("AccentColor")))
+            }
         }
     }
     
@@ -115,14 +204,7 @@ struct CreateActivityView: View {
     
     func createActivity() {
         // Here you would typically save the activity to your data model or send it to a server
-        // For now, we'll just print the details and dismiss the view
         print("Creating activity: \(title)")
         presentationMode.wrappedValue.dismiss()
-    }
-}
-
-struct CreateActivityView_Previews: PreviewProvider {
-    static var previews: some View {
-        CreateActivityView()
     }
 }

@@ -22,13 +22,18 @@ struct ActivityView: View {
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 0) {
-                headerSection
+            ZStack {
+                Color("NeutralLight").edgesIgnoringSafeArea(.all)
                 
-                if showMapView {
-                    mapView
-                } else {
-                    listView
+                VStack(spacing: 0) {
+                    headerSection
+                    
+                    if showMapView {
+                        mapView
+                    } else {
+                        listView
+                            .padding(.bottom, 80) // Add padding at the bottom for TabView
+                    }
                 }
             }
             .navigationBarHidden(true)
@@ -42,63 +47,52 @@ struct ActivityView: View {
                 ActionSheet(title: Text("Sort Activities"), buttons: sortButtons)
             }
             .overlay(loadingOverlay)
-            .overlay(
-                Button(action: {
-                    showingCreateActivity = true
-                }) {
-                    Image(systemName: "plus.circle.fill")
-                        .resizable()
-                        .frame(width: 60, height: 60)
-                        .foregroundColor(.blue)
-                        .background(Color.white)
-                        .clipShape(Circle())
-                        .shadow(radius: 4)
-                }
-                .padding(.trailing, 20)
-                .padding(.bottom, 100) // Increase bottom padding to avoid overlap with tab bar
-                .padding(.top, 20) // Add top padding for better spacing
-                .shadow(radius: 5), // Add shadow for better visibility
-                alignment: .bottomTrailing
-            )
+            .overlay(createActivityButton, alignment: .bottomTrailing)
         }
+        .accentColor(Color("AccentColor"))
         .sheet(isPresented: $showingCreateActivity) {
             CreateActivityView()
         }
+        .edgesIgnoringSafeArea(.bottom) // Ignore safe area at the bottom
     }
     
     private var headerSection: some View {
         VStack(spacing: 16) {
             HStack {
                 Image(systemName: "magnifyingglass")
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color("NeutralDark"))
                 TextField("Search activities...", text: $searchText)
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
                 Button(action: { showFilters.toggle() }) {
                     Image(systemName: "slider.horizontal.3")
-                        .foregroundColor(.blue)
+                        .foregroundColor(Color("AccentColor"))
                 }
             }
-            .padding(8)
-            .background(Color(.systemGray6))
-            .cornerRadius(10)
+            .padding(12)
+            .background(Color("NeutralLight"))
+            .cornerRadius(15)
+            .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
             
             HStack {
                 Button(action: { showLocationPicker.toggle() }) {
                     HStack {
-                        Image(systemName: "mappin.circle.fill")
+                        Image(systemName: "mappin.and.ellipse")
                         Text(selectedLocation)
                     }
+                    .foregroundColor(Color("AccentColor"))
                 }
                 Spacer()
                 Button(action: { showSortOptions.toggle() }) {
                     HStack {
-                        Image(systemName: "arrow.up.arrow.down")
+                        Image(systemName: "arrow.up.arrow.down.circle")
                         Text(sortOption.rawValue)
                     }
+                    .foregroundColor(Color("AccentColor"))
                 }
                 Button(action: { showMapView.toggle() }) {
-                    Image(systemName: showMapView ? "list.bullet" : "map")
+                    Image(systemName: showMapView ? "list.bullet.circle" : "map.circle")
+                        .foregroundColor(Color("AccentColor"))
                 }
             }
             .font(.subheadline)
@@ -106,8 +100,8 @@ struct ActivityView: View {
             activeFiltersView
         }
         .padding()
-        .background(Color.white)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 5)
+        .background(Color("NeutralLight"))
+        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
     private var activeFiltersView: some View {
@@ -115,10 +109,10 @@ struct ActivityView: View {
             HStack {
                 if filters.categories.isEmpty && filters.minRating == 0 && filters.maxDistance == 50 && filters.dateRange == nil {
                     Text("No filters applied")
-                        .foregroundColor(.gray)
+                        .foregroundColor(Color("NeutralDark"))
                         .padding(.vertical, 8)
                         .padding(.horizontal, 12)
-                        .background(Color(.systemGray6))
+                        .background(Color("NeutralLight"))
                         .cornerRadius(20)
                 } else {
                     ForEach(Array(filters.categories), id: \.self) { category in
@@ -158,7 +152,8 @@ struct ActivityView: View {
                     .buttonStyle(PlainButtonStyle())
                 }
             }
-            .padding()
+            .padding(.horizontal)
+            .padding(.top)
         }
         .refreshable {
             await refreshActivities()
@@ -224,6 +219,24 @@ struct ActivityView: View {
         // Refresh activities here
         isLoading = false
     }
+    
+    private var createActivityButton: some View {
+        Button(action: {
+            showingCreateActivity = true
+        }) {
+            Image(systemName: "plus")
+                .font(.title2)
+                .foregroundColor(Color("NeutralLight"))
+                .frame(width: 60, height: 60)
+                .background(
+                    LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                )
+                .clipShape(Circle())
+                .shadow(color: Color("NeutralDark").opacity(0.3), radius: 5, x: 0, y: 2)
+        }
+        .padding(.trailing, 20)
+        .padding(.bottom, 100)
+    }
 }
 
 struct FilterChip: View {
@@ -235,13 +248,18 @@ struct FilterChip: View {
             Text(text)
             Button(action: onRemove) {
                 Image(systemName: "xmark.circle.fill")
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color("NeutralDark"))
             }
         }
         .padding(.vertical, 8)
         .padding(.horizontal, 12)
-        .background(Color(.systemGray6))
+        .background(Color("NeutralLight"))
+        .foregroundColor(Color("NeutralDark"))
         .cornerRadius(20)
+        .overlay(
+            RoundedRectangle(cornerRadius: 20)
+                .stroke(Color("AccentColor"), lineWidth: 1)
+        )
     }
 }
 
@@ -249,55 +267,83 @@ struct ActivityCard: View {
     let activity: Activity
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: "photo")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 150)
-                .clipped()
-                .cornerRadius(12)
+        VStack(alignment: .leading, spacing: 12) {
+            ZStack(alignment: .topTrailing) {
+                Image(systemName: "photo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 150)
+                    .clipped()
+                    .cornerRadius(12)
+                
+                Text(activity.category)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color("AccentColor"))
+                    .foregroundColor(Color("NeutralLight"))
+                    .cornerRadius(8)
+                    .padding(8)
+            }
             
             Text(activity.title)
                 .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
             
             HStack {
                 Image(systemName: "star.fill")
-                    .foregroundColor(.yellow)
+                    .foregroundColor(Color("SecondaryColor"))
                 Text(String(format: "%.1f", activity.host.rating))
                 Text("(\(Int.random(in: 10...100)) reviews)")
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color("NeutralDark").opacity(0.6))
             }
+            .font(.subheadline)
             
             Text(activity.description)
                 .lineLimit(2)
                 .font(.subheadline)
-                .foregroundColor(.secondary)
+                .foregroundColor(Color("NeutralDark").opacity(0.8))
             
             HStack {
                 Image(systemName: "mappin.circle.fill")
                 Text(activity.location.name)
                 Spacer()
+                Image(systemName: "clock")
                 Text(activity.date, style: .time)
             }
             .font(.caption)
+            .foregroundColor(Color("NeutralDark").opacity(0.7))
             
             HStack {
-                Text("\(activity.currentParticipants)/\(activity.maxParticipants) participants")
-                Spacer()
-                Button("Join") {
-                    // Join action
+                HStack(spacing: -8) {
+                    ForEach(0..<min(3, activity.currentParticipants), id: \.self) { _ in
+                        Image(systemName: "person.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(Color("AccentColor"))
+                    }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+                Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
+                    .font(.caption)
+                    .foregroundColor(Color("NeutralDark"))
+                Spacer()
+                Button(action: {}) {
+                    Text("Join")
+                        .fontWeight(.semibold)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(
+                            LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .leading, endPoint: .trailing)
+                        )
+                        .foregroundColor(Color("NeutralLight"))
+                        .cornerRadius(20)
+                }
             }
         }
         .padding()
-        .background(Color.white)
-        .cornerRadius(12)
-        .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+        .background(Color("NeutralLight"))
+        .cornerRadius(16)
+        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
     }
 }
 
@@ -381,15 +427,15 @@ struct FilterView: View {
                         }) {
                             HStack {
                                 Image(systemName: categoryIcon(for: category))
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color("AccentColor"))
                                 Text(category)
                                 Spacer()
                                 if filters.categories.contains(category) {
                                     Image(systemName: "checkmark.circle.fill")
-                                        .foregroundColor(.green)
+                                        .foregroundColor(Color("AccentColor"))
                                 } else {
                                     Image(systemName: "circle")
-                                        .foregroundColor(.gray)
+                                        .foregroundColor(Color("NeutralDark"))
                                 }
                             }
                         }
@@ -399,8 +445,9 @@ struct FilterView: View {
                 Section(header: Text("Minimum Rating")) {
                     HStack {
                         Image(systemName: "star.fill")
-                            .foregroundColor(.yellow)
+                            .foregroundColor(Color("SecondaryColor"))
                         Slider(value: $filters.minRating, in: 0...5, step: 0.5)
+                            .accentColor(Color("AccentColor"))
                         Text(String(format: "%.1f", filters.minRating))
                             .frame(width: 35)
                     }
@@ -410,7 +457,7 @@ struct FilterView: View {
                     Picker(selection: $filters.maxDistance, label: 
                         HStack {
                             Image(systemName: "location.circle")
-                                .foregroundColor(.blue)
+                                .foregroundColor(Color("AccentColor"))
                             Text("Distance")
                         }
                     ) {
@@ -431,7 +478,7 @@ struct FilterView: View {
                         label: {
                             HStack {
                                 Image(systemName: "calendar")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color("AccentColor"))
                                 Text("Start Date")
                             }
                         }
@@ -446,7 +493,7 @@ struct FilterView: View {
                         label: {
                             HStack {
                                 Image(systemName: "calendar")
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(Color("AccentColor"))
                                 Text("End Date")
                             }
                         }
