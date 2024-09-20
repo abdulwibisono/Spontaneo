@@ -12,7 +12,14 @@ struct HomeView: View {
     @State private var userTrackingMode: MapUserTrackingMode = .follow
     @State private var isHotSpotsPresented = false
     @State private var bottomSheetOffset: CGFloat = 0
-    
+    @State private var lastDragValue: CGFloat = 0
+    @State private var bottomSheetHeight: CGFloat = 150 // Adjust this value as needed
+
+    // Add these state variables
+    @State private var collapsedOffset: CGFloat = 0
+    @State private var expandedOffset: CGFloat = 0
+    let desiredExpandedHeight: CGFloat = 300 // Adjust as needed
+
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -22,6 +29,10 @@ struct HomeView: View {
                         if let location = locationManager.location {
                             region.center = location.coordinate
                         }
+                        // Initialize collapsed and expanded offsets
+                        collapsedOffset = geometry.size.height - bottomSheetHeight
+                        expandedOffset = geometry.size.height - bottomSheetHeight - desiredExpandedHeight
+                        bottomSheetOffset = collapsedOffset
                     }
                     .overlay(
                         VStack {
@@ -57,17 +68,25 @@ struct HomeView: View {
                 }
                 
                 BottomSheetView()
-                    .offset(y: geometry.size.height - 150 + bottomSheetOffset) // Adjust the offset as needed
+                    .offset(y: bottomSheetOffset)
                     .gesture(
                         DragGesture()
                             .onChanged { value in
-                                bottomSheetOffset = value.translation.height
+                                let dragAmount = value.translation.height - lastDragValue
+                                bottomSheetOffset += dragAmount
+                                // Clamp the offset between expanded and collapsed positions
+                                bottomSheetOffset = max(expandedOffset, min(bottomSheetOffset, collapsedOffset))
+                                lastDragValue = value.translation.height
                             }
                             .onEnded { value in
-                                if value.translation.height > 100 {
-                                    bottomSheetOffset = geometry.size.height - 100
-                                } else {
-                                    bottomSheetOffset = 0
+                                lastDragValue = 0
+                                let threshold: CGFloat = (collapsedOffset - expandedOffset) / 2
+                                withAnimation {
+                                    if bottomSheetOffset < collapsedOffset - threshold {
+                                        bottomSheetOffset = expandedOffset
+                                    } else {
+                                        bottomSheetOffset = collapsedOffset
+                                    }
                                 }
                             }
                     )
@@ -133,7 +152,10 @@ struct HomeView: View {
             
             Text("What's in the Area")
                 .padding()
+                .padding(.top, -14)
+                .fontWeight(.bold)
             
+            // Add content to the bottom sheet as needed
             Spacer()
         }
         .frame(maxWidth: .infinity)

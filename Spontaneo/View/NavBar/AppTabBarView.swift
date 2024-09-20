@@ -8,7 +8,7 @@ struct AppTabBarView: View {
             HomeView()
                 .tabBarItem(tab: .home, selection: $tabSelection)
             
-            ActivityView()
+            ActivityView(activity: Activity.sampleActivity)
                 .tabBarItem(tab: .activities, selection: $tabSelection)
             
             RewardsView()
