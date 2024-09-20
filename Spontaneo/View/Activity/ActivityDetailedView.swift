@@ -15,6 +15,13 @@ struct ActivityDetailedView: View {
     @State private var region: MKCoordinateRegion
     @State private var showChat = false
     @Environment(\.colorScheme) var colorScheme
+    @State private var selectedImageIndex: Int = 0
+    
+    let placeholderImages = [
+        "activity_placeholder",
+        "activity_placeholder_2",
+        "activity_placeholder_3"
+    ]
     
     init(activity: Activity) {
         self.activity = activity
@@ -26,21 +33,32 @@ struct ActivityDetailedView: View {
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
+            VStack(spacing: 0) {
                 headerSection
                 
-                contentSection
-                
-                joinButton
+                VStack(alignment: .leading, spacing: 24) {
+                    imagesSection
+                    dateAndLocationSection
+                    descriptionSection
+                    participantsSection
+                    tagsSection
+                    mapSection
+                    joinButton
+                }
+                .padding(.top, 20)
+                .padding(.horizontal, 20)
+                .background(Color("NeutralLight"))
+                .cornerRadius(30, corners: [.topLeft, .topRight])
+                .offset(y: -30)
             }
-            .padding(.bottom, 80) // Add extra padding at the bottom
         }
-        .ignoresSafeArea(edges: .top)
+        .edgesIgnoringSafeArea(.top)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: { showChat = true }) {
-                    Image(systemName: "bubble.left.and.bubble.right")
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                        .foregroundColor(Color("AccentColor"))
                 }
             }
         }
@@ -50,99 +68,131 @@ struct ActivityDetailedView: View {
     }
     
     private var headerSection: some View {
-        ZStack(alignment: .bottom) {
-            Image(systemName: "photo")
+        ZStack(alignment: .bottomLeading) {
+            Image("activity_placeholder")
                 .resizable()
                 .aspectRatio(contentMode: .fill)
-                .frame(height: 250)
-                .clipped()
+                .frame(height: 300)
+                .overlay(
+                    LinearGradient(gradient: Gradient(colors: [.clear, Color("NeutralDark").opacity(0.8)]), startPoint: .top, endPoint: .bottom)
+                )
             
-            LinearGradient(gradient: Gradient(colors: [.clear, .black.opacity(0.7)]), startPoint: .top, endPoint: .bottom)
-                .frame(height: 100)
-            
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(activity.category)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Color("AccentColor").opacity(0.2))
+                    .foregroundColor(Color("AccentColor"))
+                    .clipShape(Capsule())
+                
                 Text(activity.title)
                     .font(.title)
                     .fontWeight(.bold)
-                    .foregroundColor(.white)
+                    .foregroundColor(Color("NeutralLight"))
                 
                 HStack {
-                    Label(activity.host.name, systemImage: "person.circle")
+                    Label(activity.host.name, systemImage: "person.circle.fill")
                     Spacer()
                     Label(String(format: "%.1f", activity.host.rating), systemImage: "star.fill")
                 }
                 .font(.subheadline)
-                .foregroundColor(.white)
+                .foregroundColor(Color("NeutralLight").opacity(0.8))
             }
-            .padding()
+            .padding(.horizontal, 20)
+            .padding(.bottom, 50)
         }
     }
     
-    private var contentSection: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            dateAndLocationSection
+    private var imagesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Photos", systemImage: "photo.on.rectangle.angled")
+                .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
             
-            descriptionSection
-            
-            participantsSection
-            
-            tagsSection
-            
-            mapSection
+            TabView(selection: $selectedImageIndex) {
+                ForEach(0..<placeholderImages.count, id: \.self) { index in
+                    Image(placeholderImages[index])
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 200)
+                        .clipped()
+                        .cornerRadius(16)
+                        .tag(index)
+                }
+            }
+            .frame(height: 200)
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
+            .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
         }
-        .padding()
-        .background(colorScheme == .dark ? Color.black : Color.white)
     }
     
     private var dateAndLocationSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label {
-                Text(activity.date, style: .date)
-                Text(" at ")
-                Text(activity.date, style: .time)
-            } icon: {
-                Image(systemName: "calendar")
-                    .foregroundColor(.blue)
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(spacing: 20) {
+                dateTimeInfo(title: "Date", icon: "calendar", value: activity.date, style: .date)
+                dateTimeInfo(title: "Time", icon: "clock", value: activity.date, style: .time)
             }
             
-            Label {
-                Text(activity.location.name)
-            } icon: {
+            HStack {
                 Image(systemName: "mappin.circle.fill")
-                    .foregroundColor(.red)
+                    .foregroundColor(Color("AccentColor"))
+                    .font(.title2)
+                Text(activity.location.name)
+                    .font(.headline)
+                    .foregroundColor(Color("NeutralDark"))
             }
         }
-        .font(.subheadline)
+        .padding()
+        .background(Color("NeutralLight"))
+        .cornerRadius(16)
+        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
+    }
+    
+    private func dateTimeInfo(title: String, icon: String, value: Date, style: Text.DateStyle) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Label(title, systemImage: icon)
+                .font(.caption)
+                .foregroundColor(Color("NeutralDark").opacity(0.6))
+            Text(value, style: style)
+                .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
+        }
     }
     
     private var descriptionSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("About this activity")
+            Label("Description", systemImage: "text.alignleft")
                 .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
             
             Text(activity.description)
                 .lineLimit(showFullDescription ? nil : 3)
+                .font(.subheadline)
+                .foregroundColor(Color("NeutralDark").opacity(0.8))
             
             Button(action: { showFullDescription.toggle() }) {
                 Text(showFullDescription ? "Show less" : "Show more")
                     .font(.subheadline)
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color("AccentColor"))
             }
         }
     }
     
     private var participantsSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Participants")
+        VStack(alignment: .leading, spacing: 12) {
+            Label("Participants", systemImage: "person.3.fill")
                 .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
             
             HStack {
                 ForEach(0..<min(5, activity.currentParticipants), id: \.self) { index in
-                    Image(systemName: "person.circle.fill")
+                    Image("user_placeholder")
                         .resizable()
                         .frame(width: 40, height: 40)
-                        .foregroundColor(.blue)
-                        .overlay(Circle().stroke(Color.white, lineWidth: 2))
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(Color("NeutralLight"), lineWidth: 2))
                         .offset(x: CGFloat(index * -15))
                 }
                 
@@ -150,7 +200,8 @@ struct ActivityDetailedView: View {
                     Text("+\(activity.currentParticipants - 5)")
                         .font(.subheadline)
                         .padding(8)
-                        .background(Color.gray.opacity(0.2))
+                        .background(Color("AccentColor"))
+                        .foregroundColor(Color("NeutralLight"))
                         .clipShape(Circle())
                         .offset(x: CGFloat(-5 * 15))
                 }
@@ -158,23 +209,33 @@ struct ActivityDetailedView: View {
                 Spacer()
                 
                 Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .font(.headline)
+                    .foregroundColor(Color("NeutralDark"))
             }
         }
+        .padding()
+        .background(Color("NeutralLight"))
+        .cornerRadius(16)
+        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
     }
     
     private var tagsSection: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack {
-                ForEach(activity.tags, id: \.self) { tag in
-                    Text("#\(tag)")
-                        .font(.subheadline)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.blue.opacity(0.1))
-                        .foregroundColor(.blue)
-                        .cornerRadius(20)
+        VStack(alignment: .leading, spacing: 8) {
+            Label("Tags", systemImage: "tag.fill")
+                .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    ForEach(activity.tags, id: \.self) { tag in
+                        Text("#\(tag)")
+                            .font(.subheadline)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color("AccentColor").opacity(0.1))
+                            .foregroundColor(Color("AccentColor"))
+                            .cornerRadius(20)
+                    }
                 }
             }
         }
@@ -182,14 +243,26 @@ struct ActivityDetailedView: View {
     
     private var mapSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Location")
+            Label("Location", systemImage: "map")
                 .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
             
             Map(coordinateRegion: $region, annotationItems: [activity]) { item in
-                MapMarker(coordinate: item.location.coordinate)
+                MapAnnotation(coordinate: item.location.coordinate) {
+                    Image(systemName: "mappin.circle.fill")
+                        .foregroundColor(Color("AccentColor"))
+                        .font(.title)
+                        .background(Circle().fill(Color("NeutralLight")))
+                        .clipShape(Circle())
+                }
             }
             .frame(height: 200)
-            .cornerRadius(12)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(Color("NeutralLight"), lineWidth: 1)
+            )
+            .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
         }
     }
     
@@ -199,11 +272,14 @@ struct ActivityDetailedView: View {
                 .font(.headline)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.blue)
-                .foregroundColor(.white)
-                .cornerRadius(12)
+                .background(
+                    LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .leading, endPoint: .trailing)
+                )
+                .foregroundColor(Color("NeutralLight"))
+                .cornerRadius(16)
         }
-        .padding()
+        .padding(.vertical, 16)
+        .shadow(color: Color("NeutralDark").opacity(0.2), radius: 10, x: 0, y: 5)
         .alert(isPresented: $showJoinConfirmation) {
             Alert(
                 title: Text("Join Activity"),
