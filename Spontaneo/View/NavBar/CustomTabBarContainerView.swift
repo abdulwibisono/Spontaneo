@@ -21,12 +21,6 @@ struct CustomTabBarContainerView<Content: View>: View {
             ZStack {
                 // Non-floating tab bar (always present)
                 CustomTabBarView(tabs: tabs, selection: $selection, localSelection: localSelection, namespace: namespace, isFloating: false)
-                    .opacity(selection == .home ? 0 : 1)
-                
-                // Floating tab bar (only visible on home)
-                CustomTabBarView(tabs: tabs, selection: $selection, localSelection: localSelection, namespace: namespace, isFloating: true)
-                    .opacity(selection == .home ? 1 : 0)
-                    .offset(y: selection == .home ? 0 : 20)
             }
             .animation(.easeInOut, value: selection)
         }
