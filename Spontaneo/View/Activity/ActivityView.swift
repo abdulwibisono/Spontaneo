@@ -18,6 +18,8 @@ struct ActivityView: View {
     @State private var activities = Activity.sampleActivities
     @State private var filters = ActivityFilters()
     
+    @State private var showingCreateActivity = false
+    
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
@@ -40,6 +42,27 @@ struct ActivityView: View {
                 ActionSheet(title: Text("Sort Activities"), buttons: sortButtons)
             }
             .overlay(loadingOverlay)
+            .overlay(
+                Button(action: {
+                    showingCreateActivity = true
+                }) {
+                    Image(systemName: "plus.circle.fill")
+                        .resizable()
+                        .frame(width: 60, height: 60)
+                        .foregroundColor(.blue)
+                        .background(Color.white)
+                        .clipShape(Circle())
+                        .shadow(radius: 4)
+                }
+                .padding(.trailing, 20)
+                .padding(.bottom, 100) // Increase bottom padding to avoid overlap with tab bar
+                .padding(.top, 20) // Add top padding for better spacing
+                .shadow(radius: 5), // Add shadow for better visibility
+                alignment: .bottomTrailing
+            )
+        }
+        .sheet(isPresented: $showingCreateActivity) {
+            CreateActivityView()
         }
     }
     
