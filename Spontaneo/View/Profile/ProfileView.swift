@@ -6,6 +6,7 @@ struct ProfileView: View {
     @State private var selectedTab = 0
     @EnvironmentObject var authService: AuthenticationService
     @State private var showingSettings = false
+    @State private var animateProfile = false
     
     init(user: User) {
         _viewModel = StateObject(wrappedValue: ProfileViewModel(user: user))
@@ -22,10 +23,16 @@ struct ProfileView: View {
                 
                 tabContent
                 
+                Spacer(minLength: 50)
+                
                 signOutButton
+                    .padding(.bottom, 100) // Increase bottom padding
             }
         }
         .edgesIgnoringSafeArea(.top)
+        .safeAreaInset(edge: .bottom) {
+            Color.clear.frame(height: 0) // Add safe area inset at the bottom
+        }
         .navigationBarHidden(true)
         .overlay(editProfileButton, alignment: .bottomTrailing)
         .sheet(isPresented: $showingEditProfile) {
@@ -41,6 +48,11 @@ struct ProfileView: View {
         .sheet(isPresented: $showingSettings) {
             SettingView()
         }
+        .onAppear {
+            withAnimation(.easeInOut(duration: 0.6)) {
+                animateProfile = true
+            }
+        }
     }
     
     private var signOutButton: some View {
@@ -52,15 +64,16 @@ struct ProfileView: View {
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)
                 .padding()
-                .background(Color.red)
+                .background(Color("AccentColor"))
                 .cornerRadius(10)
         }
-        .padding()
+        .padding(.horizontal)
+        .transition(.move(edge: .bottom))
     }
     
     private var profileHeader: some View {
         ZStack {
-            LinearGradient(gradient: Gradient(colors: [Color.blue.opacity(0.7), Color.purple.opacity(0.7)]), startPoint: .topLeading, endPoint: .bottomTrailing)
+            LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .topLeading, endPoint: .bottomTrailing)
             
             VStack(spacing: 20) {
                 HStack {
@@ -94,11 +107,14 @@ struct ProfileView: View {
                 .shadow(radius: 10)
                 .overlay(
                     Image(systemName: "camera.circle.fill")
-                        .foregroundColor(.blue)
+                        .foregroundColor(Color("AccentColor"))
                         .background(Color.white)
                         .clipShape(Circle())
                         .offset(x: 50, y: 50)
                 )
+                .scaleEffect(animateProfile ? 1 : 0.5)
+                .opacity(animateProfile ? 1 : 0)
+                .animation(.spring(response: 0.5, dampingFraction: 0.6, blendDuration: 0).delay(0.1), value: animateProfile)
                 
                 VStack(spacing: 4) {
                     Text(viewModel.user.fullName)
@@ -109,6 +125,9 @@ struct ProfileView: View {
                         .font(.system(size: 18, weight: .medium, design: .rounded))
                         .foregroundColor(.white.opacity(0.9))
                 }
+                .opacity(animateProfile ? 1 : 0)
+                .offset(y: animateProfile ? 0 : 20)
+                .animation(.easeOut(duration: 0.5).delay(0.3), value: animateProfile)
                 
                 HStack(spacing: 20) {
                     Button(action: {}) {
@@ -121,6 +140,9 @@ struct ProfileView: View {
                     }
                     .buttonStyle(PrimaryButtonStyle())
                 }
+                .opacity(animateProfile ? 1 : 0)
+                .offset(y: animateProfile ? 0 : 20)
+                .animation(.easeOut(duration: 0.5).delay(0.5), value: animateProfile)
             }
             .padding(.top, 20)
             .padding(.bottom, 30)
@@ -132,7 +154,7 @@ struct ProfileView: View {
         VStack(alignment: .leading, spacing: 20) {
             Text(tabTitle)
                 .font(.headline)
-                .foregroundColor(.secondary)
+                .foregroundColor(Color("NeutralDark"))
                 .padding(.horizontal)
                 .padding(.top, 20)
             
@@ -176,8 +198,8 @@ struct ProfileView: View {
                     .font(.system(size: 14, weight: .medium, design: .rounded))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 6)
-                    .background(Color.blue.opacity(0.1))
-                    .foregroundColor(.blue)
+                    .background(Color("AccentColor").opacity(0.1))
+                    .foregroundColor(Color("AccentColor"))
                     .cornerRadius(20)
             }
         }
@@ -193,7 +215,7 @@ struct ProfileView: View {
                     Spacer()
                     Text(formatDate(activity.date))
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(Color("NeutralDark"))
                 }
                 .padding(.vertical, 8)
             }
@@ -201,7 +223,7 @@ struct ProfileView: View {
             NavigationLink(destination: Text("Activity History View")) {
                 Text("See All")
                     .font(.subheadline)
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color("AccentColor"))
             }
         }
         .padding(.horizontal)
@@ -221,13 +243,16 @@ struct ProfileView: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 10)
             .background(
-                LinearGradient(gradient: Gradient(colors: [.blue, .purple]), startPoint: .topLeading, endPoint: .bottomTrailing)
+                LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .topLeading, endPoint: .bottomTrailing)
             )
             .cornerRadius(20)
             .shadow(color: Color.black.opacity(0.2), radius: 4, x: 0, y: 2)
         }
         .padding(.trailing, 20)
         .padding(.bottom, 100)
+        .scaleEffect(animateProfile ? 1 : 0.5)
+        .opacity(animateProfile ? 1 : 0)
+        .animation(.spring(response: 0.5, dampingFraction: 0.6, blendDuration: 0).delay(0.7), value: animateProfile)
     }
     
     private var loadingOverlay: some View {
@@ -264,7 +289,7 @@ struct CustomTabView: View {
         HStack(spacing: 0) {
             ForEach(0..<tabs.count, id: \.self) { index in
                 Button(action: {
-                    withAnimation {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
                         selectedTab = index
                     }
                 }) {
@@ -275,14 +300,16 @@ struct CustomTabView: View {
                     .font(.system(size: 14, weight: .medium, design: .rounded))
                     .padding(.vertical, 8)
                     .frame(maxWidth: .infinity)
-                    .foregroundColor(selectedTab == index ? .white : .primary)
-                    .background(selectedTab == index ? Color.blue : Color.clear)
+                    .foregroundColor(selectedTab == index ? .white : Color("NeutralDark"))
+                    .background(selectedTab == index ? Color("AccentColor") : Color.clear)
                     .cornerRadius(20)
                 }
             }
         }
         .padding(4)
-        .background(Color.clear)
+        .background(Color("NeutralLight"))
+        .cornerRadius(25)
+        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
     }
 }
 
@@ -294,16 +321,16 @@ struct InfoRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .foregroundColor(.blue)
+                .foregroundColor(Color("AccentColor"))
                 .frame(width: 30)
             
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.subheadline)
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color("NeutralDark"))
                 Text(value)
                     .font(.body)
-                    .foregroundColor(.primary)
+                    .foregroundColor(Color("NeutralDark"))
             }
         }
     }
@@ -427,11 +454,12 @@ struct PrimaryButtonStyle: ButtonStyle {
         configuration.label
             .padding(.vertical, 10)
             .padding(.horizontal, 20)
-            .background(Color.white)
-            .foregroundColor(.blue)
+            .background(Color("NeutralLight"))
+            .foregroundColor(Color("AccentColor"))
             .cornerRadius(20)
-            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+            .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
             .scaleEffect(configuration.isPressed ? 0.95 : 1)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: configuration.isPressed)
     }
 }
 
