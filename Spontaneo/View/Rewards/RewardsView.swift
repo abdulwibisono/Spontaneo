@@ -12,9 +12,25 @@ struct RewardsView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     headerView
+                        .padding(.top, 60)
+                        .padding(.bottom, 50)
+                        .background(
+                            LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]),
+                                           startPoint: .topLeading,
+                                           endPoint: .bottomTrailing)
+                        )
+                        .cornerRadius(30, corners: [.bottomLeft, .bottomRight])
+                        .shadow(color: Color.black.opacity(0.2), radius: 10, x: 0, y: 5)
+                        .animation(.easeInOut(duration: 0.5), value: totalPoints)
                     
                     VStack(spacing: 24) {
                         pointsProgressView
+                            .padding()
+                            .background(Color(.secondarySystemBackground))
+                            .cornerRadius(20)
+                            .shadow(color: Color.black.opacity(0.1), radius: 5, x: 0, y: 2)
+                            .animation(.easeInOut(duration: 0.5), value: totalPoints)
+                        
                         availableRewardsSection
                         rewardHistorySection
                         howToEarnSection
@@ -25,9 +41,10 @@ struct RewardsView: View {
                     .cornerRadius(30, corners: [.topLeft, .topRight])
                     .offset(y: -30)
                 }
+                .padding(.bottom, 0) 
             }
             .background(
-                LinearGradient(gradient: Gradient(colors: [Color.blue, Color.purple]),
+                LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]),
                                startPoint: .topLeading,
                                endPoint: .bottomTrailing)
                     .ignoresSafeArea()
@@ -50,8 +67,6 @@ struct RewardsView: View {
                 .font(.subheadline)
                 .foregroundColor(.white.opacity(0.8))
         }
-        .padding(.top, 60)
-        .padding(.bottom, 50)
     }
     
     private var pointsProgressView: some View {
@@ -73,9 +88,6 @@ struct RewardsView: View {
                 .font(.caption)
                 .foregroundColor(.secondary)
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(20)
     }
     
     private var availableRewardsSection: some View {
@@ -89,6 +101,8 @@ struct RewardsView: View {
                     .onTapGesture {
                         selectedReward = reward
                     }
+                    .transition(.slide)
+                    .animation(.easeInOut(duration: 0.3))
             }
         }
     }
@@ -104,6 +118,8 @@ struct RewardsView: View {
                     .onTapGesture {
                         selectedReward = reward
                     }
+                    .transition(.slide)
+                    .animation(.easeInOut(duration: 0.3))
             }
         }
     }
@@ -121,6 +137,7 @@ struct RewardsView: View {
                 earnMethodView(icon: "calendar", title: "Daily Check-in", description: "Open the app daily", points: "+10 pts")
             }
         }
+        .padding(.bottom, 50)
     }
     
     private func earnMethodView(icon: String, title: String, description: String, points: String) -> some View {
@@ -128,7 +145,7 @@ struct RewardsView: View {
             HStack {
                 Image(systemName: icon)
                     .font(.title2)
-                    .foregroundColor(.blue)
+                    .foregroundColor(Color("AccentColor"))
                 Spacer()
                 Text(points)
                     .font(.caption)
@@ -205,11 +222,11 @@ struct RoundedRectProgressViewStyle: ProgressViewStyle {
         ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: 14)
                 .frame(height: 20)
-                .foregroundColor(Color.blue.opacity(0.2))
+                .foregroundColor(Color("AccentColor").opacity(0.2))
             
             RoundedRectangle(cornerRadius: 14)
                 .frame(width: CGFloat(configuration.fractionCompleted ?? 0) * UIScreen.main.bounds.width - 40, height: 20)
-                .foregroundColor(.blue)
+                .foregroundColor(Color("AccentColor"))
         }
     }
 }
@@ -269,7 +286,7 @@ struct RewardDetailView: View {
                         Label("Visit Website", systemImage: "globe")
                             .frame(maxWidth: .infinity)
                             .padding()
-                            .background(Color.blue)
+                            .background(Color("AccentColor"))
                             .foregroundColor(.white)
                             .cornerRadius(10)
                     }
