@@ -5,6 +5,7 @@ struct CreateActivityView: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var activityService = ActivityService()
     @EnvironmentObject var authService: AuthenticationService
+    
     @State private var title = ""
     @State private var description = ""
     @State private var category = ""
@@ -15,10 +16,20 @@ struct CreateActivityView: View {
     @State private var showingImagePicker = false
     @State private var inputImage: UIImage?
     @State private var image: Image?
+    
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: -27.4698, longitude: 153.0251),
         span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
     )
+    
+    // Autocomplete Properties
+    @State private var searchCompleter = MKLocalSearchCompleter()
+    @State private var searchResults: [MKLocalSearchCompletion] = []
+    @State private var isSearching = false
+    @FocusState private var isLocationFieldFocused: Bool
+    
+    // Coordinator Delegate
+    @StateObject private var searchCompleterDelegate = SearchCompleterDelegate()
     
     let categories = ["Coffee", "Study", "Sports", "Food", "Explore"]
     
@@ -39,7 +50,7 @@ struct CreateActivityView: View {
                     .padding(.horizontal, 20)
                 }
                 .padding(.vertical, 20)
-                .padding(.bottom, 80) // Add extra padding at the bottom
+                .padding(.bottom, 80) // Extra padding at the bottom
             }
             .background(Color("NeutralLight"))
             .navigationTitle("Create Activity")
@@ -57,11 +68,51 @@ struct CreateActivityView: View {
             )
         }
         .accentColor(Color("AccentColor"))
-        .edgesIgnoringSafeArea(.bottom) // Ignore safe area at the bottom
+        .edgesIgnoringSafeArea(.bottom)
         .sheet(isPresented: $showingImagePicker, onDismiss: loadImage) {
             ImagePicker(image: $inputImage)
         }
+        .overlay(
+            VStack {
+                if isSearching && !searchResults.isEmpty {
+                    List(searchResults, id: \.self) { completion in
+                        Button(action: {
+                            selectCompletion(completion)
+                        }) {
+                            VStack(alignment: .leading) {
+                                Text(completion.title)
+                                    .font(.headline)
+                                Text(completion.subtitle)
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    }
+                    .listStyle(PlainListStyle())
+                    .frame(height: 200)
+                    .background(Color.white)
+                    .cornerRadius(10)
+                    .shadow(radius: 5)
+                    .padding(.horizontal, 20)
+                }
+            },
+            alignment: .top
+        )
+        .onAppear {
+            searchCompleter.delegate = searchCompleterDelegate
+            searchCompleter.region = region
+            searchCompleter.resultTypes = .address
+            searchCompleterDelegate.bind(
+                searchCompleter: searchCompleter,
+                searchResults: $searchResults,
+                isSearching: $isSearching,
+                region: $region,
+                onCompletionSelected: selectCompletion
+            )
+        }
     }
+    
+    // MARK: - Sections
     
     private var imageSection: some View {
         ZStack {
@@ -171,11 +222,22 @@ struct CreateActivityView: View {
             TextField("Enter location", text: $location)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .foregroundColor(Color("NeutralDark"))
-            Map(coordinateRegion: $region)
-                .frame(height: 200)
-                .cornerRadius(16)
-                .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color("NeutralLight"), lineWidth: 1))
-                .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
+                .focused($isLocationFieldFocused)
+                .onChange(of: location) { newValue in
+                    if newValue.isEmpty {
+                        searchResults = []
+                        isSearching = false
+                    } else {
+                        searchCompleter.queryFragment = newValue
+                    }
+                }
+            Map(coordinateRegion: $region, annotationItems: selectedLocationAnnotation) { item in
+                MapPin(coordinate: item.coordinate, tint: .red)
+            }
+            .frame(height: 200)
+            .cornerRadius(16)
+            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color("NeutralLight"), lineWidth: 1))
+            .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
         }
     }
     
@@ -199,7 +261,32 @@ struct CreateActivityView: View {
         }
     }
     
-    func loadImage() {
+    // MARK: - Helpers
+    
+    private var selectedLocationAnnotation: [SelectableLocation] {
+        if location.isEmpty {
+            return []
+        }
+        return [SelectableLocation(coordinate: region.center)]
+    }
+    
+    private func selectCompletion(_ completion: MKLocalSearchCompletion) {
+        let searchRequest = MKLocalSearch.Request(completion: completion)
+        let search = MKLocalSearch(request: searchRequest)
+        search.start { response, error in
+            guard let placemark = response?.mapItems.first?.placemark else { return }
+            self.location = placemark.title ?? ""
+            self.region = MKCoordinateRegion(
+                center: placemark.coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            )
+            self.isSearching = false
+            self.searchResults = []
+            self.isLocationFieldFocused = false
+        }
+    }
+    
+    private func loadImage() {
         guard let inputImage = inputImage else { return }
         image = Image(uiImage: inputImage)
     }
@@ -214,7 +301,11 @@ struct CreateActivityView: View {
             title: title,
             category: category,
             date: date,
-            location: Activity.Location(name: location, latitude: region.center.latitude, longitude: region.center.longitude),
+            location: Activity.Location(
+                name: location,
+                latitude: region.center.latitude,
+                longitude: region.center.longitude
+            ),
             currentParticipants: 1,  // Assuming the creator is the first participant
             maxParticipants: maxParticipants,
             hostId: currentUser.id,
@@ -233,4 +324,44 @@ struct CreateActivityView: View {
             print("Failed to create activity")
         }
     }
+}
+
+// MARK: - SearchCompleterDelegate
+
+final class SearchCompleterDelegate: NSObject, MKLocalSearchCompleterDelegate, ObservableObject {
+    @Published var results: [MKLocalSearchCompletion] = []
+    @Published var isSearching: Bool = false
+    
+    var onCompletionSelected: ((MKLocalSearchCompletion) -> Void)?
+    
+    func bind(
+        searchCompleter: MKLocalSearchCompleter,
+        searchResults: Binding<[MKLocalSearchCompletion]>,
+        isSearching: Binding<Bool>,
+        region: Binding<MKCoordinateRegion>,
+        onCompletionSelected: @escaping (MKLocalSearchCompletion) -> Void
+    ) {
+        self.onCompletionSelected = onCompletionSelected
+    }
+    
+    func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
+        DispatchQueue.main.async {
+            self.results = completer.results
+            self.isSearching = !completer.results.isEmpty
+        }
+    }
+    
+    func completer(_ completer: MKLocalSearchCompleter, didFailWithError error: Error) {
+        print("Search completer error: \(error.localizedDescription)")
+        DispatchQueue.main.async {
+            self.results = []
+            self.isSearching = false
+        }
+    }
+}
+
+// Helper Struct for Map Annotation
+struct SelectableLocation: Identifiable {
+    let id = UUID()
+    let coordinate: CLLocationCoordinate2D
 }
