@@ -3,6 +3,8 @@ import MapKit
 
 struct CreateActivityView: View {
     @Environment(\.presentationMode) var presentationMode
+    @StateObject private var activityService = ActivityService()
+    @EnvironmentObject var authService: AuthenticationService
     @State private var title = ""
     @State private var description = ""
     @State private var category = ""
@@ -202,9 +204,33 @@ struct CreateActivityView: View {
         image = Image(uiImage: inputImage)
     }
     
-    func createActivity() {
-        // Here you would typically save the activity to your data model or send it to a server
-        print("Creating activity: \(title)")
-        presentationMode.wrappedValue.dismiss()
+    private func createActivity() {
+        guard let currentUser = authService.user else {
+            print("No user logged in")
+            return
+        }
+
+        let newActivity = Activity(
+            title: title,
+            category: category,
+            date: date,
+            location: Activity.Location(name: location, latitude: region.center.latitude, longitude: region.center.longitude),
+            currentParticipants: 1,  // Assuming the creator is the first participant
+            maxParticipants: maxParticipants,
+            hostId: currentUser.id,
+            hostName: currentUser.username,  // Use the current user's username
+            description: description,
+            tags: [],  // Add logic to handle tags
+            receiveUpdates: true,
+            updates: [],
+            rating: 0.0  // Initial rating for new activities
+        )
+        
+        if let id = activityService.createActivity(newActivity) {
+            print("Created activity with ID: \(id)")
+            presentationMode.wrappedValue.dismiss()
+        } else {
+            print("Failed to create activity")
+        }
     }
 }

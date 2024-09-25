@@ -54,6 +54,22 @@ struct Message: Identifiable {
 
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatView(activity: Activity.sampleActivity)
+        let sampleActivity = Activity(
+            id: UUID().uuidString,
+            title: "Sample Activity",
+            category: "Coffee",
+            date: Date(),
+            location: Activity.Location(name: "Sample Location", latitude: 0, longitude: 0),
+            currentParticipants: 1,
+            maxParticipants: 10,
+            hostId: "sampleHostId",
+            hostName: "Sample Host",
+            description: "This is a sample activity for preview purposes.",
+            tags: ["sample", "preview"],
+            receiveUpdates: true,
+            updates: [],
+            rating: 4.5
+        )
+        return ChatView(activity: sampleActivity)
     }
 }

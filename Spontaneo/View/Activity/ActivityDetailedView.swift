@@ -1,10 +1,3 @@
-//
-//  ActivityDetailedView.swift
-//  Spontaneo
-//
-//  Created by Bilhuda Pramana on 20/9/2024.
-//
-
 import SwiftUI
 import MapKit
 
@@ -93,9 +86,9 @@ struct ActivityDetailedView: View {
                     .foregroundColor(Color("NeutralLight"))
                 
                 HStack {
-                    Label(activity.host.name, systemImage: "person.circle.fill")
+                    Label(activity.hostName, systemImage: "person.circle.fill")
                     Spacer()
-                    Label(String(format: "%.1f", activity.host.rating), systemImage: "star.fill")
+                    Label(String(format: "%.1f", activity.rating), systemImage: "star.fill")
                 }
                 .font(.subheadline)
                 .foregroundColor(Color("NeutralLight").opacity(0.8))
@@ -295,8 +288,26 @@ struct ActivityDetailedView: View {
 
 struct ActivityDetailedView_Previews: PreviewProvider {
     static var previews: some View {
-        NavigationView {
-            ActivityDetailedView(activity: Activity.sampleActivity)
+        let sampleActivity = Activity(
+            id: UUID().uuidString,
+            title: "Sample Activity",
+            category: "Coffee",
+            date: Date(),
+            location: Activity.Location(name: "Sample Location", latitude: -27.4698, longitude: 153.0251),
+            currentParticipants: 5,
+            maxParticipants: 10,
+            hostId: "sampleHostId",
+            hostName: "Sample Host",
+            description: "This is a sample activity for preview purposes.",
+            tags: ["sample", "preview"],
+            receiveUpdates: true,
+            updates: [],
+            rating: 4.5,
+            imageURLs: ["https://example.com/sample-image.jpg"]
+        )
+        
+        return NavigationView {
+            ActivityDetailedView(activity: sampleActivity)
         }
     }
 }
