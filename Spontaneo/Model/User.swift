@@ -1,7 +1,7 @@
 import Foundation
 
 struct User: Identifiable, Codable, Equatable {
-    let id: String
+    var id: String
     var username: String
     var email: String
     var fullName: String

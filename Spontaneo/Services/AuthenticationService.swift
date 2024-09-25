@@ -1,17 +1,35 @@
 import Firebase
 import FirebaseAuth
+import FirebaseFirestore
 import Combine
 
 class AuthenticationService: ObservableObject {
     @Published var user: User?
     private var cancellables = Set<AnyCancellable>()
+    private let db = Firestore.firestore()
     
     init() {
         Auth.auth().addStateDidChangeListener { [weak self] _, firebaseUser in
             if let firebaseUser = firebaseUser {
-                self?.user = User(id: firebaseUser.uid, username: firebaseUser.displayName ?? "", email: firebaseUser.email ?? "", fullName: "", bio: "", interests: [], profileImageURL: firebaseUser.photoURL, joinDate: Date(), activities: [])
+                self?.fetchUser(firebaseUser: firebaseUser)
             } else {
                 self?.user = nil
+            }
+        }
+    }
+    
+    private func fetchUser(firebaseUser: FirebaseAuth.User) {
+        db.collection("users").document(firebaseUser.uid).getDocument { [weak self] (document, error) in
+            if let document = document, document.exists {
+                do {
+                    var user = try document.data(as: User.self)
+                    user.id = document.documentID
+                    self?.user = user
+                } catch {
+                    print("Error decoding user: \(error)")
+                }
+            } else {
+                print("User document does not exist")
             }
         }
     }
@@ -24,7 +42,18 @@ class AuthenticationService: ObservableObject {
                         promise(.failure(error))
                     } else if let firebaseUser = authResult?.user {
                         let user = User(id: firebaseUser.uid, username: username, email: email, fullName: "", bio: "", interests: [], profileImageURL: nil, joinDate: Date(), activities: [])
-                        promise(.success(user))
+                        
+                        do {
+                            try self.db.collection("users").document(user.id).setData(from: user) { error in
+                                if let error = error {
+                                    promise(.failure(error))
+                                } else {
+                                    promise(.success(user))
+                                }
+                            }
+                        } catch {
+                            promise(.failure(error))
+                        }
                     }
                 }
             }

@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AppTabBarView: View {
     @State private var tabSelection: TabBarItem = .home
+    @EnvironmentObject var authService: AuthenticationService
     
     var body: some View {
         CustomTabBarContainerView(selection: $tabSelection) {
@@ -14,7 +15,7 @@ struct AppTabBarView: View {
             RewardsView()
                 .tabBarItem(tab: .rewards, selection: $tabSelection)
 
-            ProfileView(user: User.sampleUser)
+            ProfileView(userId: authService.user?.id ?? "")
                 .tabBarItem(tab: .profile, selection: $tabSelection)
         }
         .ignoresSafeArea(.keyboard, edges: .bottom)
