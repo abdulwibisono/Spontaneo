@@ -2,7 +2,7 @@
 //  Spontaneo_WatchApp.swift
 //  Spontaneo Watch Watch App
 //
-//  Created by Mughni Wibisono on 20/09/24.
+//  Created by Mughni Wibisono on 25/09/24.
 //
 
 import SwiftUI

@@ -14,11 +14,12 @@ struct HomeView: View {
     @State private var bottomSheetOffset: CGFloat = 0
     @State private var lastDragValue: CGFloat = 0
     @State private var bottomSheetHeight: CGFloat = 150
-
-    // Add these state variables
     @State private var collapsedOffset: CGFloat = 0
     @State private var expandedOffset: CGFloat = 0
     let desiredExpandedHeight: CGFloat = 500
+
+    @StateObject private var activityService = ActivityService()
+    @State private var activities: [Activity] = []
 
     var body: some View {
         GeometryReader { geometry in
@@ -29,10 +30,10 @@ struct HomeView: View {
                         if let location = locationManager.location {
                             region.center = location.coordinate
                         }
-                        // Initialize collapsed and expanded offsets
                         collapsedOffset = geometry.size.height - bottomSheetHeight
                         expandedOffset = geometry.size.height - bottomSheetHeight - desiredExpandedHeight
                         bottomSheetOffset = collapsedOffset
+                        fetchNearbyActivities()
                     }
                     .overlay(
                         VStack {
@@ -67,14 +68,13 @@ struct HomeView: View {
                     Spacer()
                 }
                 
-                BottomSheetView()
+                BottomSheetView(activities: activities)
                     .offset(y: bottomSheetOffset)
                     .gesture(
                         DragGesture()
                             .onChanged { value in
                                 let dragAmount = value.translation.height - lastDragValue
                                 bottomSheetOffset += dragAmount
-                                // Clamp the offset between expanded and collapsed positions
                                 bottomSheetOffset = max(expandedOffset, min(bottomSheetOffset, collapsedOffset))
                                 lastDragValue = value.translation.height
                             }
@@ -91,34 +91,54 @@ struct HomeView: View {
                             }
                     )
             }
-            .navigationTitle("Home")
+        }
+    }
+    
+    private func fetchNearbyActivities() {
+        activityService.getAllActivities { fetchedActivities in
+            if let userLocation = locationManager.location {
+                self.activities = fetchedActivities.filter { activity in
+                    let activityLocation = CLLocation(latitude: activity.location.latitude, longitude: activity.location.longitude)
+                    let distanceInMeters = userLocation.distance(from: activityLocation)
+                    let distanceInKm = distanceInMeters / 1000
+                    return distanceInKm <= 10
+                }
+            } else {
+                self.activities = fetchedActivities
+            }
         }
     }
     
     @ViewBuilder
-    func HotSpot() -> some View {
+    func BottomSheetView(activities: [Activity]) -> some View {
         VStack {
-            HStack {
-                Rectangle()
-                    .foregroundColor(.gray)
-                    .frame(width: 70, height:50)
-                
-                Rectangle()
-                    .foregroundColor(.gray)
-                    .frame(width: 70, height:50)
-            }
+            Capsule()
+                .frame(width: 40, height: 6)
+                .foregroundColor(Color.gray.opacity(0.5))
+                .padding(.top, 8)
             
-            HStack {
-                Rectangle()
-                    .foregroundColor(.gray)
-                    .frame(width: 70, height:50)
-                
-                Rectangle()
-                    .foregroundColor(.gray)
-                    .frame(width: 70, height:50)
+            Text("What's in the Area")
+                .padding()
+                .padding(.top, -14)
+                .fontWeight(.bold)
+            
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    ForEach(activities) { activity in
+                        NavigationLink(destination: ActivityDetailedView(activity: activity)) {
+                            ActivityCardHome(activity: activity)
+                        }
+                        .buttonStyle(PlainButtonStyle())
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top)
             }
         }
-        .padding(.top, 20)
+        .frame(maxWidth: .infinity)
+        .background(Color.white)
+        .cornerRadius(16)
+        .shadow(radius: 10)
     }
     
     var CategoryListView: some View {
@@ -142,37 +162,25 @@ struct HomeView: View {
             }
         }.padding(.top, 40)
     }
-    
-    @ViewBuilder
-    func BottomSheetView() -> some View {
-        VStack {
-            Capsule()
-                .frame(width: 40, height: 6)
-                .foregroundColor(Color.gray.opacity(0.5))
-                .padding(.top, 8)
-            
-            Text("What's in the Area")
-                .padding()
-                .padding(.top, -14)
-                .fontWeight(.bold)
-            
-            Spacer()
-            
-            VStack {
-                HStack {
-                    ZStack {
-                        Rectangle()
-                    }
-                }
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .background(Color.white)
-        .cornerRadius(16)
-        .shadow(radius: 10)
-    }
 }
 
-#Preview {
-    HomeView()
+struct ActivityCardHome: View {
+    let activity: Activity
+    
+    var body: some View {
+        HStack {
+            Spacer()
+            
+            ZStack {
+                Rectangle()
+                    .frame(width: 170, height: 120)
+                    .cornerRadius(12)
+                    .opacity(0.5)
+                
+                Text(activity.title)
+            }
+            
+            Spacer()
+        }
+    }
 }
