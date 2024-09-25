@@ -15,7 +15,9 @@ struct ActivityView: View {
     @State private var showLocationPicker = false
     @State private var showSortOptions = false
     
-    @State private var activities = Activity.sampleActivities
+    @StateObject private var activityService = ActivityService()
+    @EnvironmentObject var authService: AuthenticationService
+    @State private var activities: [Activity] = []
     @State private var filters = ActivityFilters()
     
     @State private var showingCreateActivity = false
@@ -51,10 +53,19 @@ struct ActivityView: View {
         }
         .accentColor(Color("AccentColor"))
         .sheet(isPresented: $showingCreateActivity) {
-            CreateActivityView()
-        }
+                    CreateActivityView().environmentObject(authService)
+                }
         .edgesIgnoringSafeArea(.bottom) // Ignore safe area at the bottom
+        .onAppear {
+                    fetchActivities()
+                }
     }
+    
+    private func fetchActivities() {
+            activityService.getAllActivities { fetchedActivities in
+                self.activities = fetchedActivities
+            }
+        }
     
     private var headerSection: some View {
         VStack(spacing: 16) {
@@ -174,8 +185,8 @@ struct ActivityView: View {
     private var filteredActivities: [Activity] {
         activities.filter { activity in
             let categoryMatch = filters.categories.isEmpty || filters.categories.contains(activity.category)
-            let ratingMatch = activity.host.rating >= filters.minRating
-            let distanceMatch = true // You would need to calculate the distance based on user's location
+            let ratingMatch = activity.rating >= filters.minRating
+            let distanceMatch = true
             let dateMatch = filters.dateRange.map { $0.contains(activity.date) } ?? true
             
             return categoryMatch && ratingMatch && distanceMatch && dateMatch
@@ -292,13 +303,18 @@ struct ActivityCard: View {
                 .foregroundColor(Color("NeutralDark"))
             
             HStack {
+                Image(systemName: "person.circle.fill")
+                    .foregroundColor(Color("AccentColor"))
+                Text(activity.hostName)
+                    .font(.subheadline)
+                    .foregroundColor(Color("NeutralDark"))
+                Spacer()
                 Image(systemName: "star.fill")
                     .foregroundColor(Color("SecondaryColor"))
-                Text(String(format: "%.1f", activity.host.rating))
-                Text("(\(Int.random(in: 10...100)) reviews)")
-                    .foregroundColor(Color("NeutralDark").opacity(0.6))
+                Text(String(format: "%.1f", activity.rating))
+                    .font(.subheadline)
+                    .foregroundColor(Color("NeutralDark"))
             }
-            .font(.subheadline)
             
             Text(activity.description)
                 .lineLimit(2)
