@@ -269,7 +269,7 @@ struct EditProfileView_Previews: PreviewProvider {
             activities: []
         )
         
-        let viewModel = ProfileViewModel(user: sampleUser)
+        let viewModel = ProfileViewModel(userId: sampleUser.id)
         
         return EditProfileView(viewModel: viewModel)
     }

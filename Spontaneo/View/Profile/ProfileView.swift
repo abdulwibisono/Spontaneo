@@ -8,9 +8,9 @@ struct ProfileView: View {
     @State private var showingSettings = false
     @State private var animateProfile = false
     
-    init(user: User) {
-        _viewModel = StateObject(wrappedValue: ProfileViewModel(user: user))
-    }
+    init(userId: String) {
+            _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: userId))
+        }
     
     var body: some View {
         ScrollView {
@@ -465,7 +465,6 @@ struct PrimaryButtonStyle: ButtonStyle {
 
 struct ProfileView_Previews: PreviewProvider {
     static var previews: some View {
-        ProfileView(user: User.sampleUser)
-            
+        ProfileView(userId: User.sampleUser.id)
     }
 }
