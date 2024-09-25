@@ -276,6 +276,8 @@ struct FilterChip: View {
 
 struct ActivityCard: View {
     let activity: Activity
+    @State private var showingEditActivity = false
+    @EnvironmentObject var authService: AuthenticationService
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -353,6 +355,18 @@ struct ActivityCard: View {
                         )
                         .foregroundColor(Color("NeutralLight"))
                         .cornerRadius(20)
+                }
+            }
+            
+            if activity.hostId == authService.user?.id {
+                Button(action: {
+                    showingEditActivity = true
+                }) {
+                    Image(systemName: "pencil")
+                        .foregroundColor(Color("AccentColor"))
+                }
+                .sheet(isPresented: $showingEditActivity) {
+                    EditActivityView(activity: activity)
                 }
             }
         }

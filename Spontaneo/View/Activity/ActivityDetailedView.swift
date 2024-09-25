@@ -9,6 +9,8 @@ struct ActivityDetailedView: View {
     @State private var showChat = false
     @Environment(\.colorScheme) var colorScheme
     @State private var selectedImageIndex: Int = 0
+    @EnvironmentObject var authService: AuthenticationService
+    @State private var showingEditActivity = false
     
     let placeholderImages = [
         "activity_placeholder",
@@ -49,14 +51,25 @@ struct ActivityDetailedView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: { showChat = true }) {
-                    Image(systemName: "bubble.left.and.bubble.right.fill")
-                        .foregroundColor(Color("AccentColor"))
+                HStack {
+                    if activity.hostId == authService.user?.id {
+                        Button(action: { showingEditActivity = true }) {
+                            Image(systemName: "pencil")
+                                .foregroundColor(Color("AccentColor"))
+                        }
+                    }
+                    Button(action: { showChat = true }) {
+                        Image(systemName: "bubble.left.and.bubble.right.fill")
+                            .foregroundColor(Color("AccentColor"))
+                    }
                 }
             }
         }
         .sheet(isPresented: $showChat) {
             ChatView(activity: activity)
+        }
+        .sheet(isPresented: $showingEditActivity) {
+            EditActivityView(activity: activity)
         }
     }
     
@@ -302,8 +315,7 @@ struct ActivityDetailedView_Previews: PreviewProvider {
             tags: ["sample", "preview"],
             receiveUpdates: true,
             updates: [],
-            rating: 4.5,
-            imageURLs: ["https://example.com/sample-image.jpg"]
+            rating: 4.5
         )
         
         return NavigationView {

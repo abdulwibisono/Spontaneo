@@ -41,6 +41,7 @@
 		43EFC22C2C9D559600F01213 /* AuthenticationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EFC1F02C9D511200F01213 /* AuthenticationViewModel.swift */; };
 		43EFC2302C9D559600F01213 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EFC1F32C9D519300F01213 /* LoginView.swift */; };
 		43EFC2312C9D559600F01213 /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43EFC1F52C9D51A300F01213 /* SignUpView.swift */; };
+		610DA2032CA402B9001D15F2 /* EditActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 610DA2022CA402B9001D15F2 /* EditActivityView.swift */; };
 		615390212C86068500E8EAEE /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615390202C86068500E8EAEE /* User.swift */; };
 		615390242C86D9EC00E8EAEE /*  ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 615390232C86D9EC00E8EAEE /*  ProfileViewModel.swift */; };
 		6186D5352C8C15200003048F /* Reward.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6186D5342C8C15200003048F /* Reward.swift */; };
@@ -74,6 +75,7 @@
 		43EFC1F32C9D519300F01213 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		43EFC1F52C9D51A300F01213 /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
 		43EFC1F82C9D51C300F01213 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
+		610DA2022CA402B9001D15F2 /* EditActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditActivityView.swift; sourceTree = "<group>"; };
 		615390202C86068500E8EAEE /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		615390232C86D9EC00E8EAEE /*  ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = " ProfileViewModel.swift"; sourceTree = "<group>"; };
 		6186D5342C8C15200003048F /* Reward.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reward.swift; sourceTree = "<group>"; };
@@ -208,6 +210,7 @@
 				939A83462C8EB5F400007615 /* ActivityView.swift */,
 				618CA4102C9D57F0007B3D79 /* ActivityDetailedView.swift */,
 				618CA41E2C9DCAAD007B3D79 /* CreateActivityView.swift */,
+				610DA2022CA402B9001D15F2 /* EditActivityView.swift */,
 			);
 			path = Activity;
 			sourceTree = "<group>";
@@ -420,6 +423,7 @@
 				6186D5352C8C15200003048F /* Reward.swift in Sources */,
 				93B5186A2C8C8706007EFF6C /* RewardsView.swift in Sources */,
 				93407DDE2C9D4E6C00AB721F /* ChatView.swift in Sources */,
+				610DA2032CA402B9001D15F2 /* EditActivityView.swift in Sources */,
 				43E95A7D2CA3F87F00233A1F /* ActivityService.swift in Sources */,
 				93B518712C8CA39E007EFF6C /* CustomTabBarContainerView.swift in Sources */,
 				93B518772C8CA3EA007EFF6C /* TabBarItemsPreferenceKey.swift in Sources */,

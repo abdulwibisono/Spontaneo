@@ -62,4 +62,23 @@ class ActivityService: ObservableObject {
             completion(activities)
         }
     }
+    
+    func updateActivity(_ activity: Activity, completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let id = activity.id else {
+            completion(.failure(NSError(domain: "ActivityService", code: 0, userInfo: [NSLocalizedDescriptionKey: "Activity ID is missing"])))
+            return
+        }
+        
+        do {
+            try db.collection("activities").document(id).setData(from: activity) { error in
+                if let error = error {
+                    completion(.failure(error))
+                } else {
+                    completion(.success(()))
+                }
+            }
+        } catch {
+            completion(.failure(error))
+        }
+    }
 }
