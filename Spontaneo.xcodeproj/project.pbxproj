@@ -56,6 +56,12 @@
 		9357DC942C858B19000C0B44 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC932C858B19000C0B44 /* HomeView.swift */; };
 		9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC972C85F755000C0B44 /* ProfileView.swift */; };
 		9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC9E2C86045E000C0B44 /* EditProfileView.swift */; };
+		935BE7F72CA4108100435670 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 935BE7F62CA4108100435670 /* Launch Screen.storyboard */; };
+		935BE7FF2CA4113500435670 /* Spontaneo_WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935BE7FE2CA4113500435670 /* Spontaneo_WatchApp.swift */; };
+		935BE8012CA4113500435670 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935BE8002CA4113500435670 /* ContentView.swift */; };
+		935BE8032CA4113700435670 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 935BE8022CA4113700435670 /* Assets.xcassets */; };
+		935BE8062CA4113700435670 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 935BE8052CA4113700435670 /* Preview Assets.xcassets */; };
+		935BE8092CA4113700435670 /* Spontaneo Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 935BE7FC2CA4113400435670 /* Spontaneo Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		939A83472C8EB5F400007615 /* ActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 939A83462C8EB5F400007615 /* ActivityView.swift */; };
 		93B5186A2C8C8706007EFF6C /* RewardsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B518692C8C8706007EFF6C /* RewardsView.swift */; };
 		93B5186F2C8CA37D007EFF6C /* AppTabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93B5186E2C8CA37D007EFF6C /* AppTabBarView.swift */; };
@@ -67,6 +73,30 @@
 		93CAD4912C7CA88F00D0D340 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93CAD4902C7CA88F00D0D340 /* Assets.xcassets */; };
 		93CAD4942C7CA88F00D0D340 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 93CAD4932C7CA88F00D0D340 /* Preview Assets.xcassets */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		935BE8072CA4113700435670 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 93CAD4812C7CA88D00D0D340 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 935BE7FB2CA4113400435670;
+			remoteInfo = "Spontaneo Watch Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		935BE80D2CA4113700435670 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				935BE8092CA4113700435670 /* Spontaneo Watch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		43E95A7C2CA3F87F00233A1F /* ActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityService.swift; sourceTree = "<group>"; };
@@ -89,6 +119,12 @@
 		9357DC932C858B19000C0B44 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		9357DC972C85F755000C0B44 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		9357DC9E2C86045E000C0B44 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
+		935BE7F62CA4108100435670 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		935BE7FC2CA4113400435670 /* Spontaneo Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spontaneo Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		935BE7FE2CA4113500435670 /* Spontaneo_WatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spontaneo_WatchApp.swift; sourceTree = "<group>"; };
+		935BE8002CA4113500435670 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		935BE8022CA4113700435670 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		935BE8052CA4113700435670 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		939A83462C8EB5F400007615 /* ActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityView.swift; sourceTree = "<group>"; };
 		93B518692C8C8706007EFF6C /* RewardsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RewardsView.swift; sourceTree = "<group>"; };
 		93B5186E2C8CA37D007EFF6C /* AppTabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTabBarView.swift; sourceTree = "<group>"; };
@@ -104,6 +140,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		935BE7F92CA4113400435670 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		93CAD4862C7CA88D00D0D340 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -204,6 +247,25 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		935BE7FD2CA4113500435670 /* Spontaneo Watch Watch App */ = {
+			isa = PBXGroup;
+			children = (
+				935BE7FE2CA4113500435670 /* Spontaneo_WatchApp.swift */,
+				935BE8002CA4113500435670 /* ContentView.swift */,
+				935BE8022CA4113700435670 /* Assets.xcassets */,
+				935BE8042CA4113700435670 /* Preview Content */,
+			);
+			path = "Spontaneo Watch Watch App";
+			sourceTree = "<group>";
+		};
+		935BE8042CA4113700435670 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				935BE8052CA4113700435670 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
 		939A83452C8EB5DD00007615 /* Activity */ = {
 			isa = PBXGroup;
 			children = (
@@ -238,8 +300,10 @@
 		93CAD4802C7CA88D00D0D340 = {
 			isa = PBXGroup;
 			children = (
+				935BE7F62CA4108100435670 /* Launch Screen.storyboard */,
 				43EFC1E32C9D4CA800F01213 /* GoogleService-Info.plist */,
 				93CAD48B2C7CA88D00D0D340 /* Spontaneo */,
+				935BE7FD2CA4113500435670 /* Spontaneo Watch Watch App */,
 				93CAD48A2C7CA88D00D0D340 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -248,6 +312,7 @@
 			isa = PBXGroup;
 			children = (
 				93CAD4892C7CA88D00D0D340 /* Spontaneo.app */,
+				935BE7FC2CA4113400435670 /* Spontaneo Watch Watch App.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -303,6 +368,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		935BE7FB2CA4113400435670 /* Spontaneo Watch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 935BE80A2CA4113700435670 /* Build configuration list for PBXNativeTarget "Spontaneo Watch Watch App" */;
+			buildPhases = (
+				935BE7F82CA4113400435670 /* Sources */,
+				935BE7F92CA4113400435670 /* Frameworks */,
+				935BE7FA2CA4113400435670 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Spontaneo Watch Watch App";
+			productName = "Spontaneo Watch Watch App";
+			productReference = 935BE7FC2CA4113400435670 /* Spontaneo Watch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
 		93CAD4882C7CA88D00D0D340 /* Spontaneo */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 93CAD4972C7CA88F00D0D340 /* Build configuration list for PBXNativeTarget "Spontaneo" */;
@@ -310,10 +392,12 @@
 				93CAD4862C7CA88D00D0D340 /* Frameworks */,
 				93CAD4872C7CA88D00D0D340 /* Resources */,
 				43EFC2292C9D557700F01213 /* Sources */,
+				935BE80D2CA4113700435670 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				935BE8082CA4113700435670 /* PBXTargetDependency */,
 			);
 			name = Spontaneo;
 			packageProductDependencies = (
@@ -360,6 +444,9 @@
 				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
+					935BE7FB2CA4113400435670 = {
+						CreatedOnToolsVersion = 15.0.1;
+					};
 					93CAD4882C7CA88D00D0D340 = {
 						CreatedOnToolsVersion = 15.0.1;
 					};
@@ -382,17 +469,28 @@
 			projectRoot = "";
 			targets = (
 				93CAD4882C7CA88D00D0D340 /* Spontaneo */,
+				935BE7FB2CA4113400435670 /* Spontaneo Watch Watch App */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		935BE7FA2CA4113400435670 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				935BE8062CA4113700435670 /* Preview Assets.xcassets in Resources */,
+				935BE8032CA4113700435670 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		93CAD4872C7CA88D00D0D340 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				93CAD4942C7CA88F00D0D340 /* Preview Assets.xcassets in Resources */,
 				93CAD4912C7CA88F00D0D340 /* Assets.xcassets in Resources */,
+				935BE7F72CA4108100435670 /* Launch Screen.storyboard in Resources */,
 				43EFC1E42C9D4CA800F01213 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -435,9 +533,87 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		935BE7F82CA4113400435670 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				935BE8012CA4113500435670 /* ContentView.swift in Sources */,
+				935BE7FF2CA4113500435670 /* Spontaneo_WatchApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		935BE8082CA4113700435670 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 935BE7FB2CA4113400435670 /* Spontaneo Watch Watch App */;
+			targetProxy = 935BE8072CA4113700435670 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		935BE80B2CA4113700435670 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Spontaneo Watch Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = AZ3FM9MHX9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spontaneo Watch";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = spontaneo.Spontaneo;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = spontaneo.Spontaneo;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Debug;
+		};
+		935BE80C2CA4113700435670 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Spontaneo Watch Watch App/Preview Content\"";
+				DEVELOPMENT_TEAM = AZ3FM9MHX9;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "Spontaneo Watch";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = spontaneo.Spontaneo;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = spontaneo.Spontaneo.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+			};
+			name = Release;
+		};
 		93CAD4952C7CA88F00D0D340 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -560,6 +736,7 @@
 		93CAD4982C7CA88F00D0D340 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
@@ -590,6 +767,7 @@
 		93CAD4992C7CA88F00D0D340 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -622,6 +800,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		935BE80A2CA4113700435670 /* Build configuration list for PBXNativeTarget "Spontaneo Watch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				935BE80B2CA4113700435670 /* Debug */,
+				935BE80C2CA4113700435670 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		93CAD4842C7CA88D00D0D340 /* Build configuration list for PBXProject "Spontaneo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

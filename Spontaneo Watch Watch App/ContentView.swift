@@ -2,7 +2,7 @@
 //  ContentView.swift
 //  Spontaneo Watch Watch App
 //
-//  Created by Mughni Wibisono on 20/09/24.
+//  Created by Mughni Wibisono on 25/09/24.
 //
 
 import SwiftUI
@@ -13,7 +13,7 @@ struct ContentView: View {
             Image(systemName: "globe")
                 .imageScale(.large)
                 .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Text("Spontaneo")
         }
         .padding()
     }
