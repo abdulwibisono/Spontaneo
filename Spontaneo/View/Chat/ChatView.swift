@@ -69,7 +69,7 @@ struct ChatView_Previews: PreviewProvider {
             receiveUpdates: true,
             updates: [],
             rating: 4.5,
-            joinedUsers: [Activity.JoinedUser(id: "1", username: "User1")]
+            joinedUsers: [Activity.JoinedUser(id: "1", username: "User1", fullName: "FullName")]
         )
         return ChatView(activity: sampleActivity)
     }

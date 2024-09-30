@@ -106,7 +106,7 @@ class ActivityService: ObservableObject {
                     return nil
                 }
                 
-                let joinedUser = Activity.JoinedUser(id: user.id, username: user.username)
+                let joinedUser = Activity.JoinedUser(id: user.id, username: user.username, fullName: user.fullName)
                 if !activity.joinedUsers.contains(where: { $0.id == user.id }) {
                     activity.joinedUsers.append(joinedUser)
                     activity.currentParticipants += 1
