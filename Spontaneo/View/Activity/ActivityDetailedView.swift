@@ -43,14 +43,14 @@ struct ActivityDetailedView: View {
                         participantsSection
                         tagsSection
                         mapSection
-                        joinLeaveButton
-                        viewJoinedUsersButton
+                        buttonsSection
                     }
                     .padding(.top, 20)
                     .padding(.horizontal, 20)
                     .background(Color("NeutralLight"))
                     .cornerRadius(30, corners: [.topLeft, .topRight])
                     .offset(y: -30)
+                    .padding(.bottom, 36)
                 }
             }
             .edgesIgnoringSafeArea(.top)
@@ -82,26 +82,6 @@ struct ActivityDetailedView: View {
             }
             .onAppear {
                 checkIfUserJoined()
-            }
-            .alert(isPresented: $showJoinConfirmation) {
-                Alert(
-                    title: Text("Join Activity"),
-                    message: Text("Are you sure you want to join this activity?"),
-                    primaryButton: .default(Text("Join")) {
-                        joinActivity()
-                    },
-                    secondaryButton: .cancel()
-                )
-            }
-            .alert(isPresented: $showLeaveConfirmation) {
-                Alert(
-                    title: Text("Leave Activity"),
-                    message: Text("Are you sure you want to leave this activity?"),
-                    primaryButton: .destructive(Text("Leave")) {
-                        leaveActivity()
-                    },
-                    secondaryButton: .cancel()
-                )
             }
         }
     
@@ -304,41 +284,40 @@ struct ActivityDetailedView: View {
         }
     }
     
-    private var joinLeaveButton: some View {
+    private var buttonsSection: some View {
+            VStack(spacing: 8) {
+                joinLeaveButton
+                viewJoinedUsersButton
+            }
+        }
+
+        private var joinLeaveButton: some View {
             Group {
                 if let currentUser = authService.user {
                     if activity.hostId != currentUser.id {
-                        if isJoined {
-                            Button(action: { showLeaveConfirmation = true }) {
-                                Text("Leave Activity")
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(Color.red)
-                                    .foregroundColor(Color("NeutralLight"))
-                                    .cornerRadius(16)
+                        Button(action: {
+                            if isJoined {
+                                leaveActivity()
+                            } else {
+                                joinActivity()
                             }
-                        } else {
-                            Button(action: { showJoinConfirmation = true }) {
-                                Text("Join Activity")
-                                    .font(.headline)
-                                    .frame(maxWidth: .infinity)
-                                    .padding()
-                                    .background(
-                                        LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .leading, endPoint: .trailing)
-                                    )
-                                    .foregroundColor(Color("NeutralLight"))
-                                    .cornerRadius(16)
-                            }
+                        }) {
+                            Text(isJoined ? "Leave Activity" : "Join Activity")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(
+                                    LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .leading, endPoint: .trailing)
+                                )
+                                .foregroundColor(Color("NeutralLight"))
+                                .cornerRadius(16)
                         }
                     }
                 }
             }
-            .padding(.vertical, 16)
-            .shadow(color: Color("NeutralDark").opacity(0.2), radius: 10, x: 0, y: 5)
         }
-    
-    private var viewJoinedUsersButton: some View {
+        
+        private var viewJoinedUsersButton: some View {
             Button(action: { showJoinedUsersList = true }) {
                 Text("View Joined Users")
                     .font(.headline)
@@ -348,8 +327,6 @@ struct ActivityDetailedView: View {
                     .foregroundColor(Color("NeutralLight"))
                     .cornerRadius(16)
             }
-            .padding(.bottom, 16)
-            .shadow(color: Color("NeutralDark").opacity(0.2), radius: 10, x: 0, y: 5)
         }
         
     private func checkIfUserJoined() {
@@ -415,7 +392,7 @@ struct ActivityDetailedView_Previews: PreviewProvider {
             receiveUpdates: true,
             updates: [],
             rating: 4.5,
-            joinedUsers: [Activity.JoinedUser(id: "1", username: "User1")]
+            joinedUsers: [Activity.JoinedUser(id: "1", username: "User1", fullName: "FullName")]
         )
         
         return NavigationView {

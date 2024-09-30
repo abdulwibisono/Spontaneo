@@ -32,5 +32,6 @@ struct Activity: Identifiable, Codable {
     struct JoinedUser: Codable, Identifiable {
         let id: String
         let username: String
+        let fullName: String
     }
 }

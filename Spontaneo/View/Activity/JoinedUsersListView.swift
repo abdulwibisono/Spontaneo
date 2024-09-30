@@ -4,26 +4,36 @@ struct JoinedUsersListView: View {
     let joinedUsers: [Activity.JoinedUser]
     
     var body: some View {
-        List(joinedUsers) { user in
-            HStack {
-                Image(systemName: "person.circle.fill")
-                    .resizable()
-                    .frame(width: 40, height: 40)
-                    .foregroundColor(.gray)
-                Text(user.username)
-                    .font(.headline)
+        List {
+            ForEach(joinedUsers) { user in
+                HStack {
+                    Image(systemName: "person.circle.fill")
+                        .resizable()
+                        .frame(width: 40, height: 40)
+                        .foregroundColor(.gray)
+                    VStack(alignment: .leading) {
+                        Text(user.username)
+                            .font(.headline)
+                        Text(user.fullName)
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                }
             }
         }
-        .navigationTitle("Joined Users")
+        .listStyle(PlainListStyle())
+        .padding(.top, 30)
     }
 }
 
 struct JoinedUsersListView_Previews: PreviewProvider {
     static var previews: some View {
-        JoinedUsersListView(joinedUsers: [
-            Activity.JoinedUser(id: "1", username: "User1"),
-            Activity.JoinedUser(id: "2", username: "User2"),
-            Activity.JoinedUser(id: "3", username: "User3")
-        ])
+        NavigationView {
+            JoinedUsersListView(joinedUsers: [
+                Activity.JoinedUser(id: "1", username: "user1", fullName: "John Doe"),
+                Activity.JoinedUser(id: "2", username: "user2", fullName: "Jane Smith"),
+                Activity.JoinedUser(id: "3", username: "user3", fullName: "Bob Johnson")
+            ])
+        }
     }
 }

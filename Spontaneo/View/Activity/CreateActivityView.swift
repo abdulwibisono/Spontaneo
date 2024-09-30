@@ -347,8 +347,8 @@ struct CreateActivityView: View {
             tags: [],
             receiveUpdates: true,
             updates: [],
-            rating: 0.0,
-            joinedUsers: [Activity.JoinedUser(id: currentUser.id, username: currentUser.username)]
+            rating: 0.0,  // Initial rating for new activities
+            joinedUsers: [Activity.JoinedUser(id: currentUser.id, username: currentUser.username, fullName: currentUser.fullName)]
         )
         
         if let id = activityService.createActivity(newActivity) {
