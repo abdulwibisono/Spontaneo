@@ -75,7 +75,8 @@ struct EditActivityView: View {
             tags: activity.tags,
             receiveUpdates: activity.receiveUpdates,
             updates: activity.updates,
-            rating: activity.rating
+            rating: activity.rating,
+            joinedUsers: activity.joinedUsers
         )
         
         activityService.updateActivity(updatedActivity) { result in

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		433466A02CAA96D700148DAC /* Spontaneo_WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935BE7FE2CA4113500435670 /* Spontaneo_WatchApp.swift */; };
+		433466A12CAA96DA00148DAC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935BE8002CA4113500435670 /* ContentView.swift */; };
+		4376A8062CAA9F0C00F661CA /* JoinedUsersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4376A8052CAA9F0C00F661CA /* JoinedUsersListView.swift */; };
 		43E95A7D2CA3F87F00233A1F /* ActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43E95A7C2CA3F87F00233A1F /* ActivityService.swift */; };
 		43EFC1E42C9D4CA800F01213 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 43EFC1E32C9D4CA800F01213 /* GoogleService-Info.plist */; };
 		43EFC1E72C9D4DB700F01213 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 43EFC1E62C9D4DB700F01213 /* FirebaseAnalytics */; };
@@ -57,8 +60,6 @@
 		9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC972C85F755000C0B44 /* ProfileView.swift */; };
 		9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9357DC9E2C86045E000C0B44 /* EditProfileView.swift */; };
 		935BE7F72CA4108100435670 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 935BE7F62CA4108100435670 /* Launch Screen.storyboard */; };
-		935BE7FF2CA4113500435670 /* Spontaneo_WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935BE7FE2CA4113500435670 /* Spontaneo_WatchApp.swift */; };
-		935BE8012CA4113500435670 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935BE8002CA4113500435670 /* ContentView.swift */; };
 		935BE8032CA4113700435670 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 935BE8022CA4113700435670 /* Assets.xcassets */; };
 		935BE8062CA4113700435670 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 935BE8052CA4113700435670 /* Preview Assets.xcassets */; };
 		935BE8092CA4113700435670 /* Spontaneo Watch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 935BE7FC2CA4113400435670 /* Spontaneo Watch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -99,6 +100,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4376A8052CAA9F0C00F661CA /* JoinedUsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedUsersListView.swift; sourceTree = "<group>"; };
 		43E95A7C2CA3F87F00233A1F /* ActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityService.swift; sourceTree = "<group>"; };
 		43EFC1E32C9D4CA800F01213 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		43EFC1F02C9D511200F01213 /* AuthenticationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationViewModel.swift; sourceTree = "<group>"; };
@@ -117,7 +119,7 @@
 		93407DDD2C9D4E6C00AB721F /* ChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatView.swift; sourceTree = "<group>"; };
 		93407DDF2C9D4E8400AB721F /* InviteFriendsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InviteFriendsView.swift; sourceTree = "<group>"; };
 		9357DC932C858B19000C0B44 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		9357DC972C85F755000C0B44 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		9357DC972C85F755000C0B44 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; usesTabs = 0; };
 		9357DC9E2C86045E000C0B44 /* EditProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileView.swift; sourceTree = "<group>"; };
 		935BE7F62CA4108100435670 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		935BE7FC2CA4113400435670 /* Spontaneo Watch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Spontaneo Watch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -273,6 +275,7 @@
 				618CA4102C9D57F0007B3D79 /* ActivityDetailedView.swift */,
 				618CA41E2C9DCAAD007B3D79 /* CreateActivityView.swift */,
 				610DA2022CA402B9001D15F2 /* EditActivityView.swift */,
+				4376A8052CAA9F0C00F661CA /* JoinedUsersListView.swift */,
 			);
 			path = Activity;
 			sourceTree = "<group>";
@@ -508,6 +511,7 @@
 				43EFC2302C9D559600F01213 /* LoginView.swift in Sources */,
 				43EFC2312C9D559600F01213 /* SignUpView.swift in Sources */,
 				93B5186F2C8CA37D007EFF6C /* AppTabBarView.swift in Sources */,
+				4376A8062CAA9F0C00F661CA /* JoinedUsersListView.swift in Sources */,
 				9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */,
 				9357DC982C85F755000C0B44 /* ProfileView.swift in Sources */,
 				619FEE262C958112008175F0 /* SettingView.swift in Sources */,
@@ -537,8 +541,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				935BE8012CA4113500435670 /* ContentView.swift in Sources */,
-				935BE7FF2CA4113500435670 /* Spontaneo_WatchApp.swift in Sources */,
+				433466A12CAA96DA00148DAC /* ContentView.swift in Sources */,
+				433466A02CAA96D700148DAC /* Spontaneo_WatchApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -572,7 +576,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = spontaneo.Spontaneo;
+				PRODUCT_BUNDLE_IDENTIFIER = spontaneo.Spontaneo.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;

@@ -25,8 +25,6 @@ struct ProfileView: View {
                 
                 Spacer(minLength: 50)
                 
-                signOutButton
-                    .padding(.bottom, 100) // Increase bottom padding
             }
         }
         .edgesIgnoringSafeArea(.top)
@@ -53,22 +51,6 @@ struct ProfileView: View {
                 animateProfile = true
             }
         }
-    }
-    
-    private var signOutButton: some View {
-        Button(action: {
-            authService.signOut()
-        }) {
-            Text("Sign Out")
-                .fontWeight(.semibold)
-                .foregroundColor(.white)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(Color("AccentColor"))
-                .cornerRadius(10)
-        }
-        .padding(.horizontal)
-        .transition(.move(edge: .bottom))
     }
     
     private var profileHeader: some View {
@@ -128,26 +110,13 @@ struct ProfileView: View {
                 .opacity(animateProfile ? 1 : 0)
                 .offset(y: animateProfile ? 0 : 20)
                 .animation(.easeOut(duration: 0.5).delay(0.3), value: animateProfile)
-                
-                HStack(spacing: 20) {
-                    Button(action: {}) {
-                        Label("Message", systemImage: "message.fill")
-                    }
-                    .buttonStyle(PrimaryButtonStyle())
-                    
-                    Button(action: {}) {
-                        Label("Follow", systemImage: "person.badge.plus")
-                    }
-                    .buttonStyle(PrimaryButtonStyle())
-                }
                 .opacity(animateProfile ? 1 : 0)
                 .offset(y: animateProfile ? 0 : 20)
                 .animation(.easeOut(duration: 0.5).delay(0.5), value: animateProfile)
             }
             .padding(.top, 20)
-            .padding(.bottom, 30)
         }
-        .frame(height: 420)
+        .frame(height: 400)
     }
     
     private var tabContent: some View {

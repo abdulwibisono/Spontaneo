@@ -1,24 +1,17 @@
-//
-//  SettingView.swift
-//  Spontaneo
-//
-//  Created by Bilhuda Pramana on 14/9/2024.
-//
-
 import SwiftUI
 
 struct SettingView: View {
     @State private var receiveNotifications = true
     @State private var darkModeEnabled = false
     @State private var useLocationServices = true
+    @EnvironmentObject var authService: AuthenticationService
+    @Environment(\.presentationMode) var presentationMode
+    @State private var showingLogoutAlert = false
     
     var body: some View {
         NavigationView {
             List {
                 Section(header: Text("Account")) {
-                    NavigationLink(destination: Text("Edit Profile")) {
-                        SettingsRow(title: "Edit Profile", icon: "person.circle")
-                    }
                     NavigationLink(destination: Text("Change Password")) {
                         SettingsRow(title: "Change Password", icon: "lock")
                     }
@@ -44,8 +37,7 @@ struct SettingView: View {
                 
                 Section {
                     Button(action: {
-                        // Implement logout functionality
-                        print("Logout tapped")
+                        showingLogoutAlert = true
                     }) {
                         Text("Logout")
                             .foregroundColor(.red)
@@ -54,7 +46,22 @@ struct SettingView: View {
             }
             .listStyle(InsetGroupedListStyle())
             .navigationTitle("Settings")
+            .alert(isPresented: $showingLogoutAlert) {
+                Alert(
+                    title: Text("Logout"),
+                    message: Text("Are you sure you want to logout?"),
+                    primaryButton: .destructive(Text("Logout")) {
+                        logout()
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
         }
+    }
+    
+    private func logout() {
+        authService.signOut()
+        presentationMode.wrappedValue.dismiss()
     }
 }
 
@@ -75,5 +82,6 @@ struct SettingsRow: View {
 struct SettingView_Previews: PreviewProvider {
     static var previews: some View {
         SettingView()
+            .environmentObject(AuthenticationService())
     }
 }
