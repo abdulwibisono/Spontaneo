@@ -1,7 +1,7 @@
 import SwiftUI
 import MapKit
 import CoreLocation
-import Spontaneo
+import Combine
 
 struct EditActivityView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -121,13 +121,7 @@ struct EditActivityView: View {
             searchCompleter.delegate = searchCompleterDelegate
             searchCompleter.region = region
             searchCompleter.resultTypes = .address
-            searchCompleterDelegate.bind(
-                searchCompleter: searchCompleter,
-                searchResults: $searchResults,
-                isSearching: $isSearching,
-                region: $region,
-                onCompletionSelected: selectCompletion
-            )
+            bindSearchCompleter()
         }
     }
     
@@ -376,5 +370,15 @@ struct EditActivityView: View {
                 print("Error updating activity: \(error.localizedDescription)")
             }
         }
+    }
+    
+    private func bindSearchCompleter() {
+        searchCompleterDelegate.bind(
+            searchCompleter: searchCompleter,
+            searchResults: $searchResults,
+            isSearching: $isSearching,
+            region: $region,
+            onCompletionSelected: selectCompletion
+        )
     }
 }
