@@ -1,5 +1,7 @@
 import Foundation
 import SwiftUI
+import MapKit
+import CoreLocation
 
 struct EditActivityView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -12,6 +14,15 @@ struct EditActivityView: View {
     @State private var location: String
     @State private var maxParticipants: Int
     
+    @State private var region: MKCoordinateRegion
+    @State private var searchCompleter = MKLocalSearchCompleter()
+    @State private var searchResults: [MKLocalSearchCompletion] = []
+    @State private var isSearching = false
+    @FocusState private var isLocationFieldFocused: Bool
+    @StateObject private var searchCompleterDelegate = SearchCompleterDelegate()
+    @State private var locationCoordinate: CLLocationCoordinate2D?
+    @State private var isLocationValid: Bool = true
+    
     init(activity: Activity) {
         _activity = State(initialValue: activity)
         _title = State(initialValue: activity.title)
@@ -20,6 +31,11 @@ struct EditActivityView: View {
         _date = State(initialValue: activity.date)
         _location = State(initialValue: activity.location.name)
         _maxParticipants = State(initialValue: activity.maxParticipants)
+        _region = State(initialValue: MKCoordinateRegion(
+            center: activity.location.coordinate,
+            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+        ))
+        _locationCoordinate = State(initialValue: activity.location.coordinate)
     }
     
     var body: some View {
@@ -42,6 +58,28 @@ struct EditActivityView: View {
                 
                 Section(header: Text("Location")) {
                     TextField("Location", text: $location)
+                        .focused($isLocationFieldFocused)
+                        .onChange(of: location) { newValue in
+                            if newValue.isEmpty {
+                                searchResults = []
+                                isSearching = false
+                                isLocationValid = false
+                                locationCoordinate = nil
+                            } else {
+                                searchCompleter.queryFragment = newValue
+                                geocodeAddress(newValue)
+                            }
+                        }
+                    if !isLocationValid && !location.isEmpty {
+                        Text("Invalid location. Please enter a valid address.")
+                            .foregroundColor(.red)
+                            .font(.caption)
+                    }
+                    Map(coordinateRegion: $region, annotationItems: [SelectableLocation(coordinate: region.center)]) { item in
+                        MapPin(coordinate: item.coordinate, tint: .red)
+                    }
+                    .frame(height: 200)
+                    .cornerRadius(16)
                 }
                 
                 Section(header: Text("Participants")) {
@@ -58,15 +96,99 @@ struct EditActivityView: View {
                 }
             )
         }
+        .onAppear {
+            searchCompleter.delegate = searchCompleterDelegate
+            searchCompleter.region = region
+            searchCompleter.resultTypes = .address
+            searchCompleterDelegate.bind(
+                searchCompleter: searchCompleter,
+                searchResults: $searchResults,
+                isSearching: $isSearching,
+                region: $region,
+                onCompletionSelected: selectCompletion
+            )
+        }
+        .overlay(
+            VStack {
+                if isSearching && !searchResults.isEmpty {
+                    List(searchResults, id: \.self) { completion in
+                        Button(action: {
+                            selectCompletion(completion)
+                        }) {
+                            VStack(alignment: .leading) {
+                                Text(completion.title)
+                                    .font(.headline)
+                                Text(completion.subtitle)
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                    }
+                    .listStyle(PlainListStyle())
+                    .frame(height: 200)
+                    .background(Color.white)
+                    .cornerRadius(10)
+                    .shadow(radius: 5)
+                    .padding(.horizontal, 20)
+                }
+            },
+            alignment: .top
+        )
+    }
+    
+    private func selectCompletion(_ completion: MKLocalSearchCompletion) {
+        let searchRequest = MKLocalSearch.Request(completion: completion)
+        let search = MKLocalSearch(request: searchRequest)
+        search.start { response, error in
+            guard let placemark = response?.mapItems.first?.placemark else { return }
+            self.location = placemark.title ?? ""
+            self.region = MKCoordinateRegion(
+                center: placemark.coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+            )
+            self.locationCoordinate = placemark.coordinate
+            self.isSearching = false
+            self.searchResults = []
+            self.isLocationFieldFocused = false
+        }
+    }
+    
+    private func geocodeAddress(_ address: String) {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address) { placemarks, error in
+            if let error = error {
+                print("Geocoding error: \(error.localizedDescription)")
+                isLocationValid = false
+                return
+            }
+            
+            if let placemark = placemarks?.first, let location = placemark.location {
+                isLocationValid = true
+                locationCoordinate = location.coordinate
+                region = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+            } else {
+                isLocationValid = false
+                locationCoordinate = nil
+            }
+        }
     }
     
     private func saveActivity() {
+        guard isLocationValid, let coordinate = locationCoordinate else {
+            print("Invalid location")
+            return
+        }
+
         let updatedActivity = Activity(
             id: activity.id,
             title: title,
             category: category,
             date: date,
-            location: Activity.Location(name: location, latitude: activity.location.latitude, longitude: activity.location.longitude),
+            location: Activity.Location(
+                name: location,
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude
+            ),
             currentParticipants: activity.currentParticipants,
             maxParticipants: maxParticipants,
             hostId: activity.hostId,

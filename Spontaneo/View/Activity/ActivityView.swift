@@ -62,10 +62,10 @@ struct ActivityView: View {
     }
     
     private func fetchActivities() {
-            activityService.getAllActivities { fetchedActivities in
-                self.activities = fetchedActivities
-            }
+        activityService.getAllActivities { fetchedActivities in
+            self.activities = fetchedActivities
         }
+    }
     
     private var headerSection: some View {
         VStack(spacing: 16) {
@@ -156,24 +156,19 @@ struct ActivityView: View {
     private var listView: some View {
         ScrollView {
             LazyVStack(spacing: 16) {
-                ForEach(filteredActivities) { activity in
+                ForEach(activities) { activity in
                     NavigationLink(destination: ActivityDetailedView(activity: activity)) {
-                        ActivityCard(activity: activity)
+                        ActivityCardHome(activity: activity)
                     }
-                    .buttonStyle(PlainButtonStyle())
                 }
             }
-            .padding(.horizontal)
-            .padding(.top)
-        }
-        .refreshable {
-            await refreshActivities()
+            .padding()
         }
     }
     
     private var mapView: some View {
         Map {
-            ForEach(filteredActivities) { activity in
+            ForEach(activities) { activity in
                 Annotation(activity.title, coordinate: activity.location.coordinate) {
                     ActivityMapPin(activity: activity)
                 }
