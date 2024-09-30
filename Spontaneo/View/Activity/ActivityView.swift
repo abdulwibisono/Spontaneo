@@ -154,28 +154,28 @@ struct ActivityView: View {
     }
     
     private var listView: some View {
-        ScrollView {
-            LazyVStack(spacing: 16) {
-                ForEach(filteredActivities) { activity in
-                    NavigationLink(destination: ActivityDetailedView(activity: activity)) {
-                        ActivityCard(activity: activity)
+            ScrollView {
+                LazyVStack(spacing: 16) {
+                    ForEach(filteredActivities) { activity in
+                        NavigationLink(destination: ActivityDetailedView(activity: activity, activityService: activityService)) {
+                            ActivityCard(activity: activity, activityService: activityService)
+                        }
+                        .buttonStyle(PlainButtonStyle())
                     }
-                    .buttonStyle(PlainButtonStyle())
                 }
+                .padding(.horizontal)
+                .padding(.top)
             }
-            .padding(.horizontal)
-            .padding(.top)
+            .refreshable {
+                await refreshActivities()
+            }
         }
-        .refreshable {
-            await refreshActivities()
-        }
-    }
     
     private var mapView: some View {
         Map {
             ForEach(filteredActivities) { activity in
                 Annotation(activity.title, coordinate: activity.location.coordinate) {
-                    ActivityMapPin(activity: activity)
+                    ActivityMapPin(activity: activity, activityService: activityService)
                 }
             }
         }
@@ -276,8 +276,10 @@ struct FilterChip: View {
 
 struct ActivityCard: View {
     let activity: Activity
-    @State private var showingEditActivity = false
-    @EnvironmentObject var authService: AuthenticationService
+        @State private var showingEditActivity = false
+        @State private var isJoined = false
+        @EnvironmentObject var authService: AuthenticationService
+        @ObservedObject var activityService: ActivityService
     
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -334,51 +336,99 @@ struct ActivityCard: View {
             .foregroundColor(Color("NeutralDark").opacity(0.7))
             
             HStack {
-                HStack(spacing: -8) {
-                    ForEach(0..<min(3, activity.currentParticipants), id: \.self) { _ in
-                        Image(systemName: "person.circle.fill")
-                            .font(.title2)
-                            .foregroundColor(Color("AccentColor"))
+                            HStack(spacing: -8) {
+                                ForEach(0..<min(3, activity.currentParticipants), id: \.self) { _ in
+                                    Image(systemName: "person.circle.fill")
+                                        .font(.title2)
+                                        .foregroundColor(Color("AccentColor"))
+                                }
+                            }
+                            Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
+                                .font(.caption)
+                                .foregroundColor(Color("NeutralDark"))
+                            Spacer()
+                            if let currentUser = authService.user, activity.hostId != currentUser.id {
+                                Button(action: {
+                                    if isJoined {
+                                        leaveActivity()
+                                    } else {
+                                        joinActivity()
+                                    }
+                                }) {
+                                    Text(isJoined ? "Leave" : "Join")
+                                        .fontWeight(.semibold)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .background(
+                                            LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .leading, endPoint: .trailing)
+                                        )
+                                        .foregroundColor(Color("NeutralLight"))
+                                        .cornerRadius(20)
+                                }
+                            }
+                        }
+                        
+                        if activity.hostId == authService.user?.id {
+                            Button(action: {
+                                showingEditActivity = true
+                            }) {
+                                Image(systemName: "pencil")
+                                    .foregroundColor(Color("AccentColor"))
+                            }
+                            .sheet(isPresented: $showingEditActivity) {
+                                EditActivityView(activity: activity)
+                            }
+                        }
+                    }
+                    .padding()
+                    .background(Color("NeutralLight"))
+                    .cornerRadius(16)
+                    .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
+                    .onAppear {
+                        checkIfUserJoined()
                     }
                 }
-                Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
-                    .font(.caption)
-                    .foregroundColor(Color("NeutralDark"))
-                Spacer()
-                Button(action: {}) {
-                    Text("Join")
-                        .fontWeight(.semibold)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(
-                            LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .leading, endPoint: .trailing)
-                        )
-                        .foregroundColor(Color("NeutralLight"))
-                        .cornerRadius(20)
+                
+                private func checkIfUserJoined() {
+                    if let currentUser = authService.user {
+                        isJoined = activity.joinedUsers.contains { $0.id == currentUser.id }
+                    }
                 }
-            }
-            
-            if activity.hostId == authService.user?.id {
-                Button(action: {
-                    showingEditActivity = true
-                }) {
-                    Image(systemName: "pencil")
-                        .foregroundColor(Color("AccentColor"))
+                
+                private func joinActivity() {
+                    guard let currentUser = authService.user else { return }
+                    
+                    Task {
+                        do {
+                            try await activityService.joinActivity(activityId: activity.id!, user: currentUser)
+                            await MainActor.run {
+                                isJoined = true
+                            }
+                        } catch {
+                            print("Error joining activity: \(error.localizedDescription)")
+                        }
+                    }
                 }
-                .sheet(isPresented: $showingEditActivity) {
-                    EditActivityView(activity: activity)
+                
+                private func leaveActivity() {
+                    guard let currentUser = authService.user else { return }
+                    
+                    Task {
+                        do {
+                            try await activityService.leaveActivity(activityId: activity.id!, userId: currentUser.id)
+                            await MainActor.run {
+                                isJoined = false
+                            }
+                        } catch {
+                            print("Error leaving activity: \(error.localizedDescription)")
+                        }
+                    }
                 }
-            }
-        }
-        .padding()
-        .background(Color("NeutralLight"))
-        .cornerRadius(16)
-        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
-    }
 }
 
 struct ActivityMapPin: View {
     let activity: Activity
+    @ObservedObject var activityService: ActivityService
     @State private var showDetails = false
     
     var body: some View {
@@ -398,7 +448,7 @@ struct ActivityMapPin: View {
             showDetails.toggle()
         }
         .sheet(isPresented: $showDetails) {
-            ActivityDetailedView(activity: activity)
+            ActivityDetailedView(activity: activity, activityService: activityService)
         }
     }
 }
