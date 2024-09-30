@@ -101,7 +101,7 @@ struct HomeView: View {
                     let activityLocation = CLLocation(latitude: activity.location.latitude, longitude: activity.location.longitude)
                     let distanceInMeters = userLocation.distance(from: activityLocation)
                     let distanceInKm = distanceInMeters / 1000
-                    return distanceInKm <= 10
+                    return distanceInKm <= 1
                 }
             } else {
                 self.activities = fetchedActivities
@@ -125,7 +125,7 @@ struct HomeView: View {
             ScrollView {
                 LazyVStack(spacing: 16) {
                     ForEach(activities) { activity in
-                        NavigationLink(destination: ActivityDetailedView(activity: activity)) {
+                        NavigationLink(destination: ActivityDetailedView(activity: activity, activityService: activityService)) {
                             ActivityCardHome(activity: activity)
                         }
                         .buttonStyle(PlainButtonStyle())
