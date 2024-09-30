@@ -6,7 +6,16 @@ class ActivityService: ObservableObject {
     
     func createActivity(_ activity: Activity) -> String? {
         do {
-            let docRef = try db.collection("activities").addDocument(from: activity)
+            var activityData = try Firestore.Encoder().encode(activity)
+            
+            // Ensure the location is stored as a GeoPoint
+            if let latitude = activityData["location.latitude"] as? Double,
+               let longitude = activityData["location.longitude"] as? Double {
+                activityData["location"] = GeoPoint(latitude: latitude, longitude: longitude)
+                activityData["location.name"] = activity.location.name
+            }
+            
+            let docRef = try db.collection("activities").addDocument(data: activityData)
             return docRef.documentID
         } catch {
             print("Error adding activity: \(error)")
@@ -57,7 +66,20 @@ class ActivityService: ObservableObject {
             }
             
             let activities = documents.compactMap { queryDocumentSnapshot -> Activity? in
-                try? queryDocumentSnapshot.data(as: Activity.self)
+                do {
+                    var data = queryDocumentSnapshot.data()
+                    if let geoPoint = data["location"] as? GeoPoint {
+                        data["location"] = [
+                            "name": data["location.name"] as? String ?? "",
+                            "latitude": geoPoint.latitude,
+                            "longitude": geoPoint.longitude
+                        ]
+                    }
+                    return try Firestore.Decoder().decode(Activity.self, from: data)
+                } catch {
+                    print("Error decoding activity: \(error)")
+                    return nil
+                }
             }
             completion(activities)
         }

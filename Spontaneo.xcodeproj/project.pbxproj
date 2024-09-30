@@ -572,7 +572,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = spontaneo.Spontaneo;
+				PRODUCT_BUNDLE_IDENTIFIER = spontaneo.Spontaneo.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -742,7 +742,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Spontaneo/Preview Content\"";
-				DEVELOPMENT_TEAM = AZ3FM9MHX9;
+				DEVELOPMENT_TEAM = 7Q432J26UJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We want to access your location";
@@ -774,7 +774,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Spontaneo/Preview Content\"";
-				DEVELOPMENT_TEAM = AZ3FM9MHX9;
+				DEVELOPMENT_TEAM = 7Q432J26UJ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We want to access your location";
