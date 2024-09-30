@@ -278,7 +278,7 @@ struct CreateActivityView: View {
         if location.isEmpty {
             return []
         }
-        return [SelectableLocation(coordinate: region.center)]
+        return [SelectableLocation(coordinate: region.center, name: location)]
     }
     
     private func selectCompletion(_ completion: MKLocalSearchCompletion) {
@@ -392,10 +392,4 @@ final class SearchCompleterDelegate: NSObject, MKLocalSearchCompleterDelegate, O
             self.isSearching = false
         }
     }
-}
-
-// Helper Struct for Map Annotation
-struct SelectableLocation: Identifiable {
-    let id = UUID()
-    let coordinate: CLLocationCoordinate2D
 }
