@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import CoreLocation
 
 struct CreateActivityView: View {
     @Environment(\.presentationMode) var presentationMode
@@ -32,6 +33,8 @@ struct CreateActivityView: View {
     @StateObject private var searchCompleterDelegate = SearchCompleterDelegate()
     
     let categories = ["Coffee", "Study", "Sports", "Food", "Explore"]
+    @State private var locationCoordinate: CLLocationCoordinate2D?
+    @State private var isLocationValid: Bool = false
     
     var body: some View {
         NavigationView {
@@ -227,10 +230,18 @@ struct CreateActivityView: View {
                     if newValue.isEmpty {
                         searchResults = []
                         isSearching = false
+                        isLocationValid = false
+                        locationCoordinate = nil
                     } else {
                         searchCompleter.queryFragment = newValue
+                        geocodeAddress(newValue)
                     }
                 }
+            if !isLocationValid && !location.isEmpty {
+                Text("Invalid location. Please enter a valid address.")
+                    .foregroundColor(.red)
+                    .font(.caption)
+            }
             Map(coordinateRegion: $region, annotationItems: selectedLocationAnnotation) { item in
                 MapPin(coordinate: item.coordinate, tint: .red)
             }
@@ -283,6 +294,8 @@ struct CreateActivityView: View {
             self.isSearching = false
             self.searchResults = []
             self.isLocationFieldFocused = false
+            self.locationCoordinate = placemark.coordinate
+            self.isLocationValid = true
         }
     }
     
@@ -291,9 +304,29 @@ struct CreateActivityView: View {
         image = Image(uiImage: inputImage)
     }
     
+    private func geocodeAddress(_ address: String) {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address) { placemarks, error in
+            if let error = error {
+                print("Geocoding error: \(error.localizedDescription)")
+                isLocationValid = false
+                return
+            }
+            
+            if let placemark = placemarks?.first, let location = placemark.location {
+                isLocationValid = true
+                locationCoordinate = location.coordinate
+                region = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+            } else {
+                isLocationValid = false
+                locationCoordinate = nil
+            }
+        }
+    }
+    
     private func createActivity() {
-        guard let currentUser = authService.user else {
-            print("No user logged in")
+        guard let currentUser = authService.user, isLocationValid, let coordinate = locationCoordinate else {
+            print("Invalid location or user not logged in")
             return
         }
 
@@ -303,15 +336,15 @@ struct CreateActivityView: View {
             date: date,
             location: Activity.Location(
                 name: location,
-                latitude: region.center.latitude,
-                longitude: region.center.longitude
+                latitude: coordinate.latitude,
+                longitude: coordinate.longitude
             ),
-            currentParticipants: 1,  // Assuming the creator is the first participant
+            currentParticipants: 1,
             maxParticipants: maxParticipants,
             hostId: currentUser.id,
-            hostName: currentUser.username,  // Use the current user's username
+            hostName: currentUser.username,
             description: description,
-            tags: [],  // Add logic to handle tags
+            tags: [],
             receiveUpdates: true,
             updates: [],
             rating: 0.0,  // Initial rating for new activities
