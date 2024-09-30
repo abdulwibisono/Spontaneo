@@ -68,7 +68,8 @@ struct ChatView_Previews: PreviewProvider {
             tags: ["sample", "preview"],
             receiveUpdates: true,
             updates: [],
-            rating: 4.5
+            rating: 4.5,
+            joinedUsers: [Activity.JoinedUser(id: "1", username: "User1")]
         )
         return ChatView(activity: sampleActivity)
     }

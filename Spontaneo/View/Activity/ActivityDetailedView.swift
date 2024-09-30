@@ -2,76 +2,108 @@ import SwiftUI
 import MapKit
 
 struct ActivityDetailedView: View {
-    let activity: Activity
-    @State private var showFullDescription = false
-    @State private var showJoinConfirmation = false
-    @State private var region: MKCoordinateRegion
-    @State private var showChat = false
-    @Environment(\.colorScheme) var colorScheme
-    @State private var selectedImageIndex: Int = 0
-    @EnvironmentObject var authService: AuthenticationService
-    @State private var showingEditActivity = false
-    
-    let placeholderImages = [
-        "activity_placeholder",
-        "activity_placeholder_2",
-        "activity_placeholder_3"
-    ]
-    
-    init(activity: Activity) {
-        self.activity = activity
-        _region = State(initialValue: MKCoordinateRegion(
+    @ObservedObject var activityService: ActivityService
+        @EnvironmentObject var authService: AuthenticationService
+        @State private var activity: Activity
+        @State private var showFullDescription = false
+        @State private var showJoinConfirmation = false
+        @State private var showLeaveConfirmation = false
+        @State private var region: MKCoordinateRegion
+        @State private var showChat = false
+        @State private var showJoinedUsersList = false
+        @Environment(\.colorScheme) var colorScheme
+        @State private var selectedImageIndex: Int = 0
+        @State private var showingEditActivity = false
+        @State private var isJoined = false
+        
+        let placeholderImages = [
+            "activity_placeholder",
+            "activity_placeholder_2",
+            "activity_placeholder_3"
+        ]
+        
+    init(activity: Activity, activityService: ActivityService) {
+        self._activity = State(initialValue: activity)
+        self.activityService = activityService
+        self._region = State(initialValue: MKCoordinateRegion(
             center: activity.location.coordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
         ))
     }
-    
-    var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                headerSection
-                
-                VStack(alignment: .leading, spacing: 24) {
-                    imagesSection
-                    dateAndLocationSection
-                    descriptionSection
-                    participantsSection
-                    tagsSection
-                    mapSection
-                    joinButton
+        
+        var body: some View {
+            ScrollView {
+                VStack(spacing: 0) {
+                    headerSection
+                    
+                    VStack(alignment: .leading, spacing: 24) {
+                        imagesSection
+                        dateAndLocationSection
+                        descriptionSection
+                        participantsSection
+                        tagsSection
+                        mapSection
+                        joinLeaveButton
+                        viewJoinedUsersButton
+                    }
+                    .padding(.top, 20)
+                    .padding(.horizontal, 20)
+                    .background(Color("NeutralLight"))
+                    .cornerRadius(30, corners: [.topLeft, .topRight])
+                    .offset(y: -30)
                 }
-                .padding(.top, 20)
-                .padding(.horizontal, 20)
-                .background(Color("NeutralLight"))
-                .cornerRadius(30, corners: [.topLeft, .topRight])
-                .offset(y: -30)
             }
-        }
-        .edgesIgnoringSafeArea(.top)
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                HStack {
-                    if activity.hostId == authService.user?.id {
-                        Button(action: { showingEditActivity = true }) {
-                            Image(systemName: "pencil")
+            .edgesIgnoringSafeArea(.top)
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    HStack {
+                        if activity.hostId == authService.user?.id {
+                            Button(action: { showingEditActivity = true }) {
+                                Image(systemName: "pencil")
+                                    .foregroundColor(Color("AccentColor"))
+                            }
+                        }
+                        Button(action: { showChat = true }) {
+                            Image(systemName: "bubble.left.and.bubble.right.fill")
                                 .foregroundColor(Color("AccentColor"))
                         }
                     }
-                    Button(action: { showChat = true }) {
-                        Image(systemName: "bubble.left.and.bubble.right.fill")
-                            .foregroundColor(Color("AccentColor"))
-                    }
                 }
             }
+            .sheet(isPresented: $showChat) {
+                ChatView(activity: activity)
+            }
+            .sheet(isPresented: $showingEditActivity) {
+                EditActivityView(activity: activity)
+            }
+            .sheet(isPresented: $showJoinedUsersList) {
+                JoinedUsersListView(joinedUsers: activity.joinedUsers)
+            }
+            .onAppear {
+                checkIfUserJoined()
+            }
+            .alert(isPresented: $showJoinConfirmation) {
+                Alert(
+                    title: Text("Join Activity"),
+                    message: Text("Are you sure you want to join this activity?"),
+                    primaryButton: .default(Text("Join")) {
+                        joinActivity()
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
+            .alert(isPresented: $showLeaveConfirmation) {
+                Alert(
+                    title: Text("Leave Activity"),
+                    message: Text("Are you sure you want to leave this activity?"),
+                    primaryButton: .destructive(Text("Leave")) {
+                        leaveActivity()
+                    },
+                    secondaryButton: .cancel()
+                )
+            }
         }
-        .sheet(isPresented: $showChat) {
-            ChatView(activity: activity)
-        }
-        .sheet(isPresented: $showingEditActivity) {
-            EditActivityView(activity: activity)
-        }
-    }
     
     private var headerSection: some View {
         ZStack(alignment: .bottomLeading) {
@@ -187,43 +219,43 @@ struct ActivityDetailedView: View {
     }
     
     private var participantsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Label("Participants", systemImage: "person.3.fill")
-                .font(.headline)
-                .foregroundColor(Color("NeutralDark"))
-            
-            HStack {
-                ForEach(0..<min(5, activity.currentParticipants), id: \.self) { index in
-                    Image("user_placeholder")
-                        .resizable()
-                        .frame(width: 40, height: 40)
-                        .clipShape(Circle())
-                        .overlay(Circle().stroke(Color("NeutralLight"), lineWidth: 2))
-                        .offset(x: CGFloat(index * -15))
-                }
-                
-                if activity.currentParticipants > 5 {
-                    Text("+\(activity.currentParticipants - 5)")
-                        .font(.subheadline)
-                        .padding(8)
-                        .background(Color("AccentColor"))
-                        .foregroundColor(Color("NeutralLight"))
-                        .clipShape(Circle())
-                        .offset(x: CGFloat(-5 * 15))
-                }
-                
-                Spacer()
-                
-                Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
+            VStack(alignment: .leading, spacing: 12) {
+                Label("Participants", systemImage: "person.3.fill")
                     .font(.headline)
                     .foregroundColor(Color("NeutralDark"))
+                
+                HStack {
+                    ForEach(0..<min(5, activity.currentParticipants), id: \.self) { index in
+                        Image("user_placeholder")
+                            .resizable()
+                            .frame(width: 40, height: 40)
+                            .clipShape(Circle())
+                            .overlay(Circle().stroke(Color("NeutralLight"), lineWidth: 2))
+                            .offset(x: CGFloat(index * -15))
+                    }
+                    
+                    if activity.currentParticipants > 5 {
+                        Text("+\(activity.currentParticipants - 5)")
+                            .font(.subheadline)
+                            .padding(8)
+                            .background(Color("AccentColor"))
+                            .foregroundColor(Color("NeutralLight"))
+                            .clipShape(Circle())
+                            .offset(x: CGFloat(-5 * 15))
+                    }
+                    
+                    Spacer()
+                    
+                    Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
+                        .font(.headline)
+                        .foregroundColor(Color("NeutralDark"))
+                }
             }
+            .padding()
+            .background(Color("NeutralLight"))
+            .cornerRadius(16)
+            .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
         }
-        .padding()
-        .background(Color("NeutralLight"))
-        .cornerRadius(16)
-        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
-    }
     
     private var tagsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -272,29 +304,96 @@ struct ActivityDetailedView: View {
         }
     }
     
-    private var joinButton: some View {
-        Button(action: { showJoinConfirmation = true }) {
-            Text("Join Activity")
-                .font(.headline)
-                .frame(maxWidth: .infinity)
-                .padding()
-                .background(
-                    LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .leading, endPoint: .trailing)
-                )
-                .foregroundColor(Color("NeutralLight"))
-                .cornerRadius(16)
+    private var joinLeaveButton: some View {
+            Group {
+                if let currentUser = authService.user {
+                    if activity.hostId != currentUser.id {
+                        if isJoined {
+                            Button(action: { showLeaveConfirmation = true }) {
+                                Text("Leave Activity")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.red)
+                                    .foregroundColor(Color("NeutralLight"))
+                                    .cornerRadius(16)
+                            }
+                        } else {
+                            Button(action: { showJoinConfirmation = true }) {
+                                Text("Join Activity")
+                                    .font(.headline)
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(
+                                        LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .leading, endPoint: .trailing)
+                                    )
+                                    .foregroundColor(Color("NeutralLight"))
+                                    .cornerRadius(16)
+                            }
+                        }
+                    }
+                }
+            }
+            .padding(.vertical, 16)
+            .shadow(color: Color("NeutralDark").opacity(0.2), radius: 10, x: 0, y: 5)
         }
-        .padding(.vertical, 16)
-        .shadow(color: Color("NeutralDark").opacity(0.2), radius: 10, x: 0, y: 5)
-        .alert(isPresented: $showJoinConfirmation) {
-            Alert(
-                title: Text("Join Activity"),
-                message: Text("Are you sure you want to join this activity?"),
-                primaryButton: .default(Text("Join")) {
-                    // Action to join the activity
-                },
-                secondaryButton: .cancel()
-            )
+    
+    private var viewJoinedUsersButton: some View {
+            Button(action: { showJoinedUsersList = true }) {
+                Text("View Joined Users")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(Color("NeutralLight"))
+                    .cornerRadius(16)
+            }
+            .padding(.bottom, 16)
+            .shadow(color: Color("NeutralDark").opacity(0.2), radius: 10, x: 0, y: 5)
+        }
+        
+    private func checkIfUserJoined() {
+            if let currentUser = authService.user {
+                isJoined = activity.joinedUsers.contains { $0.id == currentUser.id }
+            }
+        }
+        
+    private func joinActivity() {
+        guard let currentUser = authService.user else { return }
+        
+        Task {
+            do {
+                try await activityService.joinActivity(activityId: activity.id!, user: currentUser)
+                refreshActivity()
+            } catch {
+                print("Error joining activity: \(error.localizedDescription)")
+            }
+        }
+    }
+
+    private func leaveActivity() {
+        guard let currentUser = authService.user else { return }
+        
+        Task {
+            do {
+                try await activityService.leaveActivity(activityId: activity.id!, userId: currentUser.id)
+                refreshActivity()
+            } catch {
+                print("Error leaving activity: \(error.localizedDescription)")
+            }
+        }
+    }
+            
+    private func refreshActivity() {
+        Task {
+            await activityService.getActivity(id: activity.id!) { updatedActivity in
+                if let updatedActivity = updatedActivity {
+                    DispatchQueue.main.async {
+                        self.activity = updatedActivity
+                        self.checkIfUserJoined()
+                    }
+                }
+            }
         }
     }
 }
@@ -315,11 +414,13 @@ struct ActivityDetailedView_Previews: PreviewProvider {
             tags: ["sample", "preview"],
             receiveUpdates: true,
             updates: [],
-            rating: 4.5
+            rating: 4.5,
+            joinedUsers: [Activity.JoinedUser(id: "1", username: "User1")]
         )
         
         return NavigationView {
-            ActivityDetailedView(activity: sampleActivity)
-        }
+                    ActivityDetailedView(activity: sampleActivity, activityService: ActivityService())
+                        .environmentObject(AuthenticationService())
+                }
     }
 }

@@ -81,4 +81,81 @@ class ActivityService: ObservableObject {
             completion(.failure(error))
         }
     }
+    
+    func joinActivity(activityId: String, user: User) async throws {
+            let activityRef = db.collection("activities").document(activityId)
+            
+            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+                let activityDocument: DocumentSnapshot
+                do {
+                    try activityDocument = transaction.getDocument(activityRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    return nil
+                }
+                
+                guard var activity = try? activityDocument.data(as: Activity.self) else {
+                    let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Activity does not exist"])
+                    errorPointer?.pointee = error
+                    return nil
+                }
+                
+                if activity.currentParticipants >= activity.maxParticipants {
+                    let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Activity is full"])
+                    errorPointer?.pointee = error
+                    return nil
+                }
+                
+                let joinedUser = Activity.JoinedUser(id: user.id, username: user.username)
+                if !activity.joinedUsers.contains(where: { $0.id == user.id }) {
+                    activity.joinedUsers.append(joinedUser)
+                    activity.currentParticipants += 1
+                    
+                    do {
+                        try transaction.setData(from: activity, forDocument: activityRef)
+                    } catch let error as NSError {
+                        errorPointer?.pointee = error
+                        return nil
+                    }
+                }
+                
+                return nil
+            }
+        }
+        
+    func leaveActivity(activityId: String, userId: String) async throws {
+            let activityRef = db.collection("activities").document(activityId)
+            
+            try await db.runTransaction { (transaction, errorPointer) -> Any? in
+                let activityDocument: DocumentSnapshot
+                do {
+                    try activityDocument = transaction.getDocument(activityRef)
+                } catch let fetchError as NSError {
+                    errorPointer?.pointee = fetchError
+                    return nil
+                }
+                
+                guard var activity = try? activityDocument.data(as: Activity.self) else {
+                    let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Activity does not exist"])
+                    errorPointer?.pointee = error
+                    return nil
+                }
+                
+                if let index = activity.joinedUsers.firstIndex(where: { $0.id == userId }) {
+                    activity.joinedUsers.remove(at: index)
+                    activity.currentParticipants -= 1
+                    
+                    do {
+                        try transaction.setData(from: activity, forDocument: activityRef)
+                    } catch let error as NSError {
+                        errorPointer?.pointee = error
+                        return nil
+                    }
+                }
+                
+            return nil
+        }
+    }
 }
+
+

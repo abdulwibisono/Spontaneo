@@ -8,7 +8,7 @@ struct Activity: Identifiable, Codable {
     let category: String
     let date: Date
     let location: Location
-    let currentParticipants: Int
+    var currentParticipants: Int
     let maxParticipants: Int
     let hostId: String
     let hostName: String
@@ -17,6 +17,7 @@ struct Activity: Identifiable, Codable {
     var receiveUpdates: Bool
     let updates: [String]
     let rating: Double
+    var joinedUsers: [JoinedUser]
     
     struct Location: Codable, Hashable {
         let name: String
@@ -26,5 +27,10 @@ struct Activity: Identifiable, Codable {
         var coordinate: CLLocationCoordinate2D {
             CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         }
+    }
+    
+    struct JoinedUser: Codable, Identifiable {
+        let id: String
+        let username: String
     }
 }

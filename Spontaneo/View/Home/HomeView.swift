@@ -125,7 +125,7 @@ struct HomeView: View {
             ScrollView {
                 LazyVStack(spacing: 16) {
                     ForEach(activities) { activity in
-                        NavigationLink(destination: ActivityDetailedView(activity: activity)) {
+                        NavigationLink(destination: ActivityDetailedView(activity: activity, activityService: activityService)) {
                             ActivityCardHome(activity: activity)
                         }
                         .buttonStyle(PlainButtonStyle())
