@@ -21,11 +21,12 @@ struct ActivityView: View {
     @State private var filters = ActivityFilters()
     
     @State private var showingCreateActivity = false
+    @State private var scrollOffset: CGFloat = 0
     
     var body: some View {
         NavigationView {
             ZStack {
-                Color("NeutralLight").edgesIgnoringSafeArea(.all)
+                Color("BackgroundColor").edgesIgnoringSafeArea(.all)
                 
                 VStack(spacing: 0) {
                     headerSection
@@ -33,8 +34,25 @@ struct ActivityView: View {
                     if showMapView {
                         mapView
                     } else {
-                        listView
-                            .padding(.bottom, 80) // Add padding at the bottom for TabView
+                        ScrollView {
+                            GeometryReader { geometry in
+                                Color.clear.preference(key: ScrollOffsetPreferenceKey.self, value: geometry.frame(in: .named("scroll")).origin.y)
+                            }
+                            .frame(height: 0)
+                            
+                            VStack(spacing: 16) {
+                                featuredActivitiesSection
+                                listView
+                            }
+                            .padding(.bottom, 80)
+                        }
+                        .coordinateSpace(name: "scroll")
+                        .onPreferenceChange(ScrollOffsetPreferenceKey.self) { value in
+                            scrollOffset = value
+                        }
+                        .refreshable {
+                            await refreshActivities()
+                        }
                     }
                 }
             }
@@ -53,19 +71,13 @@ struct ActivityView: View {
         }
         .accentColor(Color("AccentColor"))
         .sheet(isPresented: $showingCreateActivity) {
-                    CreateActivityView().environmentObject(authService)
-                }
-        .edgesIgnoringSafeArea(.bottom) // Ignore safe area at the bottom
-        .onAppear {
-                    fetchActivities()
-                }
-    }
-    
-    private func fetchActivities() {
-            activityService.getAllActivities { fetchedActivities in
-                self.activities = fetchedActivities
-            }
+            CreateActivityView().environmentObject(authService)
         }
+        .edgesIgnoringSafeArea(.bottom)
+        .onAppear {
+            fetchActivities()
+        }
+    }
     
     private var headerSection: some View {
         VStack(spacing: 16) {
@@ -73,7 +85,7 @@ struct ActivityView: View {
                 Image(systemName: "magnifyingglass")
                     .foregroundColor(Color("NeutralDark"))
                 TextField("Search activities...", text: $searchText)
-                    .autocapitalization(.none)
+                    .textInputAutocapitalization(.never)
                     .disableAutocorrection(true)
                 Button(action: { showFilters.toggle() }) {
                     Image(systemName: "slider.horizontal.3")
@@ -113,6 +125,45 @@ struct ActivityView: View {
         .padding()
         .background(Color("NeutralLight"))
         .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
+        .opacity(1 - min(1, max(0, -scrollOffset / 100)))
+    }
+    
+    private var featuredActivitiesSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Featured Activities")
+                .font(.title2)
+                .fontWeight(.bold)
+                .padding(.horizontal)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 16) {
+                    ForEach(filteredActivities.prefix(5)) { activity in
+                        FeaturedActivityCard(activity: activity)
+                    }
+                }
+                .padding(.horizontal)
+            }
+        }
+        .padding(.top)
+    }
+    
+    private var listView: some View {
+        LazyVStack(spacing: 16) {
+            ForEach(filteredActivities) { activity in
+                NavigationLink(destination: ActivityDetailedView(activity: activity, activityService: activityService)) {
+                    ActivityCard(activity: activity, activityService: activityService)
+                        .transition(.opacity)
+                }
+                .buttonStyle(PlainButtonStyle())
+            }
+        }
+        .padding(.horizontal)
+    }
+    
+    private func fetchActivities() {
+        activityService.getAllActivities { fetchedActivities in
+            self.activities = fetchedActivities
+        }
     }
     
     private var activeFiltersView: some View {
@@ -152,24 +203,6 @@ struct ActivityView: View {
         formatter.dateFormat = "MMM d"
         return "\(formatter.string(from: range.lowerBound)) - \(formatter.string(from: range.upperBound))"
     }
-    
-    private var listView: some View {
-            ScrollView {
-                LazyVStack(spacing: 16) {
-                    ForEach(filteredActivities) { activity in
-                        NavigationLink(destination: ActivityDetailedView(activity: activity, activityService: activityService)) {
-                            ActivityCard(activity: activity, activityService: activityService)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                }
-                .padding(.horizontal)
-                .padding(.top)
-            }
-            .refreshable {
-                await refreshActivities()
-            }
-        }
     
     private var mapView: some View {
         Map {
@@ -641,6 +674,61 @@ struct LocationPickerView: View {
             }
             .navigationTitle("Select Location")
         }
+    }
+}
+
+struct FeaturedActivityCard: View {
+    let activity: Activity
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            ZStack(alignment: .topTrailing) {
+                Image(systemName: "photo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 200, height: 120)
+                    .clipped()
+                    .cornerRadius(12)
+                
+                Text(activity.category)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color("AccentColor"))
+                    .foregroundColor(Color("NeutralLight"))
+                    .cornerRadius(8)
+                    .padding(8)
+            }
+            
+            Text(activity.title)
+                .font(.headline)
+                .lineLimit(1)
+            
+            HStack {
+                Image(systemName: "person.circle.fill")
+                    .foregroundColor(Color("AccentColor"))
+                Text(activity.hostName)
+                    .font(.subheadline)
+                Spacer()
+                Image(systemName: "star.fill")
+                    .foregroundColor(Color("SecondaryColor"))
+                Text(String(format: "%.1f", activity.rating))
+                    .font(.subheadline)
+            }
+        }
+        .frame(width: 200)
+        .padding()
+        .background(Color("NeutralLight"))
+        .cornerRadius(16)
+        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
+    }
+}
+
+struct ScrollOffsetPreferenceKey: PreferenceKey {
+    static var defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+        value = nextValue()
     }
 }
 
