@@ -38,6 +38,21 @@ struct HomeView: View {
     @State private var showLocationButton = false
     @State private var selectedHotspot: Hotspot?
 
+    @State private var isSearching = false
+    @State private var searchText = ""
+    @State private var isMapExpanded = false
+    @Namespace private var animation
+    
+    var filteredActivities: [Activity] {
+        activities.filter { activity in
+            if selectedCategory.isEmpty {
+                return true
+            } else {
+                return activity.category == selectedCategory
+            }
+        }
+    }
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
@@ -47,13 +62,18 @@ struct HomeView: View {
                         setupInitialState(geometry: geometry)
                     }
                 
-                VStack {
-                    searchBar
-                    CategoryListView
-                        .padding(.top, 20)
+                VStack(spacing: 0) {
+                    searchBarView
+                        .padding(.top, 60)
+                    
+                    if !isSearching {
+                        CategoryListView
+                            .padding(.top, 20)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                    
                     Spacer()
                 }
-                .padding(.top, 60)
                 
                 locationButton
                 
@@ -71,10 +91,11 @@ struct HomeView: View {
             MapAnnotation(coordinate: hotspot.coordinate) {
                 HotspotAnnotationView(hotspot: hotspot, isSelected: selectedHotspot == hotspot)
                     .onTapGesture {
-                        withAnimation(.easeInOut(duration: 0.5)) {
+                        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
                             region.center = hotspot.coordinate
                             region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
                             selectedHotspot = hotspot
+                            isMapExpanded = true
                         }
                     }
             }
@@ -90,26 +111,56 @@ struct HomeView: View {
         )
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                withAnimation {
+                withAnimation(.easeInOut(duration: 1)) {
                     isMapLoaded = true
                 }
             }
         }
+        .gesture(
+            DragGesture().onChanged { _ in
+                withAnimation(.easeInOut) {
+                    isMapExpanded = true
+                }
+            }
+        )
     }
     
-    private var searchBar: some View {
+    private var searchBarView: some View {
         HStack {
             Image(systemName: "magnifyingglass")
                 .foregroundColor(Color("AccentColor"))
-            Text("Search for activities...")
-                .foregroundColor(Color("NeutralDark").opacity(0.6))
-            Spacer()
+            
+            if isSearching {
+                TextField("Search for activities...", text: $searchText)
+                    .foregroundColor(Color("NeutralDark"))
+                    .autocapitalization(.none)
+                    .disableAutocorrection(true)
+                
+                Button(action: {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                        isSearching = false
+                        searchText = ""
+                    }
+                }) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(Color("NeutralDark").opacity(0.6))
+                }
+            } else {
+                Text("Search for activities...")
+                    .foregroundColor(Color("NeutralDark").opacity(0.6))
+                Spacer()
+            }
         }
         .padding()
         .background(Color("NeutralLight"))
         .cornerRadius(20)
         .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
         .padding(.horizontal)
+        .onTapGesture {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                isSearching = true
+            }
+        }
     }
     
     private var locationButton: some View {
@@ -234,7 +285,7 @@ struct HomeView: View {
                 .foregroundColor(Color("NeutralDark"))
                 .padding()
             
-            if activities.isEmpty {
+            if filteredActivities.isEmpty {
                 emptyStateView
             } else {
                 activityList
@@ -248,11 +299,12 @@ struct HomeView: View {
     
     private var emptyStateView: some View {
         VStack(spacing: 20) {
-            Image(systemName: "mappin.slash")
-                .font(.system(size: 50))
-                .foregroundColor(Color("AccentColor"))
+            EmptyStateAnimation()
+                .frame(width: 200, height: 200)
+            
             Text("No activities nearby")
                 .font(.headline)
+            
             Text("Try expanding your search area or create a new activity!")
                 .font(.subheadline)
                 .multilineTextAlignment(.center)
@@ -265,12 +317,13 @@ struct HomeView: View {
     private var activityList: some View {
         ScrollView {
             LazyVStack(spacing: 16) {
-                ForEach(activities) { activity in
+                ForEach(filteredActivities) { activity in
                     NavigationLink(destination: ActivityDetailedView(activity: activity, activityService: activityService)) {
                         ActivityCardHome(activity: activity)
                     }
                     .buttonStyle(PlainButtonStyle())
-                    .transition(.opacity.combined(with: .slide))
+                    .transition(.asymmetric(insertion: .scale.combined(with: .opacity),
+                                            removal: .scale.combined(with: .opacity)))
                 }
             }
             .padding(.horizontal)
@@ -293,7 +346,15 @@ struct HomeView: View {
                         }
                         .padding(.horizontal, 16)
                         .padding(.vertical, 8)
-                        .background(selectedCategory == item.title ? Color("AccentColor") : Color("NeutralLight"))
+                        .background(
+                            ZStack {
+                                if selectedCategory == item.title {
+                                    RoundedRectangle(cornerRadius: 20)
+                                        .fill(Color("AccentColor"))
+                                        .matchedGeometryEffect(id: "category_background", in: animation)
+                                }
+                            }
+                        )
                         .foregroundColor(selectedCategory == item.title ? Color("NeutralLight") : Color("NeutralDark"))
                         .cornerRadius(20)
                         .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
@@ -354,7 +415,16 @@ struct ActivityCardHome: View {
                 .background(Color("NeutralDark").opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
             
-            VStack(alignment: .leading, spacing: 4) {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(activity.category)
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(Color("AccentColor").opacity(0.2))
+                    .foregroundColor(Color("AccentColor"))
+                    .clipShape(Capsule())
+                
                 Text(activity.title)
                     .font(.headline)
                     .foregroundColor(Color("NeutralDark"))
@@ -368,12 +438,13 @@ struct ActivityCardHome: View {
                 HStack {
                     Image(systemName: "mappin.circle.fill")
                     Text("1.2 km away")
+                    Spacer()
+                    Image(systemName: "person.2.fill")
+                    Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
                 }
                 .font(.caption)
                 .foregroundColor(Color("AccentColor"))
             }
-            
-            Spacer()
         }
         .padding()
         .background(Color("NeutralLight"))
@@ -383,6 +454,34 @@ struct ActivityCardHome: View {
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isHovered)
         .onHover { hovering in
             isHovered = hovering
+        }
+    }
+}
+
+struct EmptyStateAnimation: View {
+    @State private var isAnimating = false
+    
+    var body: some View {
+        ZStack {
+            Circle()
+                .stroke(Color("AccentColor").opacity(0.3), lineWidth: 5)
+                .frame(width: 150, height: 150)
+            
+            Circle()
+                .trim(from: 0, to: 0.3)
+                .stroke(Color("AccentColor"), lineWidth: 5)
+                .frame(width: 150, height: 150)
+                .rotationEffect(Angle(degrees: isAnimating ? 360 : 0))
+                .animation(.linear(duration: 1).repeatForever(autoreverses: false), value: isAnimating)
+            
+            Image(systemName: "mappin.and.ellipse")
+                .font(.system(size: 50))
+                .foregroundColor(Color("AccentColor"))
+                .offset(y: isAnimating ? -10 : 10)
+                .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: isAnimating)
+        }
+        .onAppear {
+            isAnimating = true
         }
     }
 }
