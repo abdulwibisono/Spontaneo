@@ -16,7 +16,6 @@ struct Hotspot: Identifiable, Equatable {
 }
 
 struct HomeView: View {
-    @State var selectedCategory = ""
     @StateObject private var locationManager = LocationManager()
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 37.3352, longitude: -122.0096),
@@ -43,14 +42,24 @@ struct HomeView: View {
     @State private var isMapExpanded = false
     @Namespace private var animation
     
+    @State private var selectedCategory: CategoryModel?
+    @State private var categories: [CategoryModel] = getCategoryList()
+    @State private var isFilterExpanded = false
+
+    // Add this to the existing state variables
+    @State private var mapStyle: MapStyle = .standard
+    @State private var showNearbyActivityAlert = false
+    @State private var nearbyActivity: Activity?
+
+    @State private var zoomLevel: Double = 0.05
+    
+    @State private var searchResults: [Activity] = []
+    
     var filteredActivities: [Activity] {
-        activities.filter { activity in
-            if selectedCategory.isEmpty {
-                return true
-            } else {
-                return activity.category == selectedCategory
-            }
+        guard let selectedCategory = selectedCategory, selectedCategory.title != "All" else {
+            return activities
         }
+        return activities.filter { $0.category == selectedCategory.title }
     }
     
     var body: some View {
@@ -60,15 +69,26 @@ struct HomeView: View {
                     .edgesIgnoringSafeArea(.all)
                     .onAppear {
                         setupInitialState(geometry: geometry)
+                        checkNearbyActivities()
                     }
                 
                 VStack(spacing: 0) {
-                    searchBarView
-                        .padding(.top, 60)
+                    HStack(spacing: 16) {
+                        filterButton
+                        Spacer()
+                        searchButton
+                        mapStyleButton
+                    }
+                    .padding(.top, 60)
+                    .padding(.horizontal)
                     
-                    if !isSearching {
+                    if isFilterExpanded {
                         CategoryListView
-                            .padding(.top, 20)
+                            .transition(.move(edge: .top).combined(with: .opacity))
+                    }
+                    
+                    if isSearching {
+                        searchBarView
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
                     
@@ -77,88 +97,134 @@ struct HomeView: View {
                 
                 locationButton
                 
-                BottomSheetView(activities: activities)
+                BottomSheetView(activities: filteredActivities)
                     .offset(y: bottomSheetOffset)
                     .gesture(dragGesture)
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: bottomSheetOffset)
             }
         }
         .accentColor(Color("AccentColor"))
+        .alert(isPresented: $showNearbyActivityAlert) {
+            Alert(
+                title: Text("Nearby Activity"),
+                message: Text("You're near \(nearbyActivity?.title ?? "an activity"). Would you like to check it out?"),
+                primaryButton: .default(Text("View")) {
+                    // Navigate to the activity detail view
+                },
+                secondaryButton: .cancel()
+            )
+        }
     }
     
     private var mapView: some View {
-        Map(coordinateRegion: $region, showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: hotspots) { hotspot in
-            MapAnnotation(coordinate: hotspot.coordinate) {
-                HotspotAnnotationView(hotspot: hotspot, isSelected: selectedHotspot == hotspot)
-                    .onTapGesture {
-                        withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                            region.center = hotspot.coordinate
-                            region.span = MKCoordinateSpan(latitudeDelta: 0.01, longitudeDelta: 0.01)
-                            selectedHotspot = hotspot
-                            isMapExpanded = true
+        GeometryReader { geometry in
+            Map(coordinateRegion: Binding(
+                get: { self.region },
+                set: { newRegion in
+                    self.region = newRegion
+                    self.zoomLevel = Double(newRegion.span.latitudeDelta)
+                }
+            ), showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: activities) { activity in
+                MapAnnotation(coordinate: activity.location.coordinate) {
+                    ActivityPin(activity: activity, isHighlighted: searchResults.contains(where: { $0.id == activity.id }))
+                        .onTapGesture {
+                            centerMapOnActivity(activity)
                         }
+                }
+            }
+            .overlay(
+                ForEach(hotspots) { hotspot in
+                    if zoomLevel > 0.02 {
+                        HotspotAnnotationView(hotspot: hotspot, isSelected: selectedHotspot == hotspot)
+                            .position(
+                                x: geometry.size.width * (hotspot.coordinate.longitude - region.center.longitude) / region.span.longitudeDelta + geometry.size.width / 2,
+                                y: geometry.size.height * (region.center.latitude - hotspot.coordinate.latitude) / region.span.latitudeDelta + geometry.size.height / 2
+                            )
+                            .onTapGesture {
+                                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                                    region.center = hotspot.coordinate
+                                    region.span = MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+                                    selectedHotspot = hotspot
+                                    isMapExpanded = true
+                                }
+                            }
                     }
-            }
-        }
-        .mapStyle(.standard(elevation: .realistic))
-        .overlay(
-            Circle()
-                .fill(Color.blue.opacity(0.2))
-                .frame(width: 40, height: 40)
-                .scaleEffect(isMapLoaded ? 1 : 0)
-                .opacity(isMapLoaded ? 0 : 1)
-                .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: isMapLoaded)
-        )
-        .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                withAnimation(.easeInOut(duration: 1)) {
-                    isMapLoaded = true
+                }
+            )
+            .mapStyle(mapStyle)
+            .overlay(
+                Circle()
+                    .fill(Color.blue.opacity(0.2))
+                    .frame(width: 40, height: 40)
+                    .scaleEffect(isMapLoaded ? 1 : 0)
+                    .opacity(isMapLoaded ? 0 : 1)
+                    .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: isMapLoaded)
+            )
+            .onAppear {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    withAnimation(.easeInOut(duration: 1)) {
+                        isMapLoaded = true
+                    }
                 }
             }
-        }
-        .gesture(
-            DragGesture().onChanged { _ in
-                withAnimation(.easeInOut) {
-                    isMapExpanded = true
+            .gesture(
+                DragGesture().onChanged { _ in
+                    withAnimation(.easeInOut) {
+                        isMapExpanded = true
+                    }
                 }
+            )
+        }
+    }
+    
+    private var searchButton: some View {
+        Button(action: {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                isSearching.toggle()
             }
-        )
+        }) {
+            Image(systemName: "magnifyingglass")
+                .foregroundColor(Color("AccentColor"))
+                .padding(12)
+                .background(Color("NeutralLight"))
+                .clipShape(Circle())
+                .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
+        }
     }
     
     private var searchBarView: some View {
-        HStack {
-            Image(systemName: "magnifyingglass")
-                .foregroundColor(Color("AccentColor"))
-            
-            if isSearching {
+        VStack {
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .foregroundColor(Color("AccentColor"))
+                
                 TextField("Search for activities...", text: $searchText)
                     .foregroundColor(Color("NeutralDark"))
                     .autocapitalization(.none)
                     .disableAutocorrection(true)
+                    .onChange(of: searchText) { _ in
+                        searchActivities()
+                    }
                 
                 Button(action: {
                     withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                         isSearching = false
                         searchText = ""
+                        searchResults = []
                     }
                 }) {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(Color("NeutralDark").opacity(0.6))
                 }
-            } else {
-                Text("Search for activities...")
-                    .foregroundColor(Color("NeutralDark").opacity(0.6))
-                Spacer()
             }
-        }
-        .padding()
-        .background(Color("NeutralLight"))
-        .cornerRadius(20)
-        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
-        .padding(.horizontal)
-        .onTapGesture {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                isSearching = true
+            .padding()
+            .background(Color("NeutralLight"))
+            .cornerRadius(20)
+            .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
+            .padding(.horizontal)
+            
+            if !searchResults.isEmpty {
+                searchResultsView
             }
         }
     }
@@ -214,6 +280,7 @@ struct HomeView: View {
         expandedOffset = geometry.size.height - bottomSheetHeight - desiredExpandedHeight
         bottomSheetOffset = collapsedOffset
         fetchNearbyActivities()
+        selectedCategory = categories.first
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
             withAnimation {
@@ -249,27 +316,60 @@ struct HomeView: View {
     }
     
     private func calculateHotspots() {
-        let gridSize = 0.005 // Approximately 500 meters
-        var hotspotDict: [String: [Activity]] = [:]
-        
+        let epsilon: Double = 0.001 // Approximately 100 meters
+        let minPoints = 2 // Minimum number of points to form a cluster
+
+        var clusters: [[Activity]] = []
+        var visited = Set<String>()
+
         for activity in activities {
-            let lat = Double(Int(activity.location.latitude / gridSize)) * gridSize
-            let lon = Double(Int(activity.location.longitude / gridSize)) * gridSize
-            let key = "\(lat),\(lon)"
-            
-            if hotspotDict[key] != nil {
-                hotspotDict[key]?.append(activity)
-            } else {
-                hotspotDict[key] = [activity]
+            guard let id = activity.id else { continue }
+            if visited.contains(id) { continue }
+            visited.insert(id)
+
+            var cluster = [activity]
+            var neighbors = findNeighbors(of: activity, within: epsilon)
+
+            while !neighbors.isEmpty {
+                let neighbor = neighbors.removeFirst()
+                if let neighborId = neighbor.id, !visited.contains(neighborId) {
+                    visited.insert(neighborId)
+                    let newNeighbors = findNeighbors(of: neighbor, within: epsilon)
+                    neighbors.append(contentsOf: newNeighbors)
+                }
+                cluster.append(neighbor)
+            }
+
+            if cluster.count >= minPoints {
+                clusters.append(cluster)
             }
         }
-        
-        hotspots = hotspotDict.compactMap { (key, activities) in
-            guard activities.count >= 2 else { return nil }
-            let parts = key.split(separator: ",")
-            guard let lat = Double(parts[0]), let lon = Double(parts[1]) else { return nil }
-            return Hotspot(coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lon), activityCount: activities.count)
+
+        hotspots = clusters.map { cluster in
+            let center = calculateClusterCenter(cluster)
+            return Hotspot(coordinate: center, activityCount: cluster.count)
         }
+    }
+
+    private func findNeighbors(of activity: Activity, within epsilon: Double) -> [Activity] {
+        return activities.filter { neighbor in
+            guard let neighborId = neighbor.id, let activityId = activity.id, neighborId != activityId else { return false }
+            let distance = calculateDistance(from: activity.location.coordinate, to: neighbor.location.coordinate)
+            return distance <= epsilon
+        }
+    }
+
+    private func calculateDistance(from location1: CLLocationCoordinate2D, to location2: CLLocationCoordinate2D) -> Double {
+        let location1 = CLLocation(latitude: location1.latitude, longitude: location1.longitude)
+        let location2 = CLLocation(latitude: location2.latitude, longitude: location2.longitude)
+        return location1.distance(from: location2) / 1000 // Convert to kilometers
+    }
+
+    private func calculateClusterCenter(_ cluster: [Activity]) -> CLLocationCoordinate2D {
+        let totalLat = cluster.reduce(0) { $0 + $1.location.coordinate.latitude }
+        let totalLon = cluster.reduce(0) { $0 + $1.location.coordinate.longitude }
+        let count = Double(cluster.count)
+        return CLLocationCoordinate2D(latitude: totalLat / count, longitude: totalLon / count)
     }
     
     @ViewBuilder
@@ -331,39 +431,208 @@ struct HomeView: View {
         }
     }
     
-    var CategoryListView: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                ForEach(categoryList, id: \.id) { item in
-                    Button(action: {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
-                            selectedCategory = item.title
-                        }
-                    }) {
-                        HStack {
-                            Image(systemName: item.icon)
-                            Text(item.title)
-                        }
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 8)
-                        .background(
-                            ZStack {
-                                if selectedCategory == item.title {
-                                    RoundedRectangle(cornerRadius: 20)
-                                        .fill(Color("AccentColor"))
-                                        .matchedGeometryEffect(id: "category_background", in: animation)
-                                }
-                            }
-                        )
-                        .foregroundColor(selectedCategory == item.title ? Color("NeutralLight") : Color("NeutralDark"))
-                        .cornerRadius(20)
-                        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
-                    }
-                    .scaleEffect(selectedCategory == item.title ? 1.05 : 1)
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: selectedCategory)
+    private var filterButton: some View {
+        Button(action: {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                isFilterExpanded.toggle()
+                if !isFilterExpanded {
+                    selectedCategory = categories.first
                 }
             }
-            .padding(.horizontal)
+        }) {
+            HStack {
+                Image(systemName: "line.3.horizontal.decrease.circle")
+                Text(selectedCategory?.title ?? "All")
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 12)
+            .background(Color("NeutralLight"))
+            .foregroundColor(Color("AccentColor"))
+            .cornerRadius(20)
+            .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
+        }
+    }
+    
+    private var CategoryListView: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                ForEach(categories) { category in
+                    CategoryButton(
+                        category: category,
+                        isSelected: selectedCategory == category,
+                        action: { selectCategory(category) }
+                    )
+                }
+            }
+            .padding(.vertical, 8)
+            .padding(.horizontal, 4)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 20)
+                .fill(Color("NeutralLight").opacity(0.9))
+                .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
+        )
+        .frame(height: 100)
+        .padding(.horizontal)
+    }
+    
+    private func selectCategory(_ category: CategoryModel) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            selectedCategory = category
+            isFilterExpanded = false
+        }
+    }
+    
+    // Add this to the body, near the other buttons in the top bar
+    private var mapStyleButton: some View {
+        Menu {
+            Button("Standard") { mapStyle = .standard }
+            Button("Satellite") { mapStyle = .hybrid }
+            Button("Hybrid") { mapStyle = .imagery(elevation: .realistic) }
+        } label: {
+            Image(systemName: "map")
+                .foregroundColor(Color("AccentColor"))
+                .padding(12)
+                .background(Color("NeutralLight"))
+                .clipShape(Circle())
+                .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
+        }
+    }
+    
+    // Add this function to check for nearby activities
+    private func checkNearbyActivities() {
+        guard let userLocation = locationManager.location else { return }
+        
+        for activity in activities {
+            let activityLocation = CLLocation(latitude: activity.location.latitude, longitude: activity.location.longitude)
+            let distance = userLocation.distance(from: activityLocation)
+            
+            if distance <= 1000 { // Within 1km
+                nearbyActivity = activity
+                showNearbyActivityAlert = true
+                break
+            }
+        }
+    }
+    
+    private func searchActivities() {
+        searchResults = activities.filter { activity in
+            activity.title.lowercased().contains(searchText.lowercased()) ||
+            activity.description.lowercased().contains(searchText.lowercased()) ||
+            activity.category.lowercased().contains(searchText.lowercased())
+        }
+        
+        if let firstResult = searchResults.first {
+            withAnimation(.easeInOut(duration: 0.5)) {
+                region.center = firstResult.location.coordinate
+                region.span = MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+            }
+        }
+    }
+    
+    private var searchResultsView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(searchResults) { activity in
+                    Button(action: {
+                        centerMapOnActivity(activity)
+                    }) {
+                        HStack {
+                            Image(systemName: iconForCategory(activity.category))
+                                .foregroundColor(Color("AccentColor"))
+                            Text(activity.title)
+                                .foregroundColor(Color("NeutralDark"))
+                        }
+                        .padding(.vertical, 5)
+                    }
+                }
+            }
+            .padding()
+        }
+        .background(Color("NeutralLight"))
+        .cornerRadius(10)
+        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
+        .frame(maxHeight: 200)
+    }
+    
+    private func iconForCategory(_ category: String) -> String {
+        switch category {
+        case "Sports": return "sportscourt"
+        case "Music": return "music.note"
+        case "Food": return "fork.knife"
+        case "Art": return "paintpalette"
+        case "Education": return "book"
+        default: return "star"
+        }
+    }
+    
+    private func centerMapOnActivity(_ activity: Activity) {
+        withAnimation(.easeInOut(duration: 0.5)) {
+            region.center = activity.location.coordinate
+            region.span = MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
+        }
+        isSearching = false
+    }
+}
+
+struct CategoryButton: View {
+    let category: CategoryModel
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            VStack(spacing: 4) {
+                Image(systemName: category.icon)
+                    .font(.system(size: 16))
+                Text(category.title)
+                    .font(.caption)
+                    .fontWeight(.medium)
+            }
+            .frame(width: 60, height: 60)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? Color("AccentColor") : Color("NeutralLight"))
+            )
+            .foregroundColor(isSelected ? Color("NeutralLight") : Color("NeutralDark"))
+        }
+        .buttonStyle(PlainButtonStyle())
+        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+    }
+}
+
+struct ActivityPin: View {
+    let activity: Activity
+    let isHighlighted: Bool
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Image(systemName: iconForCategory(activity.category))
+                .font(.system(size: 24))
+                .foregroundColor(.white)
+                .frame(width: 40, height: 40)
+                .background(isHighlighted ? Color.yellow : Color("AccentColor"))
+                .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke(Color.white, lineWidth: 2)
+                )
+            
+            Image(systemName: "arrowtriangle.down.fill")
+                .font(.system(size: 12))
+                .foregroundColor(isHighlighted ? Color.yellow : Color("AccentColor"))
+                .offset(y: -5)
+        }
+    }
+    
+    private func iconForCategory(_ category: String) -> String {
+        switch category {
+        case "Sports": return "sportscourt"
+        case "Music": return "music.note"
+        case "Food": return "fork.knife"
+        case "Art": return "paintpalette"
+        case "Education": return "book"
+        default: return "star"
         }
     }
 }
@@ -377,19 +646,20 @@ struct HotspotAnnotationView: View {
         ZStack {
             Circle()
                 .fill(Color("AccentColor").opacity(0.3))
-                .frame(width: CGFloat(hotspot.activityCount * 15), height: CGFloat(hotspot.activityCount * 15))
+                .frame(width: CGFloat(Double(hotspot.activityCount) * 10), height: CGFloat(Double(hotspot.activityCount) * 10))
             
             Circle()
                 .stroke(Color("AccentColor"), lineWidth: 2)
-                .frame(width: CGFloat(hotspot.activityCount * 15), height: CGFloat(hotspot.activityCount * 15))
+                .frame(width: CGFloat(Double(hotspot.activityCount) * 10), height: CGFloat(Double(hotspot.activityCount) * 10))
+            
+            Image(systemName: "star.circle.fill")
+                .font(.system(size: CGFloat(Double(hotspot.activityCount) * 5)))
+                .foregroundColor(Color("AccentColor"))
             
             Text("\(hotspot.activityCount)")
-                .font(.caption)
+                .font(.caption2)
                 .fontWeight(.bold)
-                .foregroundColor(Color("NeutralLight"))
-                .padding(8)
-                .background(Color("AccentColor"))
-                .clipShape(Circle())
+                .foregroundColor(.white)
         }
         .scaleEffect(isAnimating ? 1.1 : 1)
         .scaleEffect(isSelected ? 1.2 : 1)
@@ -400,7 +670,6 @@ struct HotspotAnnotationView: View {
         }
     }
 }
-
 struct ActivityCardHome: View {
     let activity: Activity
     @State private var isHovered = false
