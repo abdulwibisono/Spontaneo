@@ -42,7 +42,11 @@ struct HomeView: View {
     @State private var isMapExpanded = false
     @Namespace private var animation
     
-    @State private var selectedCategory: CategoryModel?
+    @State private var selectedCategory: CategoryModel? {
+        didSet {
+            calculateHotspots()
+        }
+    }
     @State private var categories: [CategoryModel] = getCategoryList()
     @State private var isFilterExpanded = false
 
@@ -124,7 +128,7 @@ struct HomeView: View {
                     self.region = newRegion
                     self.zoomLevel = Double(newRegion.span.latitudeDelta)
                 }
-            ), showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: activities) { activity in
+            ), showsUserLocation: true, userTrackingMode: $userTrackingMode, annotationItems: zoomLevel <= 0.02 ? filteredActivities : []) { activity in
                 MapAnnotation(coordinate: activity.location.coordinate) {
                     ActivityPin(activity: activity, isHighlighted: searchResults.contains(where: { $0.id == activity.id }))
                         .onTapGesture {
@@ -135,7 +139,7 @@ struct HomeView: View {
             .overlay(
                 ForEach(hotspots) { hotspot in
                     if zoomLevel > 0.02 {
-                        HotspotAnnotationView(hotspot: hotspot, isSelected: selectedHotspot == hotspot)
+                        HotspotAnnotationView(hotspot: hotspot, isSelected: selectedHotspot == hotspot, zoomLevel: zoomLevel)
                             .position(
                                 x: geometry.size.width * (hotspot.coordinate.longitude - region.center.longitude) / region.span.longitudeDelta + geometry.size.width / 2,
                                 y: geometry.size.height * (region.center.latitude - hotspot.coordinate.latitude) / region.span.latitudeDelta + geometry.size.height / 2
@@ -322,7 +326,7 @@ struct HomeView: View {
         var clusters: [[Activity]] = []
         var visited = Set<String>()
 
-        for activity in activities {
+        for activity in filteredActivities {
             guard let id = activity.id else { continue }
             if visited.contains(id) { continue }
             visited.insert(id)
@@ -352,7 +356,7 @@ struct HomeView: View {
     }
 
     private func findNeighbors(of activity: Activity, within epsilon: Double) -> [Activity] {
-        return activities.filter { neighbor in
+        return filteredActivities.filter { neighbor in
             guard let neighborId = neighbor.id, let activityId = activity.id, neighborId != activityId else { return false }
             let distance = calculateDistance(from: activity.location.coordinate, to: neighbor.location.coordinate)
             return distance <= epsilon
@@ -480,6 +484,7 @@ struct HomeView: View {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
             selectedCategory = category
             isFilterExpanded = false
+            calculateHotspots()
         }
     }
     
@@ -557,12 +562,42 @@ struct HomeView: View {
     
     private func iconForCategory(_ category: String) -> String {
         switch category {
-        case "Sports": return "sportscourt"
-        case "Music": return "music.note"
-        case "Food": return "fork.knife"
-        case "Art": return "paintpalette"
-        case "Education": return "book"
-        default: return "star"
+        case "Coffee":
+            return "cup.and.saucer.fill"
+        case "Study":
+            return "book.fill"
+        case "Sports":
+            return "sportscourt.fill"
+        case "Food":
+            return "fork.knife"
+        case "Explore":
+            return "binoculars.fill"
+        case "Music":
+            return "music.note"
+        case "Art":
+            return "paintpalette.fill"
+        case "Tech":
+            return "laptopcomputer"
+        case "Outdoor":
+            return "leaf.fill"
+        case "Fitness":
+            return "figure.walk"
+        case "Games":
+            return "gamecontroller.fill"
+        case "Travel":
+            return "airplane"
+        case "Events":
+            return "calendar.circle.fill"
+        case "Fashion":
+            return "tshirt.fill"
+        case "Health":
+            return "heart.fill"
+        case "Books":
+            return "books.vertical.fill"
+        case "Movies":
+            return "film.fill"
+        default:
+            return "star.fill"
         }
     }
     
@@ -627,12 +662,42 @@ struct ActivityPin: View {
     
     private func iconForCategory(_ category: String) -> String {
         switch category {
-        case "Sports": return "sportscourt"
-        case "Music": return "music.note"
-        case "Food": return "fork.knife"
-        case "Art": return "paintpalette"
-        case "Education": return "book"
-        default: return "star"
+        case "Coffee":
+            return "cup.and.saucer.fill"
+        case "Study":
+            return "book.fill"
+        case "Sports":
+            return "sportscourt.fill"
+        case "Food":
+            return "fork.knife"
+        case "Explore":
+            return "binoculars.fill"
+        case "Music":
+            return "music.note"
+        case "Art":
+            return "paintpalette.fill"
+        case "Tech":
+            return "laptopcomputer"
+        case "Outdoor":
+            return "leaf.fill"
+        case "Fitness":
+            return "figure.walk"
+        case "Games":
+            return "gamecontroller.fill"
+        case "Travel":
+            return "airplane"
+        case "Events":
+            return "calendar.circle.fill"
+        case "Fashion":
+            return "tshirt.fill"
+        case "Health":
+            return "heart.fill"
+        case "Books":
+            return "books.vertical.fill"
+        case "Movies":
+            return "film.fill"
+        default:
+            return "star.fill"
         }
     }
 }
@@ -640,34 +705,30 @@ struct ActivityPin: View {
 struct HotspotAnnotationView: View {
     let hotspot: Hotspot
     let isSelected: Bool
+    let zoomLevel: Double
     @State private var isAnimating = false
     
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(Color("AccentColor").opacity(0.3))
-                .frame(width: CGFloat(Double(hotspot.activityCount) * 10), height: CGFloat(Double(hotspot.activityCount) * 10))
-            
-            Circle()
-                .stroke(Color("AccentColor"), lineWidth: 2)
-                .frame(width: CGFloat(Double(hotspot.activityCount) * 10), height: CGFloat(Double(hotspot.activityCount) * 10))
-            
-            Image(systemName: "star.circle.fill")
-                .font(.system(size: CGFloat(Double(hotspot.activityCount) * 5)))
-                .foregroundColor(Color("AccentColor"))
-            
-            Text("\(hotspot.activityCount)")
-                .font(.caption2)
-                .fontWeight(.bold)
-                .foregroundColor(.white)
-        }
-        .scaleEffect(isAnimating ? 1.1 : 1)
-        .scaleEffect(isSelected ? 1.2 : 1)
-        .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: isAnimating)
-        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
-        .onAppear {
-            isAnimating = true
-        }
+        Circle()
+            .fill(Color("AccentColor").opacity(0.5))
+            .frame(width: size, height: size)
+            .overlay(
+                Circle()
+                    .stroke(Color("AccentColor"), lineWidth: 2)
+            )
+            .scaleEffect(isAnimating ? 1.1 : 1)
+            .scaleEffect(isSelected ? 1.2 : 1)
+            .animation(.easeInOut(duration: 1).repeatForever(autoreverses: true), value: isAnimating)
+            .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isSelected)
+            .onAppear {
+                isAnimating = true
+            }
+    }
+    
+    private var size: CGFloat {
+        let baseSize = CGFloat(hotspot.activityCount * 3)
+        let zoomFactor = 1 / zoomLevel
+        return min(max(baseSize * zoomFactor, 20), 60) // Limit size between 20 and 60
     }
 }
 struct ActivityCardHome: View {
