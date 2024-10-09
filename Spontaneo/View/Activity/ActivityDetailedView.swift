@@ -15,6 +15,7 @@ struct ActivityDetailedView: View {
         @State private var selectedImageIndex: Int = 0
         @State private var showingEditActivity = false
         @State private var isJoined = false
+        @Environment(\.presentationMode) var presentationMode
         
         let placeholderImages = [
             "activity_placeholder",
@@ -56,6 +57,12 @@ struct ActivityDetailedView: View {
             .edgesIgnoringSafeArea(.top)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
+                        Image(systemName: "chevron.left")
+                            .foregroundColor(Color("AccentColor"))
+                    }
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
                         if activity.hostId == authService.user?.id {

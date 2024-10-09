@@ -59,11 +59,69 @@ struct HomeView: View {
     
     @State private var searchResults: [Activity] = []
     
+    // Add these to the existing state variables
+    @State private var nearbyHotspot: Hotspot?
+    @State private var showHotspotNotification = false
+    @State private var isInsideHotspot = false
+
+    @State private var showHotspotDetail = false
+    @State private var selectedHotspotActivities: [Activity] = []
+    @State private var lastRecalculationLocation: CLLocation?
+
+    @State private var lastNotificationTime: Date?
+    @State private var lastNotifiedHotspotId: UUID?
+
+    @State private var dismissedHotspots: Set<UUID> = []
+    @State private var selectedActivity: Activity?
+    @State private var showActivityDetail = false
+
     var filteredActivities: [Activity] {
         guard let selectedCategory = selectedCategory, selectedCategory.title != "All" else {
             return activities
         }
         return activities.filter { $0.category == selectedCategory.title }
+    }
+    
+    // Change this from private to static
+    static func iconForCategory(_ category: String) -> String {
+        switch category {
+        case "Coffee":
+            return "cup.and.saucer.fill"
+        case "Study":
+            return "book.fill"
+        case "Sports":
+            return "sportscourt.fill"
+        case "Food":
+            return "fork.knife"
+        case "Explore":
+            return "binoculars.fill"
+        case "Music":
+            return "music.note"
+        case "Art":
+            return "paintpalette.fill"
+        case "Tech":
+            return "laptopcomputer"
+        case "Outdoor":
+            return "leaf.fill"
+        case "Fitness":
+            return "figure.walk"
+        case "Games":
+            return "gamecontroller.fill"
+        case "Travel":
+            return "airplane"
+        case "Events":
+            return "calendar.circle.fill"
+        case "Fashion":
+            return "tshirt.fill"
+        case "Health":
+            return "heart.fill"
+        case "Books":
+            return "books.vertical.fill"
+        case "Movies":
+            return "film.fill"
+        default:
+            return "star.fill"
+        }
     }
     
     var body: some View {
@@ -74,6 +132,11 @@ struct HomeView: View {
                     .onAppear {
                         setupInitialState(geometry: geometry)
                         checkNearbyActivities()
+                        
+                        // Add this timer to periodically check for nearby hotspots
+                        Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
+                            checkNearbyHotspots()
+                        }
                     }
                 
                 VStack(spacing: 0) {
@@ -105,19 +168,46 @@ struct HomeView: View {
                     .offset(y: bottomSheetOffset)
                     .gesture(dragGesture)
                     .animation(.spring(response: 0.5, dampingFraction: 0.8), value: bottomSheetOffset)
+                
+                if showHotspotNotification, let hotspot = nearbyHotspot {
+                    VStack {
+                        Spacer()
+                        HotspotNotificationView(
+                            hotspot: hotspot,
+                            isInside: isInsideHotspot,
+                            onDismiss: dismissHotspotNotification
+                        )
+                        .padding(.horizontal)
+                        .padding(.bottom, 100)
+                    }
+                    .transition(.move(edge: .bottom))
+                    .animation(.spring(response: 0.5, dampingFraction: 0.7), value: showHotspotNotification)
+                }
+                
+                if showHotspotDetail, let selectedHotspot = selectedHotspot {
+                    HotspotDetailView(
+                        hotspot: selectedHotspot,
+                        activities: selectedHotspotActivities,
+                        onDismiss: {
+                            withAnimation {
+                                showHotspotDetail = false
+                            }
+                        },
+                        selectedActivity: $selectedActivity,
+                        showActivityDetail: $showActivityDetail
+                    )
+                    .frame(width: geometry.size.width * 0.9, height: geometry.size.height * 0.7)
+                    .position(x: geometry.size.width / 2, y: geometry.size.height / 2)
+                    .transition(.opacity.combined(with: .scale))
+                }
+            }
+            .onChange(of: locationManager.location) { newLocation in
+                if let newLocation = newLocation {
+                    checkAndRecalculateHotspots(newLocation: newLocation)
+                }
             }
         }
         .accentColor(Color("AccentColor"))
-        .alert(isPresented: $showNearbyActivityAlert) {
-            Alert(
-                title: Text("Nearby Activity"),
-                message: Text("You're near \(nearbyActivity?.title ?? "an activity"). Would you like to check it out?"),
-                primaryButton: .default(Text("View")) {
-                    // Navigate to the activity detail view
-                },
-                secondaryButton: .cancel()
-            )
-        }
     }
     
     private var mapView: some View {
@@ -132,7 +222,8 @@ struct HomeView: View {
                 MapAnnotation(coordinate: activity.location.coordinate) {
                     ActivityPin(activity: activity, isHighlighted: searchResults.contains(where: { $0.id == activity.id }))
                         .onTapGesture {
-                            centerMapOnActivity(activity)
+                            selectedActivity = activity
+                            showActivityDetail = true
                         }
                 }
             }
@@ -149,7 +240,8 @@ struct HomeView: View {
                                     region.center = hotspot.coordinate
                                     region.span = MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
                                     selectedHotspot = hotspot
-                                    isMapExpanded = true
+                                    selectedHotspotActivities = getActivitiesForHotspot(hotspot)
+                                    showHotspotDetail = true
                                 }
                             }
                     }
@@ -179,6 +271,11 @@ struct HomeView: View {
                 }
             )
         }
+        .sheet(isPresented: $showActivityDetail, content: {
+            if let activity = selectedActivity {
+                ActivityDetailedView(activity: activity, activityService: activityService)
+            }
+        })
     }
     
     private var searchButton: some View {
@@ -319,7 +416,7 @@ struct HomeView: View {
         }
     }
     
-    private func calculateHotspots() {
+    func calculateHotspots() {
         let epsilon: Double = 0.001 // Approximately 100 meters
         let minPoints = 2 // Minimum number of points to form a cluster
 
@@ -608,6 +705,66 @@ struct HomeView: View {
         }
         isSearching = false
     }
+    
+    // Add this function to check for nearby hotspots
+    private func checkNearbyHotspots() {
+        guard let userLocation = locationManager.location else { return }
+        
+        let now = Date()
+        let cooldownPeriod: TimeInterval = 500 
+        
+        for hotspot in hotspots {
+            let hotspotLocation = CLLocation(latitude: hotspot.coordinate.latitude, longitude: hotspot.coordinate.longitude)
+            let distance = userLocation.distance(from: hotspotLocation)
+            
+            if distance <= 200 && !dismissedHotspots.contains(hotspot.id) { // Within 200 meters and not dismissed
+                if let lastTime = lastNotificationTime,
+                   let lastHotspotId = lastNotifiedHotspotId,
+                   now.timeIntervalSince(lastTime) < cooldownPeriod && lastHotspotId == hotspot.id {
+                    // Skip notification if cooldown period hasn't passed for this hotspot
+                    continue
+                }
+                
+                nearbyHotspot = hotspot
+                isInsideHotspot = distance <= 50 // Consider inside if within 50 meters
+                showHotspotNotification = true
+                lastNotificationTime = now
+                lastNotifiedHotspotId = hotspot.id
+                break
+            }
+        }
+    }
+    
+    private func checkAndRecalculateHotspots(newLocation: CLLocation) {
+        guard let lastLocation = lastRecalculationLocation else {
+            calculateHotspots()
+            lastRecalculationLocation = newLocation
+            return
+        }
+        
+        let distance = newLocation.distance(from: lastLocation)
+        if distance > 500 { // Recalculate if the user has moved more than 500 meters
+            calculateHotspots()
+            lastRecalculationLocation = newLocation
+        }
+    }
+    
+    private func getActivitiesForHotspot(_ hotspot: Hotspot) -> [Activity] {
+        return filteredActivities.filter { activity in
+            let activityLocation = CLLocation(latitude: activity.location.latitude, longitude: activity.location.longitude)
+            let hotspotLocation = CLLocation(latitude: hotspot.coordinate.latitude, longitude: hotspot.coordinate.longitude)
+            return activityLocation.distance(from: hotspotLocation) <= 200 // Activities within 200 meters of the hotspot
+        }
+    }
+    
+    private func dismissHotspotNotification() {
+        withAnimation {
+            showHotspotNotification = false
+            if let hotspot = nearbyHotspot {
+                dismissedHotspots.insert(hotspot.id)
+            }
+        }
+    }
 }
 
 struct CategoryButton: View {
@@ -813,5 +970,127 @@ struct EmptyStateAnimation: View {
         .onAppear {
             isAnimating = true
         }
+    }
+}
+
+// Add this struct at the bottom of the file
+struct HotspotNotificationView: View {
+    let hotspot: Hotspot
+    let isInside: Bool
+    let onDismiss: () -> Void
+    
+    @State private var offset: CGFloat = 100
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Image(systemName: isInside ? "location.fill" : "location")
+                    .foregroundColor(Color("AccentColor"))
+                    .font(.system(size: 24))
+                Text(isInside ? "You're in a Hotspot!" : "Approaching Hotspot")
+                    .font(.headline)
+                    .foregroundColor(Color("NeutralDark"))
+                Spacer()
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(Color("NeutralDark").opacity(0.6))
+                        .font(.system(size: 24))
+                }
+            }
+            
+            Text("\(hotspot.activityCount) activities nearby")
+                .font(.subheadline)
+                .foregroundColor(Color("NeutralDark").opacity(0.8))
+            
+            Text(isInside ? "Explore what's happening around you!" : "Get ready to discover exciting activities!")
+                .font(.caption)
+                .foregroundColor(Color("NeutralDark").opacity(0.7))
+            
+            Button(action: {
+                // Action to view hotspot details
+            }) {
+                Text("View Activities")
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                    .foregroundColor(.white)
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 16)
+                    .background(Color("AccentColor"))
+                    .cornerRadius(20)
+            }
+        }
+        .padding()
+        .background(Color("NeutralLight"))
+        .cornerRadius(16)
+        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
+        .offset(y: offset)
+        .animation(.spring(response: 0.5, dampingFraction: 0.7), value: offset)
+        .onAppear {
+            withAnimation {
+                offset = 0
+            }
+        }
+    }
+}
+
+struct HotspotDetailView: View {
+    let hotspot: Hotspot
+    let activities: [Activity]
+    let onDismiss: () -> Void
+    @Binding var selectedActivity: Activity?
+    @Binding var showActivityDetail: Bool
+    
+    var body: some View {
+        VStack {
+            HStack {
+                Text("Hotspot Activities")
+                    .font(.title)
+                    .fontWeight(.bold)
+                Spacer()
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(Color("NeutralDark").opacity(0.6))
+                }
+            }
+            .padding()
+            
+            List(activities) { activity in
+                ActivityRowView(activity: activity)
+                    .onTapGesture {
+                        selectedActivity = activity
+                        showActivityDetail = true
+                    }
+            }
+        }
+        .background(Color("NeutralLight"))
+        .cornerRadius(16)
+        .shadow(color: Color("NeutralDark").opacity(0.1), radius: 10, x: 0, y: 5)
+    }
+}
+
+struct ActivityRowView: View {
+    let activity: Activity
+    
+    var body: some View {
+        HStack {
+            Image(systemName: iconForCategory(activity.category))
+                .foregroundColor(Color("AccentColor"))
+                .frame(width: 30, height: 30)
+            
+            VStack(alignment: .leading, spacing: 4) {
+                Text(activity.title)
+                    .font(.headline)
+                Text(activity.description)
+                    .font(.subheadline)
+                    .foregroundColor(Color("NeutralDark").opacity(0.7))
+                    .lineLimit(2)
+            }
+        }
+        .padding(.vertical, 8)
+    }
+    
+    private func iconForCategory(_ category: String) -> String {
+        // Use the existing iconForCategory function from HomeView
+        HomeView.iconForCategory(category)
     }
 }
