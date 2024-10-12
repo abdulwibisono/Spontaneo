@@ -1,36 +1,32 @@
 import SwiftUI
 import MapKit
 import CoreLocation
-import Combine
 
 struct EditActivityView: View {
     @Environment(\.presentationMode) var presentationMode
     @StateObject private var activityService = ActivityService()
     @State private var activity: Activity
+    
     @State private var title: String
     @State private var description: String
     @State private var category: String
     @State private var date: Date
     @State private var location: String
     @State private var maxParticipants: Int
-    
-    // New properties
+    @State private var isPublic: Bool
     @State private var showingImagePicker = false
     @State private var inputImage: UIImage?
     @State private var image: Image?
-    @State private var isPublic: Bool
+    
     @State private var region: MKCoordinateRegion
-    @State private var locationCoordinate: CLLocationCoordinate2D?
-    @State private var isLocationValid: Bool = true
     
     // Autocomplete Properties
-    @StateObject private var searchCompleterDelegate = SearchCompleterDelegate()
-    @State private var searchCompleter = MKLocalSearchCompleter()
-    @State private var searchResults: [MKLocalSearchCompletion] = []
-    @State private var isSearching = false
+    @StateObject private var searchCompleter = SearchCompleter()
     @FocusState private var isLocationFieldFocused: Bool
     
     let categories = ["Coffee", "Study", "Sports", "Food", "Explore"]
+    @State private var locationCoordinate: CLLocationCoordinate2D?
+    @State private var isLocationValid: Bool = true
     
     init(activity: Activity) {
         _activity = State(initialValue: activity)
@@ -65,63 +61,27 @@ struct EditActivityView: View {
                     .padding(.horizontal, 20)
                 }
                 .padding(.vertical, 20)
-                .padding(.bottom, 80)
+                .padding(.bottom, 80) // Extra padding at the bottom
             }
             .background(Color("NeutralLight"))
             .navigationTitle("Edit Activity")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        presentationMode.wrappedValue.dismiss()
-                    }
-                    .foregroundColor(Color("AccentColor"))
+            .navigationBarItems(
+                leading: Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Save") {
-                        saveActivity()
-                    }
-                    .disabled(title.isEmpty || category.isEmpty || location.isEmpty || !isLocationValid)
-                    .foregroundColor(title.isEmpty || category.isEmpty || location.isEmpty || !isLocationValid ? Color("NeutralDark").opacity(0.4) : Color("AccentColor"))
+                .foregroundColor(Color("AccentColor")),
+                trailing: Button("Save") {
+                    saveActivity()
                 }
-            }
+                .disabled(title.isEmpty || category.isEmpty || location.isEmpty || !isLocationValid)
+                .foregroundColor(title.isEmpty || category.isEmpty || location.isEmpty || !isLocationValid ? Color("NeutralDark").opacity(0.4) : Color("AccentColor"))
+            )
         }
         .accentColor(Color("AccentColor"))
         .edgesIgnoringSafeArea(.bottom)
         .sheet(isPresented: $showingImagePicker, onDismiss: loadImage) {
             ImagePicker(image: $inputImage)
-        }
-        .overlay(
-            VStack {
-                if isSearching && !searchResults.isEmpty {
-                    List(searchResults, id: \.self) { completion in
-                        Button(action: {
-                            selectCompletion(completion)
-                        }) {
-                            VStack(alignment: .leading) {
-                                Text(completion.title)
-                                    .font(.headline)
-                                Text(completion.subtitle)
-                                    .font(.subheadline)
-                                    .foregroundColor(.gray)
-                            }
-                        }
-                    }
-                    .listStyle(PlainListStyle())
-                    .frame(height: 200)
-                    .background(Color.white)
-                    .cornerRadius(10)
-                    .shadow(radius: 5)
-                    .padding(.horizontal, 20)
-                }
-            },
-            alignment: .top
-        )
-        .onAppear {
-            searchCompleter.delegate = searchCompleterDelegate
-            searchCompleter.region = region
-            searchCompleter.resultTypes = .address
-            bindSearchCompleter()
         }
     }
     
@@ -237,23 +197,31 @@ struct EditActivityView: View {
                 .foregroundColor(Color("NeutralDark"))
                 .focused($isLocationFieldFocused)
                 .onChange(of: location) { newValue in
-                    if newValue.isEmpty {
-                        searchResults = []
-                        isSearching = false
-                        isLocationValid = false
-                        locationCoordinate = nil
-                    } else {
-                        searchCompleter.queryFragment = newValue
-                        geocodeAddress(newValue)
-                    }
+                    searchCompleter.search(query: newValue)
                 }
             if !isLocationValid && !location.isEmpty {
                 Text("Invalid location. Please enter a valid address.")
                     .foregroundColor(.red)
                     .font(.caption)
             }
+            if !searchCompleter.results.isEmpty && isLocationFieldFocused {
+                List(searchCompleter.results, id: \.self) { result in
+                    Button(action: {
+                        selectLocation(result)
+                    }) {
+                        VStack(alignment: .leading) {
+                            Text(result.title)
+                            Text(result.subtitle)
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                        }
+                    }
+                }
+                .listStyle(PlainListStyle())
+                .frame(height: min(CGFloat(searchCompleter.results.count * 44), 200))
+            }
             Map(coordinateRegion: $region, annotationItems: selectedLocationAnnotation) { item in
-                MapPin(coordinate: item.coordinate, tint: .red)
+                MapMarker(coordinate: item.coordinate)
             }
             .frame(height: 200)
             .cornerRadius(16)
@@ -291,47 +259,23 @@ struct EditActivityView: View {
         return [SelectableLocation(coordinate: region.center, name: location)]
     }
     
-    private func selectCompletion(_ completion: MKLocalSearchCompletion) {
-        let searchRequest = MKLocalSearch.Request(completion: completion)
-        let search = MKLocalSearch(request: searchRequest)
-        search.start { response, error in
-            guard let placemark = response?.mapItems.first?.placemark else { return }
-            self.location = placemark.title ?? ""
-            self.region = MKCoordinateRegion(
-                center: placemark.coordinate,
-                span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
-            )
-            self.isSearching = false
-            self.searchResults = []
-            self.isLocationFieldFocused = false
-            self.locationCoordinate = placemark.coordinate
-            self.isLocationValid = true
+    private func selectLocation(_ result: MKLocalSearchCompletion) {
+        searchCompleter.getLocation(for: result) { location in
+            if let location = location {
+                DispatchQueue.main.async {
+                    self.location = result.title + ", " + result.subtitle
+                    self.region = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+                    self.isLocationValid = true
+                    self.locationCoordinate = location.coordinate
+                    self.isLocationFieldFocused = false
+                }
+            }
         }
     }
     
     private func loadImage() {
         guard let inputImage = inputImage else { return }
         image = Image(uiImage: inputImage)
-    }
-    
-    private func geocodeAddress(_ address: String) {
-        let geocoder = CLGeocoder()
-        geocoder.geocodeAddressString(address) { placemarks, error in
-            if let error = error {
-                print("Geocoding error: \(error.localizedDescription)")
-                isLocationValid = false
-                return
-            }
-            
-            if let placemark = placemarks?.first, let location = placemark.location {
-                isLocationValid = true
-                locationCoordinate = location.coordinate
-                region = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
-            } else {
-                isLocationValid = false
-                locationCoordinate = nil
-            }
-        }
     }
     
     private func saveActivity() {
@@ -371,14 +315,9 @@ struct EditActivityView: View {
             }
         }
     }
-    
-    private func bindSearchCompleter() {
-        searchCompleterDelegate.bind(
-            searchCompleter: searchCompleter,
-            searchResults: $searchResults,
-            isSearching: $isSearching,
-            region: $region,
-            onCompletionSelected: selectCompletion
-        )
-    }
 }
+
+// Add the SearchCompleter class here if it's not already in a separate file
+// class SearchCompleter: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
+//     // ... (same as in CreateActivityView)
+// }

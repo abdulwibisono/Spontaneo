@@ -57,12 +57,6 @@ struct ActivityDetailedView: View {
             .edgesIgnoringSafeArea(.top)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(action: { presentationMode.wrappedValue.dismiss() }) {
-                        Image(systemName: "chevron.left")
-                            .foregroundColor(Color("AccentColor"))
-                    }
-                }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     HStack {
                         if activity.hostId == authService.user?.id {
