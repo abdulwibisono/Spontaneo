@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import CoreLocation
 
 struct ActivityView: View {
     @State private var searchText = ""
@@ -23,6 +24,11 @@ struct ActivityView: View {
     @State private var showingCreateActivity = false
     @State private var scrollOffset: CGFloat = 0
     
+    @State private var debouncedSearchText = ""
+    @State private var searchTask: Task<Void, Never>?
+    
+    @StateObject private var locationManager = LocationManager()
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -41,8 +47,14 @@ struct ActivityView: View {
                             .frame(height: 0)
                             
                             VStack(spacing: 16) {
-                                featuredActivitiesSection
-                                listView
+                                if !debouncedSearchText.isEmpty && filteredActivities.isEmpty {
+                                    Text("No activities found for '\(debouncedSearchText)'")
+                                        .foregroundColor(Color("NeutralDark"))
+                                        .padding()
+                                } else {
+                                    featuredActivitiesSection
+                                    listView
+                                }
                             }
                             .padding(.bottom, 80)
                         }
@@ -76,6 +88,17 @@ struct ActivityView: View {
         .edgesIgnoringSafeArea(.bottom)
         .onAppear {
             fetchActivities()
+        }
+        .onChange(of: searchText) { newValue in
+            searchTask?.cancel()
+            searchTask = Task {
+                try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds debounce
+                if !Task.isCancelled {
+                    await MainActor.run {
+                        debouncedSearchText = newValue
+                    }
+                }
+            }
         }
     }
     
@@ -121,6 +144,14 @@ struct ActivityView: View {
             .font(.subheadline)
             
             activeFiltersView
+            
+            if !filters.isEmpty {
+                Button(action: clearAllFilters) {
+                    Text("Clear all filters")
+                        .font(.subheadline)
+                        .foregroundColor(Color("AccentColor"))
+                }
+            }
         }
         .padding()
         .background(Color("NeutralLight"))
@@ -217,14 +248,25 @@ struct ActivityView: View {
     
     private var filteredActivities: [Activity] {
         activities.filter { activity in
+            let searchMatch = debouncedSearchText.isEmpty || activity.title.lowercased().contains(debouncedSearchText.lowercased()) || activity.description.lowercased().contains(debouncedSearchText.lowercased())
             let categoryMatch = filters.categories.isEmpty || filters.categories.contains(activity.category)
             let ratingMatch = activity.rating >= filters.minRating
-            let distanceMatch = true
+            let distanceMatch = calculateDistance(to: activity.location) <= filters.maxDistance
             let dateMatch = filters.dateRange.map { $0.contains(activity.date) } ?? true
             
-            return categoryMatch && ratingMatch && distanceMatch && dateMatch
+            return searchMatch && categoryMatch && ratingMatch && distanceMatch && dateMatch
         }
         .sorted(by: sortOption.sortingClosure)
+    }
+    
+    private func calculateDistance(to location: Activity.Location) -> Double {
+        guard let userLocation = locationManager.location else {
+            return Double.infinity // Return a large value if user location is not available
+        }
+        
+        let activityLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
+        let distanceInMeters = userLocation.distance(from: activityLocation)
+        return distanceInMeters / 1000 // Convert to kilometers
     }
     
     private var loadingOverlay: some View {
@@ -280,6 +322,28 @@ struct ActivityView: View {
         }
         .padding(.trailing, 20)
         .padding(.bottom, 100)
+    }
+    
+    private func clearAllFilters() {
+        filters = ActivityFilters()
+        debouncedSearchText = ""
+        searchText = ""
+    }
+    
+    // Add this computed property to check if any filters are active
+    private var filtersActive: Bool {
+        return !filters.categories.isEmpty || filters.minRating > 0 || filters.maxDistance < 50 || filters.dateRange != nil || !debouncedSearchText.isEmpty
+    }
+}
+
+struct ActivityFilters {
+    var categories: Set<String> = []
+    var minRating: Double = 0
+    var maxDistance: Double = 50 // km
+    var dateRange: ClosedRange<Date>?
+    
+    var isEmpty: Bool {
+        return categories.isEmpty && minRating == 0 && maxDistance == 50 && dateRange == nil
     }
 }
 
@@ -506,19 +570,16 @@ enum SortOption: String, CaseIterable {
     }
 }
 
-struct ActivityFilters {
-    var categories: Set<String> = []
-    var minRating: Double = 0
-    var maxDistance: Double = 50 // km
-    var dateRange: ClosedRange<Date>?
-}
-
 struct FilterView: View {
     @Environment(\.presentationMode) var presentationMode
     @State private var filters: ActivityFilters
     var applyFilters: (ActivityFilters) -> Void
     
-    let allCategories = ["Coffee", "Study", "Sports", "Food", "Explore"]
+    let allCategories = [
+        "Coffee", "Study", "Sports", "Food", "Explore", "Music", "Art", "Tech", 
+        "Outdoor", "Fitness", "Games", "Travel", "Events", "Fashion", "Health", 
+        "Books", "Movies"
+    ]
     let distanceOptions = [5.0, 10.0, 20.0, 50.0]
     
     init(currentFilters: ActivityFilters, applyFilters: @escaping (ActivityFilters) -> Void) {
@@ -650,8 +711,32 @@ struct FilterView: View {
             return "fork.knife"
         case "Explore":
             return "binoculars.fill"
+        case "Music":
+            return "music.note"
+        case "Art":
+            return "paintpalette.fill"
+        case "Tech":
+            return "laptopcomputer"
+        case "Outdoor":
+            return "leaf.fill"
+        case "Fitness":
+            return "figure.walk"
+        case "Games":
+            return "gamecontroller.fill"
+        case "Travel":
+            return "airplane"
+        case "Events":
+            return "calendar.circle.fill"
+        case "Fashion":
+            return "tshirt.fill"
+        case "Health":
+            return "heart.fill"
+        case "Books":
+            return "books.vertical.fill"
+        case "Movies":
+            return "film.fill"
         default:
-            return "questionmark.circle"
+            return "star.fill"
         }
     }
 }

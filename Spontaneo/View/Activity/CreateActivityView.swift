@@ -27,7 +27,11 @@ struct CreateActivityView: View {
     @StateObject private var searchCompleter = SearchCompleter()
     @FocusState private var isLocationFieldFocused: Bool
     
-    let categories = ["Coffee", "Study", "Sports", "Food", "Explore"]
+    let categories = [
+        "Coffee", "Study", "Sports", "Food", "Explore", "Music", "Art", "Tech", 
+        "Outdoor", "Fitness", "Games", "Travel", "Events", "Fashion", "Health", 
+        "Books", "Movies"
+    ]
     @State private var locationCoordinate: CLLocationCoordinate2D?
     @State private var isLocationValid: Bool = false
     
@@ -133,16 +137,29 @@ struct CreateActivityView: View {
     
     private var categorySection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Category", systemImage: "tag")
+            Text("Category")
                 .font(.headline)
                 .foregroundColor(Color("NeutralDark"))
-            Picker("Category", selection: $category) {
-                ForEach(categories, id: \.self) { category in
-                    Text(category).tag(category)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(categories, id: \.self) { cat in
+                        Button(action: {
+                            category = cat
+                        }) {
+                            HStack {
+                                Image(systemName: HomeView.iconForCategory(cat))
+                                Text(cat)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(category == cat ? Color("AccentColor") : Color("NeutralLight"))
+                            .foregroundColor(category == cat ? Color("NeutralLight") : Color("NeutralDark"))
+                            .cornerRadius(20)
+                        }
+                    }
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
-            .background(Color("NeutralLight"))
         }
     }
     
