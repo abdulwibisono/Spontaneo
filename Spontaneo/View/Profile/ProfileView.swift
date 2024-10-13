@@ -7,10 +7,12 @@ struct ProfileView: View {
     @EnvironmentObject var authService: AuthenticationService
     @State private var showingSettings = false
     @State private var animateProfile = false
+    @State private var showingImagePicker = false
+    @State private var inputImage: UIImage?
     
     init(userId: String) {
-            _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: userId))
-        }
+        _viewModel = StateObject(wrappedValue: ProfileViewModel(userId: userId))
+    }
     
     var body: some View {
         ScrollView {
@@ -24,12 +26,11 @@ struct ProfileView: View {
                 tabContent
                 
                 Spacer(minLength: 50)
-                
             }
         }
         .edgesIgnoringSafeArea(.top)
         .safeAreaInset(edge: .bottom) {
-            Color.clear.frame(height: 0) // Add safe area inset at the bottom
+            Color.clear.frame(height: 0)
         }
         .navigationBarHidden(true)
         .overlay(editProfileButton, alignment: .bottomTrailing)
@@ -46,10 +47,17 @@ struct ProfileView: View {
         .sheet(isPresented: $showingSettings) {
             SettingView()
         }
+        .sheet(isPresented: $showingImagePicker, onDismiss: loadImage) {
+            ImagePicker(image: $inputImage)
+        }
         .onAppear {
             withAnimation(.easeInOut(duration: 0.6)) {
                 animateProfile = true
             }
+        }
+        .onReceive(viewModel.$user) { _ in
+            // This line is not needed as SwiftUI automatically updates the view
+            // self.objectWillChange.send()
         }
     }
     
@@ -74,29 +82,18 @@ struct ProfileView: View {
                     .padding(.trailing, 20)
                 }
                 
-                AsyncImage(url: viewModel.user.profileImageURL) { image in
-                    image
-                        .resizable()
-                        .scaledToFill()
-                } placeholder: {
-                    Image(systemName: "person.circle.fill")
-                        .resizable()
-                        .foregroundColor(.white)
-                }
-                .frame(width: 140, height: 140)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color.white, lineWidth: 4))
-                .shadow(radius: 10)
-                .overlay(
-                    Image(systemName: "camera.circle.fill")
-                        .foregroundColor(Color("AccentColor"))
-                        .background(Color.white)
-                        .clipShape(Circle())
+                profileImage
+                    .overlay(
+                        Button(action: {
+                            showingImagePicker = true
+                        }) {
+                            Image(systemName: "camera.circle.fill")
+                                .foregroundColor(Color("AccentColor"))
+                                .background(Color.white)
+                                .clipShape(Circle())
+                        }
                         .offset(x: 50, y: 50)
-                )
-                .scaleEffect(animateProfile ? 1 : 0.5)
-                .opacity(animateProfile ? 1 : 0)
-                .animation(.spring(response: 0.5, dampingFraction: 0.6, blendDuration: 0).delay(0.1), value: animateProfile)
+                    )
                 
                 VStack(spacing: 4) {
                     Text(viewModel.user.fullName)
@@ -117,6 +114,44 @@ struct ProfileView: View {
             .padding(.top, 20)
         }
         .frame(height: 400)
+    }
+    
+    private var profileImage: some View {
+        Group {
+            if let image = viewModel.profileImage {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else if let url = viewModel.user.profileImageURL {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .empty:
+                        ProgressView()
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    case .failure:
+                        Image(systemName: "person.circle.fill")
+                            .resizable()
+                            .foregroundColor(.gray)
+                    @unknown default:
+                        EmptyView()
+                    }
+                }
+            } else {
+                Image(systemName: "person.circle.fill")
+                    .resizable()
+                    .foregroundColor(.gray)
+            }
+        }
+        .frame(width: 140, height: 140)
+        .clipShape(Circle())
+        .overlay(Circle().stroke(Color.white, lineWidth: 4))
+        .shadow(radius: 10)
+        .scaleEffect(animateProfile ? 1 : 0.5)
+        .opacity(animateProfile ? 1 : 0)
+        .animation(.spring(response: 0.5, dampingFraction: 0.6, blendDuration: 0).delay(0.1), value: animateProfile)
     }
     
     private var tabContent: some View {
@@ -243,6 +278,11 @@ struct ProfileView: View {
         formatter.dateStyle = .medium
         formatter.timeStyle = .short
         return formatter.string(from: date)
+    }
+    
+    private func loadImage() {
+        guard let inputImage = inputImage else { return }
+        viewModel.uploadProfileImage(inputImage)
     }
 }
 
