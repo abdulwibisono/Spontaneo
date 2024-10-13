@@ -89,13 +89,27 @@ struct ActivityDetailedView: View {
     
     private var headerSection: some View {
         ZStack(alignment: .bottomLeading) {
-            Image("activity_placeholder")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 300)
-                .overlay(
-                    LinearGradient(gradient: Gradient(colors: [.clear, Color("NeutralDark").opacity(0.8)]), startPoint: .top, endPoint: .bottom)
-                )
+            if let firstImageUrl = activity.imageUrls.first {
+                AsyncImage(url: firstImageUrl) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 300)
+                        .overlay(
+                                    Color.black
+                                        .opacity(0.5)
+                                )
+                } placeholder: {
+                    ProgressView()
+                }
+            } else {
+                Image(systemName: "photo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 300)
+                    .clipped()
+                    .cornerRadius(12)
+            }
             
             VStack(alignment: .leading, spacing: 12) {
                 Text(activity.category)

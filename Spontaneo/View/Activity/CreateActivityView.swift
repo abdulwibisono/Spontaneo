@@ -82,31 +82,41 @@ struct CreateActivityView: View {
     private var imageSection: some View {
         VStack {
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
-                    ForEach(inputImages.indices, id: \.self) { index in
-                        ZStack(alignment: .topTrailing) {
-                            Image(uiImage: inputImages[index])
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 100, height: 100)
-                                .clipped()
-                                .cornerRadius(8)
-                            
-                            Button(action: {
-                                deleteImage(at: index)
-                            }) {
-                                Image(systemName: "xmark.circle.fill")
-                                    .foregroundColor(.red)
-                                    .padding(5)
-                            }
-                        }
-                    }
+                VStack {
                     Button(action: {
                         showingImagePicker = true
                     }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 40))
-                            .foregroundColor(Color("AccentColor"))
+                        HStack {
+                            Text("Add Image")
+                                .font(.system(size: 36))
+                                .foregroundStyle(Color(.black))
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 40))
+                                .foregroundColor(Color("AccentColor"))
+                        }.padding(.leading, 30)
+                    }
+                    
+                    HStack {
+                        ForEach(inputImages.indices, id: \.self) { index in
+                            
+                                ZStack(alignment: .topTrailing) {
+                                    Image(uiImage: inputImages[index])
+                                        .resizable()
+                                        .scaledToFill()
+                                        .frame(width: 100, height: 100)
+                                        .clipped()
+                                        .cornerRadius(8)
+                                    
+                                    Button(action: {
+                                        deleteImage(at: index)
+                                    }) {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundColor(.red)
+                                            .padding(5)
+                                    }
+                                }
+                            
+                        }
                     }
                 }
             }
@@ -140,9 +150,9 @@ struct CreateActivityView: View {
                                 Image(systemName: HomeView.iconForCategory(cat))
                                 Text(cat)
                             }
-                            .padding(.horizontal, 12)
+                            .padding(.horizontal, 10)
                             .padding(.vertical, 8)
-                            .background(category == cat ? Color("AccentColor") : Color("NeutralLight"))
+                            .background(category == cat ? Color("AccentColor") : Color(.white))
                             .foregroundColor(category == cat ? Color("NeutralLight") : Color("NeutralDark"))
                             .cornerRadius(20)
                         }
