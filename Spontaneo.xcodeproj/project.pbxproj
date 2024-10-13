@@ -589,18 +589,18 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Spontaneo Watch Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 7Q432J26UJ;
+				DEVELOPMENT_TEAM = AZ3FM9MHX9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Spontaneo Watch";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = Billy.spontaneo.Spontaneo;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = abdul.spontaneo.Spontaneo;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Billy.spontaneo.Spontaneo.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = abdul.spontaneo.Spontaneo.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -620,18 +620,18 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Spontaneo Watch Watch App/Preview Content\"";
-				DEVELOPMENT_TEAM = 7Q432J26UJ;
+				DEVELOPMENT_TEAM = AZ3FM9MHX9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "Spontaneo Watch";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = Billy.spontaneo.Spontaneo;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = abdul.spontaneo.Spontaneo;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Billy.spontaneo.Spontaneo.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = abdul.spontaneo.Spontaneo.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -770,7 +770,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Spontaneo/Preview Content\"";
-				DEVELOPMENT_TEAM = 7Q432J26UJ;
+				DEVELOPMENT_TEAM = AZ3FM9MHX9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We want to access your location";
@@ -785,7 +785,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Billy.spontaneo.Spontaneo;
+				PRODUCT_BUNDLE_IDENTIFIER = abdul.spontaneo.Spontaneo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -803,7 +803,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Spontaneo/Preview Content\"";
-				DEVELOPMENT_TEAM = 7Q432J26UJ;
+				DEVELOPMENT_TEAM = AZ3FM9MHX9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "We want to access your location";
@@ -818,7 +818,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = Billy.spontaneo.Spontaneo;
+				PRODUCT_BUNDLE_IDENTIFIER = abdul.spontaneo.Spontaneo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_EMIT_LOC_STRINGS = YES;

@@ -429,16 +429,29 @@ struct ActivityCard: View {
             }
             
             Text(activity.description)
-                .lineLimit(2)
+                .lineLimit(1)
                 .font(.subheadline)
                 .foregroundColor(Color("NeutralDark").opacity(0.8))
             
             HStack {
                 Image(systemName: "mappin.circle.fill")
                 Text(activity.location.name)
+            }
+            .font(.caption)
+            .foregroundColor(Color("NeutralDark").opacity(0.7))
+            
+            HStack {
+                HStack {
+                    Image(systemName: "calendar")
+                    Text(activity.date, style: .date)
+                }
+                
                 Spacer()
-                Image(systemName: "clock")
-                Text(activity.date, style: .time)
+                
+                HStack {
+                    Image(systemName: "clock")
+                    Text(activity.date, style: .time)
+                }
             }
             .font(.caption)
             .foregroundColor(Color("NeutralDark").opacity(0.7))
