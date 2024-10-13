@@ -25,15 +25,3 @@ struct JoinedUsersListView: View {
         .padding(.top, 30)
     }
 }
-
-struct JoinedUsersListView_Previews: PreviewProvider {
-    static var previews: some View {
-        NavigationView {
-            JoinedUsersListView(joinedUsers: [
-                Activity.JoinedUser(id: "1", username: "user1", fullName: "John Doe"),
-                Activity.JoinedUser(id: "2", username: "user2", fullName: "Jane Smith"),
-                Activity.JoinedUser(id: "3", username: "user3", fullName: "Bob Johnson")
-            ])
-        }
-    }
-}
