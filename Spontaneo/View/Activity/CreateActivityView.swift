@@ -15,7 +15,8 @@ struct CreateActivityView: View {
     @State private var maxParticipants = 10
     @State private var isPublic = true
     @State private var showingImagePicker = false
-    @State private var inputImage: UIImage?
+    @State private var inputImages: [UIImage] = [] // Store selected images
+    @State private var imageUrls: [URL] = [] // Store uploaded image URLs
     @State private var image: Image?
     
     @State private var region = MKCoordinateRegion(
@@ -71,54 +72,42 @@ struct CreateActivityView: View {
         }
         .accentColor(Color("AccentColor"))
         .edgesIgnoringSafeArea(.bottom)
-        .sheet(isPresented: $showingImagePicker, onDismiss: loadImage) {
-            ImagePicker(image: $inputImage)
+        .sheet(isPresented: $showingImagePicker) {
+            PhotoPicker(selectedImages: $inputImages)
         }
     }
     
     // MARK: - Sections
     
     private var imageSection: some View {
-        ZStack {
-            if let image = image {
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .frame(height: 200)
-                    .clipped()
-                    .cornerRadius(16)
-            } else {
-                Rectangle()
-                    .fill(Color("NeutralLight"))
-                    .frame(height: 200)
-                    .cornerRadius(16)
-                    .overlay(
-                        VStack {
-                            Image(systemName: "camera.fill")
-                                .foregroundColor(Color("NeutralDark").opacity(0.4))
-                                .font(.largeTitle)
-                            Text("Add Photo")
-                                .foregroundColor(Color("NeutralDark").opacity(0.4))
-                                .font(.headline)
-                        }
-                    )
-            }
-            
-            VStack {
-                Spacer()
+        VStack {
+            ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    Spacer()
+                    ForEach(inputImages.indices, id: \.self) { index in
+                        ZStack(alignment: .topTrailing) {
+                            Image(uiImage: inputImages[index])
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 100)
+                                .clipped()
+                                .cornerRadius(8)
+                            
+                            Button(action: {
+                                deleteImage(at: index)
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.red)
+                                    .padding(5)
+                            }
+                        }
+                    }
                     Button(action: {
                         showingImagePicker = true
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 40))
-                            .foregroundColor(Color("NeutralLight"))
-                            .background(Color("AccentColor"))
-                            .clipShape(Circle())
-                            .shadow(color: Color("NeutralDark").opacity(0.3), radius: 5, x: 0, y: 2)
+                            .foregroundColor(Color("AccentColor"))
                     }
-                    .padding()
                 }
             }
         }
@@ -278,8 +267,12 @@ struct CreateActivityView: View {
     }
     
     private func loadImage() {
-        guard let inputImage = inputImage else { return }
-        image = Image(uiImage: inputImage)
+        // This function will be called after image picker is dismissed
+        // Implement logic to handle multiple images if needed
+        // For example, you can update the UI to show the selected images
+        if let newImage = inputImages.last {
+            image = Image(uiImage: newImage)
+        }
     }
     
     private func createActivity() {
@@ -288,32 +281,52 @@ struct CreateActivityView: View {
             return
         }
 
-        let newActivity = Activity(
-            title: title,
-            category: category,
-            date: date,
-            location: Activity.Location(
-                name: location,
-                latitude: coordinate.latitude,
-                longitude: coordinate.longitude
-            ),
-            currentParticipants: 1,
-            maxParticipants: maxParticipants,
-            hostId: currentUser.id,
-            hostName: currentUser.username,
-            description: description,
-            tags: [],
-            receiveUpdates: true,
-            updates: [],
-            rating: 0.0,  // Initial rating for new activities
-            joinedUsers: [Activity.JoinedUser(id: currentUser.id, username: currentUser.username, fullName: currentUser.fullName)]
-        )
-        
-        if let id = activityService.createActivity(newActivity) {
-            print("Created activity with ID: \(id)")
-            presentationMode.wrappedValue.dismiss()
-        } else {
-            print("Failed to create activity")
+        uploadImages { urls in
+            let newActivity = Activity(
+                title: title,
+                category: category,
+                date: date,
+                location: Activity.Location(
+                    name: location,
+                    latitude: coordinate.latitude,
+                    longitude: coordinate.longitude
+                ),
+                currentParticipants: 1,
+                maxParticipants: maxParticipants,
+                hostId: currentUser.id,
+                hostName: currentUser.username,
+                description: description,
+                tags: [],
+                receiveUpdates: true,
+                updates: [],
+                rating: 0.0,
+                joinedUsers: [Activity.JoinedUser(id: currentUser.id, username: currentUser.username, fullName: currentUser.fullName)],
+                imageUrls: urls
+            )
+            
+            if let id = activityService.createActivity(newActivity) {
+                print("Created activity with ID: \(id)")
+                presentationMode.wrappedValue.dismiss()
+            } else {
+                print("Failed to create activity")
+            }
+        }
+    }
+    
+    private func uploadImages(completion: @escaping ([URL]) -> Void) {
+        activityService.uploadImages(inputImages) { urls in
+            self.imageUrls = urls
+            completion(urls)
+        }
+    }
+    
+    private func deleteImage(at index: Int) {
+        let url = imageUrls[index]
+        activityService.deleteImages([url]) { success in
+            if success {
+                inputImages.remove(at: index)
+                imageUrls.remove(at: index)
+            }
         }
     }
 }

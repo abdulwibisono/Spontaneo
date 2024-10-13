@@ -32,6 +32,9 @@ struct EditActivityView: View {
     @State private var locationCoordinate: CLLocationCoordinate2D?
     @State private var isLocationValid: Bool = true
     
+    @State private var inputImages: [UIImage] = []
+    @State private var imageUrls: [URL] = []
+    
     init(activity: Activity) {
         _activity = State(initialValue: activity)
         _title = State(initialValue: activity.title)
@@ -92,46 +95,28 @@ struct EditActivityView: View {
     // MARK: - Sections
     
     private var imageSection: some View {
-        ZStack {
-            if let image = image {
-                image
-                    .resizable()
-                    .scaledToFill()
-                    .frame(height: 200)
-                    .clipped()
-                    .cornerRadius(16)
-            } else {
-                Rectangle()
-                    .fill(Color("NeutralLight"))
-                    .frame(height: 200)
-                    .cornerRadius(16)
-                    .overlay(
-                        VStack {
-                            Image(systemName: "camera.fill")
-                                .foregroundColor(Color("NeutralDark").opacity(0.4))
-                                .font(.largeTitle)
-                            Text("Add Photo")
-                                .foregroundColor(Color("NeutralDark").opacity(0.4))
-                                .font(.headline)
-                        }
-                    )
-            }
-            
-            VStack {
-                Spacer()
+        VStack {
+            ScrollView(.horizontal, showsIndicators: false) {
                 HStack {
-                    Spacer()
+                    ForEach(imageUrls, id: \.self) { url in
+                        AsyncImage(url: url) { image in
+                            image
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 100)
+                                .clipped()
+                                .cornerRadius(8)
+                        } placeholder: {
+                            ProgressView()
+                        }
+                    }
                     Button(action: {
                         showingImagePicker = true
                     }) {
                         Image(systemName: "plus.circle.fill")
                             .font(.system(size: 40))
-                            .foregroundColor(Color("NeutralLight"))
-                            .background(Color("AccentColor"))
-                            .clipShape(Circle())
-                            .shadow(color: Color("NeutralDark").opacity(0.3), radius: 5, x: 0, y: 2)
+                            .foregroundColor(Color("AccentColor"))
                     }
-                    .padding()
                 }
             }
         }
@@ -320,7 +305,8 @@ struct EditActivityView: View {
             receiveUpdates: activity.receiveUpdates,
             updates: activity.updates,
             rating: activity.rating,
-            joinedUsers: activity.joinedUsers
+            joinedUsers: activity.joinedUsers,
+            imageUrls: imageUrls
         )
         
         activityService.updateActivity(updatedActivity) { result in
