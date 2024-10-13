@@ -15,6 +15,7 @@ struct ActivityDetailedView: View {
         @State private var selectedImageIndex: Int = 0
         @State private var showingEditActivity = false
         @State private var isJoined = false
+        @Environment(\.presentationMode) var presentationMode
         
         let placeholderImages = [
             "activity_placeholder",

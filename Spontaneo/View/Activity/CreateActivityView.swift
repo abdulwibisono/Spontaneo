@@ -27,7 +27,11 @@ struct CreateActivityView: View {
     @StateObject private var searchCompleter = SearchCompleter()
     @FocusState private var isLocationFieldFocused: Bool
     
-    let categories = ["Coffee", "Study", "Sports", "Food", "Explore"]
+    let categories = [
+        "Coffee", "Study", "Sports", "Food", "Explore", "Music", "Art", "Tech", 
+        "Outdoor", "Fitness", "Games", "Travel", "Events", "Fashion", "Health", 
+        "Books", "Movies"
+    ]
     @State private var locationCoordinate: CLLocationCoordinate2D?
     @State private var isLocationValid: Bool = false
     
@@ -133,16 +137,29 @@ struct CreateActivityView: View {
     
     private var categorySection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Label("Category", systemImage: "tag")
+            Text("Category")
                 .font(.headline)
                 .foregroundColor(Color("NeutralDark"))
-            Picker("Category", selection: $category) {
-                ForEach(categories, id: \.self) { category in
-                    Text(category).tag(category)
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(categories, id: \.self) { cat in
+                        Button(action: {
+                            category = cat
+                        }) {
+                            HStack {
+                                Image(systemName: HomeView.iconForCategory(cat))
+                                Text(cat)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 8)
+                            .background(category == cat ? Color("AccentColor") : Color("NeutralLight"))
+                            .foregroundColor(category == cat ? Color("NeutralLight") : Color("NeutralDark"))
+                            .cornerRadius(20)
+                        }
+                    }
                 }
             }
-            .pickerStyle(SegmentedPickerStyle())
-            .background(Color("NeutralLight"))
         }
     }
     
@@ -205,7 +222,7 @@ struct CreateActivityView: View {
                     }
                 }
                 .listStyle(PlainListStyle())
-                .frame(height: 200)
+                .frame(height: min(CGFloat(searchCompleter.results.count * 44), 200))
             }
             Map(coordinateRegion: .constant(region), annotationItems: selectedLocationAnnotation) { item in
                 MapMarker(coordinate: item.coordinate)
@@ -249,11 +266,13 @@ struct CreateActivityView: View {
     private func selectLocation(_ result: MKLocalSearchCompletion) {
         searchCompleter.getLocation(for: result) { location in
             if let location = location {
-                self.location = result.title
-                self.region = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
-                self.isLocationValid = true
-                self.locationCoordinate = location.coordinate
-                self.isLocationFieldFocused = false
+                DispatchQueue.main.async {
+                    self.location = result.title + ", " + result.subtitle
+                    self.region = MKCoordinateRegion(center: location.coordinate, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
+                    self.isLocationValid = true
+                    self.locationCoordinate = location.coordinate
+                    self.isLocationFieldFocused = false
+                }
             }
         }
     }
@@ -307,7 +326,8 @@ class SearchCompleter: NSObject, ObservableObject, MKLocalSearchCompleterDelegat
         completer = MKLocalSearchCompleter()
         super.init()
         completer.delegate = self
-        completer.resultTypes = .pointOfInterest
+        completer.resultTypes = [.address, .pointOfInterest] // Add .address type
+        
     }
 
     func search(query: String) {
@@ -315,7 +335,9 @@ class SearchCompleter: NSObject, ObservableObject, MKLocalSearchCompleterDelegat
     }
 
     func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-        results = completer.results
+        DispatchQueue.main.async {
+            self.results = completer.results
+        }
     }
 
     func getLocation(for result: MKLocalSearchCompletion, completion: @escaping (CLLocation?) -> Void) {
