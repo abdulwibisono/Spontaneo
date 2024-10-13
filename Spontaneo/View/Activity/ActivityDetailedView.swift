@@ -131,19 +131,21 @@ struct ActivityDetailedView: View {
                 .foregroundColor(Color("NeutralDark"))
             
             TabView(selection: $selectedImageIndex) {
-                ForEach(0..<placeholderImages.count, id: \.self) { index in
-                    Image(placeholderImages[index])
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 200)
-                        .clipped()
-                        .cornerRadius(16)
-                        .tag(index)
+                ForEach(activity.imageUrls, id: \.self) { url in
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                            .frame(height: 200)
+                            .clipped()
+                            .cornerRadius(16)
+                    } placeholder: {
+                        ProgressView()
+                    }
                 }
             }
             .frame(height: 200)
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .automatic))
-            .indexViewStyle(PageIndexViewStyle(backgroundDisplayMode: .always))
+            .tabViewStyle(PageTabViewStyle())
         }
     }
     
@@ -393,12 +395,13 @@ struct ActivityDetailedView_Previews: PreviewProvider {
             receiveUpdates: true,
             updates: [],
             rating: 4.5,
-            joinedUsers: [Activity.JoinedUser(id: "1", username: "User1", fullName: "FullName")]
+            joinedUsers: [Activity.JoinedUser(id: "1", username: "User1", fullName: "FullName")],
+            imageUrls: [] // Provide an empty array or sample URLs
         )
         
         return NavigationView {
-                    ActivityDetailedView(activity: sampleActivity, activityService: ActivityService())
-                        .environmentObject(AuthenticationService())
-                }
+            ActivityDetailedView(activity: sampleActivity, activityService: ActivityService())
+                .environmentObject(AuthenticationService())
+        }
     }
 }

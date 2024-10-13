@@ -1,5 +1,6 @@
 import Firebase
 import FirebaseFirestore
+import FirebaseStorage
 
 class ActivityService: ObservableObject {
     private let db = Firestore.firestore()
@@ -40,10 +41,15 @@ class ActivityService: ObservableObject {
         }
     }
     
-    func deleteActivity(id: String) {
-        db.collection("activities").document(id).delete() { error in
-            if let error = error {
-                print("Error deleting activity: \(error)")
+    func deleteActivity(id: String, imageUrls: [URL]) {
+        deleteImages(imageUrls) { [weak self] success in // Capture self weakly
+            guard let self = self else { return } // Safely unwrap self
+            if success {
+                self.db.collection("activities").document(id).delete() { error in
+                    if let error = error {
+                        print("Error deleting activity: \(error)")
+                    }
+                }
             }
         }
     }
@@ -156,6 +162,58 @@ class ActivityService: ObservableObject {
             return nil
         }
     }
+    
+    func uploadImages(_ images: [UIImage], completion: @escaping ([URL]) -> Void) {
+        var uploadedUrls: [URL] = []
+        let dispatchGroup = DispatchGroup()
+
+        for image in images {
+            dispatchGroup.enter()
+            guard let imageData = image.jpegData(compressionQuality: 0.5) else {
+                dispatchGroup.leave()
+                continue
+            }
+
+            let imageName = UUID().uuidString
+            let imageRef = Storage.storage().reference().child("activity_images/\(imageName).jpg")
+
+            imageRef.putData(imageData, metadata: nil) { metadata, error in
+                if let error = error {
+                    print("Error uploading image: \(error.localizedDescription)")
+                    dispatchGroup.leave()
+                    return
+                }
+
+                imageRef.downloadURL { url, error in
+                    if let url = url {
+                        uploadedUrls.append(url)
+                    }
+                    dispatchGroup.leave()
+                }
+            }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            completion(uploadedUrls)
+        }
+    }
+
+    func deleteImages(_ urls: [URL], completion: @escaping (Bool) -> Void) {
+        let dispatchGroup = DispatchGroup()
+
+        for url in urls {
+            dispatchGroup.enter()
+            let imageRef = Storage.storage().reference(forURL: url.absoluteString)
+            imageRef.delete { error in
+                if let error = error {
+                    print("Error deleting image: \(error.localizedDescription)")
+                }
+                dispatchGroup.leave()
+            }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            completion(true)
+        }
+    }
 }
-
-
