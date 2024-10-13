@@ -150,6 +150,7 @@ struct ActivityDetailedView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(spacing: 20) {
                 dateTimeInfo(title: "Date", icon: "calendar", value: activity.date, style: .date)
+                Spacer()
                 dateTimeInfo(title: "Time", icon: "clock", value: activity.date, style: .time)
             }
             
@@ -158,7 +159,7 @@ struct ActivityDetailedView: View {
                     .foregroundColor(Color("AccentColor"))
                     .font(.title2)
                 Text(activity.location.name)
-                    .font(.headline)
+                    .font(.system(size: 16))
                     .foregroundColor(Color("NeutralDark"))
             }
         }
@@ -200,11 +201,19 @@ struct ActivityDetailedView: View {
     
     private var participantsSection: some View {
             VStack(alignment: .leading, spacing: 12) {
-                Label("Participants", systemImage: "person.3.fill")
-                    .font(.headline)
-                    .foregroundColor(Color("NeutralDark"))
-                
                 HStack {
+                    Label("Participants", systemImage: "person.3.fill")
+                        .font(.headline)
+                        .foregroundColor(Color("NeutralDark"))
+                    
+                    Spacer()
+                    
+                    Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
+                        .font(.headline)
+                        .foregroundColor(Color("NeutralDark"))
+                }
+                
+                VStack {
                     ForEach(0..<min(5, activity.currentParticipants), id: \.self) { index in
                         Image("user_placeholder")
                             .resizable()
@@ -223,13 +232,8 @@ struct ActivityDetailedView: View {
                             .clipShape(Circle())
                             .offset(x: CGFloat(-5 * 15))
                     }
-                    
-                    Spacer()
-                    
-                    Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
-                        .font(.headline)
-                        .foregroundColor(Color("NeutralDark"))
                 }
+                .padding(.bottom, -30)
             }
             .padding()
             .background(Color("NeutralLight"))

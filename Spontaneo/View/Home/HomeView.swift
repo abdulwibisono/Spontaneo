@@ -148,6 +148,7 @@ struct HomeView: View {
                     }
                     .padding(.top, 60)
                     .padding(.horizontal)
+                    .padding(.bottom, 5)
                     
                     if isFilterExpanded {
                         CategoryListView
@@ -348,7 +349,7 @@ struct HomeView: View {
                 .scaleEffect(showLocationButton ? 1 : 0.5)
                 .animation(.spring(response: 0.5, dampingFraction: 0.7), value: showLocationButton)
             }
-            .padding(.bottom, 100)
+            .padding(.bottom, 110)
         }
     }
     
