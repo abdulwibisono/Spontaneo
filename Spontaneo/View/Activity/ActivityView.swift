@@ -800,7 +800,7 @@ struct FeaturedActivityCard: View {
                     WebImage(url: firstImageUrl) // Use WebImage for caching
                         .resizable()
                         .aspectRatio(contentMode: .fill)
-                        .frame(width: 200, height: 120)
+                        .frame(height: 150)
                         .clipped()
                         .cornerRadius(12)
                 } else {

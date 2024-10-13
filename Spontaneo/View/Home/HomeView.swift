@@ -895,13 +895,25 @@ struct ActivityCardHome: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            Image(systemName: "photo")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 80, height: 80)
-                .cornerRadius(8)
-                .background(Color("NeutralDark").opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+            if let firstImageUrl = activity.imageUrls.first {
+                AsyncImage(url: firstImageUrl) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(height: 100)
+                        .clipped()
+                        .cornerRadius(12)
+                } placeholder: {
+                    ProgressView()
+                }
+            } else {
+                Image(systemName: "photo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(height: 150)
+                    .clipped()
+                    .cornerRadius(12)
+            }
             
             VStack(alignment: .leading, spacing: 8) {
                 Text(activity.category)

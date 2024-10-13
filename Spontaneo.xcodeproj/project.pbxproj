@@ -54,6 +54,7 @@
 		619FEE262C958112008175F0 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619FEE252C958112008175F0 /* SettingView.swift */; };
 		61E3460C2CBC00F50026F87E /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E3460B2CBC00F50026F87E /* PhotoPicker.swift */; };
 		61E3460F2CBC0D260026F87E /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 61E3460E2CBC0D260026F87E /* SDWebImageSwiftUI */; };
+		61E3461C2CBC2D6F0026F87E /* Brisbane.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 61E3461B2CBC2D6F0026F87E /* Brisbane.gpx */; };
 		61FC18B72CAAD3AD00E2AAB8 /* SearchCompleterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61FC18B62CAAD3AD00E2AAB8 /* SearchCompleterDelegate.swift */; };
 		932BF88C2C88AF5D001B1EFD /* LocationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 932BF88B2C88AF5D001B1EFD /* LocationManager.swift */; };
 		93407DDB2C9D4E2100AB721F /* Activity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93407DDA2C9D4E2000AB721F /* Activity.swift */; };
@@ -120,6 +121,7 @@
 		619EA5242CAABDDF00742C7B /* SelectableLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableLocation.swift; sourceTree = "<group>"; };
 		619FEE252C958112008175F0 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		61E3460B2CBC00F50026F87E /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
+		61E3461B2CBC2D6F0026F87E /* Brisbane.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Brisbane.gpx; sourceTree = "<group>"; };
 		61FC18B62CAAD3AD00E2AAB8 /* SearchCompleterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCompleterDelegate.swift; sourceTree = "<group>"; };
 		932BF88B2C88AF5D001B1EFD /* LocationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationManager.swift; sourceTree = "<group>"; };
 		93407DDA2C9D4E2000AB721F /* Activity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Activity.swift; sourceTree = "<group>"; };
@@ -340,6 +342,7 @@
 		93CAD48B2C7CA88D00D0D340 /* Spontaneo */ = {
 			isa = PBXGroup;
 			children = (
+				61E3461B2CBC2D6F0026F87E /* Brisbane.gpx */,
 				61E3460A2CBC00E50026F87E /* Utilities */,
 				43EFC1F72C9D51B400F01213 /* Services */,
 				615390222C86D9D600E8EAEE /* ViewModels */,
@@ -512,6 +515,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				61E3461C2CBC2D6F0026F87E /* Brisbane.gpx in Resources */,
 				93CAD4942C7CA88F00D0D340 /* Preview Assets.xcassets in Resources */,
 				93CAD4912C7CA88F00D0D340 /* Assets.xcassets in Resources */,
 				935BE7F72CA4108100435670 /* Launch Screen.storyboard in Resources */,
