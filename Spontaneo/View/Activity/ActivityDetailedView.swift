@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import SDWebImageSwiftUI // Add this import for image caching
 
 struct ActivityDetailedView: View {
     @ObservedObject var activityService: ActivityService
@@ -132,16 +133,12 @@ struct ActivityDetailedView: View {
             
             TabView(selection: $selectedImageIndex) {
                 ForEach(activity.imageUrls, id: \.self) { url in
-                    AsyncImage(url: url) { image in
-                        image
-                            .resizable()
-                            .scaledToFill()
-                            .frame(height: 200)
-                            .clipped()
-                            .cornerRadius(16)
-                    } placeholder: {
-                        ProgressView()
-                    }
+                    WebImage(url: url) // Use WebImage for caching
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 200)
+                        .clipped()
+                        .cornerRadius(16)
                 }
             }
             .frame(height: 200)

@@ -1,6 +1,7 @@
 import SwiftUI
 import MapKit
 import CoreLocation
+import SDWebImageSwiftUI // Add this import for image caching
 
 struct ActivityView: View {
     @State private var searchText = ""
@@ -783,16 +784,12 @@ struct FeaturedActivityCard: View {
         VStack(alignment: .leading, spacing: 8) {
             ZStack(alignment: .topTrailing) {
                 if let firstImageUrl = activity.imageUrls.first {
-                    AsyncImage(url: firstImageUrl) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                            .frame(width: 200, height: 120)
-                            .clipped()
-                            .cornerRadius(12)
-                    } placeholder: {
-                        ProgressView()
-                    }
+                    WebImage(url: firstImageUrl) // Use WebImage for caching
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 200, height: 120)
+                        .clipped()
+                        .cornerRadius(12)
                 } else {
                     Image(systemName: "photo")
                         .resizable()

@@ -270,6 +270,9 @@ struct CreateActivityView: View {
         // This function will be called after image picker is dismissed
         // Implement logic to handle multiple images if needed
         // For example, you can update the UI to show the selected images
+        if let newImage = inputImages.last {
+            image = Image(uiImage: newImage)
+        }
     }
     
     private func createActivity() {

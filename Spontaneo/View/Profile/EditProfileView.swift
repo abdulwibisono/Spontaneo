@@ -183,6 +183,7 @@ struct EditProfileView: View {
         
         // Upload the new image
         viewModel.uploadProfileImage(inputImage)
+        viewModel.profileImage = inputImage // Update the local image
     }
 }
 
