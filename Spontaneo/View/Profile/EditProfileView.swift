@@ -42,37 +42,48 @@ struct EditProfileView: View {
     private var profileImagePicker: some View {
         VStack {
             ZStack {
-                AsyncImage(url: viewModel.user.profileImageURL) { image in
-                    image
+                if let image = viewModel.profileImage {
+                    Image(uiImage: image)
                         .resizable()
                         .scaledToFill()
-                } placeholder: {
+                } else if let url = viewModel.user.profileImageURL {
+                    AsyncImage(url: url) { image in
+                        image
+                            .resizable()
+                            .scaledToFill()
+                    } placeholder: {
+                        ProgressView()
+                    }
+                } else {
                     Image(systemName: "person.circle.fill")
                         .resizable()
                         .foregroundColor(.gray)
                 }
-                .frame(width: 120, height: 120)
-                .clipShape(Circle())
-                .overlay(Circle().stroke(Color.blue, lineWidth: 2))
-                .shadow(radius: 5)
-                
-                Image(systemName: "camera.circle.fill")
-                    .resizable()
-                    .frame(width: 30, height: 30)
-                    .foregroundColor(.white)
-                    .background(Color.blue)
-                    .clipShape(Circle())
-                    .offset(x: 40, y: 40)
             }
+            .frame(width: 120, height: 120)
+            .clipShape(Circle())
+            .overlay(Circle().stroke(Color.blue, lineWidth: 2))
+            .shadow(radius: 5)
             
-            Button(action: {
-                showingImagePicker = true
-            }) {
-                Text("Change Photo")
-                    .font(.headline)
-                    .foregroundColor(.blue)
+            HStack {
+                Button(action: {
+                    showingImagePicker = true
+                }) {
+                    Text("Change Photo")
+                        .font(.headline)
+                        .foregroundColor(.blue)
+                }
+                .padding(.top, 8)
+                
+                Button(action: {
+                    viewModel.deleteProfileImage()
+                }) {
+                    Text("Delete Photo")
+                        .font(.headline)
+                        .foregroundColor(.red)
+                }
+                .padding(.top, 8)
             }
-            .padding(.top, 8)
         }
         .padding()
         .background(Color(.secondarySystemGroupedBackground))
@@ -90,7 +101,7 @@ struct EditProfileView: View {
                 Text("Bio")
                     .font(.headline)
                     .foregroundColor(.primary)
-                
+                   
                 TextEditor(text: $bio)
                     .frame(height: 100)
                     .padding(8)
@@ -164,7 +175,7 @@ struct EditProfileView: View {
     
     private func loadImage() {
         guard let inputImage = inputImage else { return }
-        viewModel.updateProfileImage(inputImage)
+        viewModel.uploadProfileImage(inputImage)
     }
 }
 
@@ -226,6 +237,7 @@ struct InterestTag: View {
 
 struct ImagePicker: UIViewControllerRepresentable {
     @Binding var image: UIImage?
+    @Environment(\.presentationMode) var presentationMode
     
     func makeUIViewController(context: Context) -> UIImagePickerController {
         let picker = UIImagePickerController()
@@ -250,7 +262,7 @@ struct ImagePicker: UIViewControllerRepresentable {
             if let uiImage = info[.originalImage] as? UIImage {
                 parent.image = uiImage
             }
-            picker.dismiss(animated: true)
+            parent.presentationMode.wrappedValue.dismiss()
         }
     }
 }
