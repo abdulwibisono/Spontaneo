@@ -10,6 +10,7 @@
 		433466A02CAA96D700148DAC /* Spontaneo_WatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935BE7FE2CA4113500435670 /* Spontaneo_WatchApp.swift */; };
 		433466A12CAA96DA00148DAC /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 935BE8002CA4113500435670 /* ContentView.swift */; };
 		4376A8062CAA9F0C00F661CA /* JoinedUsersListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4376A8052CAA9F0C00F661CA /* JoinedUsersListView.swift */; };
+		43A8B0AD2CBCB20400B68598 /* FireworkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43A8B0AC2CBCB20400B68598 /* FireworkView.swift */; };
 		43E95A7D2CA3F87F00233A1F /* ActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43E95A7C2CA3F87F00233A1F /* ActivityService.swift */; };
 		43EFC1E42C9D4CA800F01213 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 43EFC1E32C9D4CA800F01213 /* GoogleService-Info.plist */; };
 		43EFC1E72C9D4DB700F01213 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 43EFC1E62C9D4DB700F01213 /* FirebaseAnalytics */; };
@@ -106,6 +107,7 @@
 
 /* Begin PBXFileReference section */
 		4376A8052CAA9F0C00F661CA /* JoinedUsersListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedUsersListView.swift; sourceTree = "<group>"; };
+		43A8B0AC2CBCB20400B68598 /* FireworkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FireworkView.swift; sourceTree = "<group>"; };
 		43E95A7C2CA3F87F00233A1F /* ActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityService.swift; sourceTree = "<group>"; };
 		43EFC1E32C9D4CA800F01213 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		43EFC1F02C9D511200F01213 /* AuthenticationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationViewModel.swift; sourceTree = "<group>"; };
@@ -197,6 +199,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		43A8B0AB2CBCB1E400B68598 /* Animation */ = {
+			isa = PBXGroup;
+			children = (
+				43A8B0AC2CBCB20400B68598 /* FireworkView.swift */,
+			);
+			path = Animation;
+			sourceTree = "<group>";
+		};
 		43EFC1F22C9D518000F01213 /* Authentication */ = {
 			isa = PBXGroup;
 			children = (
@@ -366,6 +376,7 @@
 		93CAD49A2C7CAE0900D0D340 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				43A8B0AB2CBCB1E400B68598 /* Animation */,
 				43EFC1F22C9D518000F01213 /* Authentication */,
 				93407DDC2C9D4E6100AB721F /* Chat */,
 				939A83452C8EB5DD00007615 /* Activity */,
@@ -537,6 +548,7 @@
 				43EFC2302C9D559600F01213 /* LoginView.swift in Sources */,
 				43EFC2312C9D559600F01213 /* SignUpView.swift in Sources */,
 				93B5186F2C8CA37D007EFF6C /* AppTabBarView.swift in Sources */,
+				43A8B0AD2CBCB20400B68598 /* FireworkView.swift in Sources */,
 				619EA5252CAABDDF00742C7B /* SelectableLocation.swift in Sources */,
 				4376A8062CAA9F0C00F661CA /* JoinedUsersListView.swift in Sources */,
 				9357DC9F2C86045E000C0B44 /* EditProfileView.swift in Sources */,

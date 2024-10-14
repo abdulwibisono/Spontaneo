@@ -14,7 +14,7 @@ struct SignUpView: View {
                 .edgesIgnoringSafeArea(.all)
             
             VStack(spacing: 25) {
-                Text("🏃‍♀️ Join the Race!")
+                Text("🏃‍♀️ Sign Up!")
                     .font(.system(size: 35, weight: .bold, design: .rounded))
                     .foregroundColor(.purple)
                 
