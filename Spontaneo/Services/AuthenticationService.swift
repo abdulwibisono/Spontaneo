@@ -41,7 +41,8 @@ class AuthenticationService: ObservableObject {
                     if let error = error {
                         promise(.failure(error))
                     } else if let firebaseUser = authResult?.user {
-                        let user = User(id: firebaseUser.uid, username: username, email: email, fullName: "", bio: "", interests: [], profileImageURL: nil, joinDate: Date(), activities: [])
+                        let user = User(id: firebaseUser.uid, username: username, email: email, fullName: "", bio: "", interests: [], profileImageURL: nil, joinDate: Date(), activities: [],averageRating: 0,
+                        numberOfRatings: 0)
                         
                         do {
                             try self.db.collection("users").document(user.id).setData(from: user) { error in
@@ -69,7 +70,8 @@ class AuthenticationService: ObservableObject {
                     if let error = error {
                         promise(.failure(error))
                     } else if let firebaseUser = authResult?.user {
-                        let user = User(id: firebaseUser.uid, username: firebaseUser.displayName ?? "", email: email, fullName: "", bio: "", interests: [], profileImageURL: firebaseUser.photoURL, joinDate: Date(), activities: [])
+                        let user = User(id: firebaseUser.uid, username: firebaseUser.displayName ?? "", email: email, fullName: "", bio: "", interests: [], profileImageURL: firebaseUser.photoURL, joinDate: Date(), activities: [],averageRating: 0,
+                        numberOfRatings: 0)
                         promise(.success(user))
                     }
                 }
@@ -86,4 +88,49 @@ class AuthenticationService: ObservableObject {
             print("Error signing out: \(error.localizedDescription)")
         }
     }
+    
+    func rateUser(userId: String, rating: Double) -> AnyPublisher<Void, Error> {
+            Deferred {
+                Future { promise in
+                    let userRef = self.db.collection("users").document(userId)
+                    
+                    self.db.runTransaction({ (transaction, errorPointer) -> Any? in
+                        let userDocument: DocumentSnapshot
+                        do {
+                            try userDocument = transaction.getDocument(userRef)
+                        } catch let fetchError as NSError {
+                            errorPointer?.pointee = fetchError
+                            return nil
+                        }
+
+                        guard let oldRating = userDocument.data()?["averageRating"] as? Double,
+                              let oldCount = userDocument.data()?["numberOfRatings"] as? Int else {
+                            let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [
+                                NSLocalizedDescriptionKey: "Unable to retrieve user rating"
+                            ])
+                            errorPointer?.pointee = error
+                            return nil
+                        }
+
+                        let newCount = oldCount + 1
+                        let newRating = ((oldRating * Double(oldCount)) + rating) / Double(newCount)
+
+                        transaction.updateData([
+                            "averageRating": newRating,
+                            "numberOfRatings": newCount
+                        ], forDocument: userRef)
+
+                        return nil
+                    }) { (object, error) in
+                        if let error = error {
+                            promise(.failure(error))
+                        } else {
+                            promise(.success(()))
+                        }
+                    }
+                }
+            }
+            .receive(on: RunLoop.main)
+            .eraseToAnyPublisher()
+        }
 }

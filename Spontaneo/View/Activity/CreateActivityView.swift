@@ -305,6 +305,7 @@ struct CreateActivityView: View {
                 maxParticipants: maxParticipants,
                 hostId: currentUser.id,
                 hostName: currentUser.username,
+                hostRating: currentUser.averageRating,
                 description: description,
                 tags: [],
                 receiveUpdates: true,

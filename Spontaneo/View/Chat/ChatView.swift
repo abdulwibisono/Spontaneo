@@ -64,6 +64,7 @@ struct ChatView_Previews: PreviewProvider {
             maxParticipants: 10,
             hostId: "sampleHostId",
             hostName: "Sample Host",
+            hostRating: 4.5,
             description: "This is a sample activity for preview purposes.",
             tags: ["sample", "preview"],
             receiveUpdates: true,

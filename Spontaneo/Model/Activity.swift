@@ -12,6 +12,7 @@ struct Activity: Identifiable, Codable {
     let maxParticipants: Int
     let hostId: String
     let hostName: String
+    let hostRating: Double?
     let description: String
     let tags: [String]
     var receiveUpdates: Bool
