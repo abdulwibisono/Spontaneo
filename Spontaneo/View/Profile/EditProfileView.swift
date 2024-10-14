@@ -286,7 +286,9 @@ struct EditProfileView_Previews: PreviewProvider {
             interests: ["Swift", "SwiftUI", "Combine"],
             profileImageURL: URL(string: "https://example.com/profile.jpg"),
             joinDate: Date(),
-            activities: []
+            activities: [],
+            averageRating: 0,
+            numberOfRatings: 0
         )
         
         let viewModel = ProfileViewModel(userId: sampleUser.id)

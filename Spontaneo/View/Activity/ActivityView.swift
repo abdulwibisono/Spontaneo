@@ -415,7 +415,7 @@ struct ActivityCard: View {
                 Spacer()
                 Image(systemName: "star.fill")
                     .foregroundColor(Color("SecondaryColor"))
-                Text(String(format: "%.1f", activity.rating))
+                Text(String( activity.hostRating ?? 0))
                     .font(.subheadline)
                     .foregroundColor(Color("NeutralDark"))
             }
@@ -831,7 +831,7 @@ struct FeaturedActivityCard: View {
                 Spacer()
                 Image(systemName: "star.fill")
                     .foregroundColor(Color("SecondaryColor"))
-                Text(String(format: "%.1f", activity.rating))
+                Text(String( activity.hostRating ?? 0))
                     .font(.subheadline)
             }
         }

@@ -17,6 +17,8 @@ struct ActivityDetailedView: View {
         @State private var showingEditActivity = false
         @State private var isJoined = false
         @State private var showFireworks = false
+    @State private var showingRatingSheet = false
+    @State private var userRating: Double = 0
         @Environment(\.presentationMode) var presentationMode
         
         let placeholderImages = [
@@ -38,8 +40,22 @@ struct ActivityDetailedView: View {
             ScrollView {
                 VStack(spacing: 0) {
                     headerSection
-                    
                     VStack(alignment: .leading, spacing: 24) {
+                        Button(action: {
+                            showingRatingSheet = true
+                        }) {
+                            Text("Rate Host")
+                                .font(.headline)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color("AccentColor"))
+                                .foregroundColor(Color("NeutralLight"))
+                                .cornerRadius(16)
+                        }
+                        .padding(.top)
+                        .sheet(isPresented: $showingRatingSheet) {
+                                    RatingView(rating: $userRating, onSubmit: submitRating)
+                                }
                         imagesSection
                         dateAndLocationSection
                         descriptionSection
@@ -138,10 +154,12 @@ struct ActivityDetailedView: View {
                     .foregroundColor(Color("NeutralLight"))
                 
                 HStack {
-                    Label(activity.hostName, systemImage: "person.circle.fill")
-                    Spacer()
-                    Label(String(format: "%.1f", activity.rating), systemImage: "star.fill")
-                }
+                                Label(activity.hostName, systemImage: "person.circle.fill")
+                                Spacer()
+                                if let hostRating = activity.hostRating {
+                                    Label(String(format: "%.1f", hostRating), systemImage: "star.fill")
+                                }
+                            }
                 .font(.subheadline)
                 .foregroundColor(Color("NeutralLight").opacity(0.8))
             }
@@ -390,6 +408,20 @@ struct ActivityDetailedView: View {
             }
         }
     }
+    
+    private func submitRating() {
+            authService.rateUser(userId: activity.hostId, rating: userRating)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        print("Rating submitted successfully")
+                    case .failure(let error):
+                        print("Error submitting rating: \(error.localizedDescription)")
+                    }
+                }, receiveValue: { _ in
+                    showingRatingSheet = false
+                })
+        }
 }
 
 struct ActivityDetailedView_Previews: PreviewProvider {
@@ -404,6 +436,7 @@ struct ActivityDetailedView_Previews: PreviewProvider {
             maxParticipants: 10,
             hostId: "sampleHostId",
             hostName: "Sample Host",
+            hostRating: 4.5,
             description: "This is a sample activity for preview purposes.",
             tags: ["sample", "preview"],
             receiveUpdates: true,
@@ -417,5 +450,44 @@ struct ActivityDetailedView_Previews: PreviewProvider {
             ActivityDetailedView(activity: sampleActivity, activityService: ActivityService())
                 .environmentObject(AuthenticationService())
         }
+    }
+}
+
+struct RatingView: View {
+    @Binding var rating: Double
+    var onSubmit: () -> Void
+    @Environment(\.presentationMode) var presentationMode
+
+    var body: some View {
+        VStack(spacing: 20) {
+            Text("Rate the Host")
+                .font(.title)
+                .fontWeight(.bold)
+
+            HStack {
+                ForEach(1...5, id: \.self) { number in
+                    Image(systemName: number <= Int(rating) ? "star.fill" : "star")
+                        .foregroundColor(Color("AccentColor"))
+                        .font(.largeTitle)
+                        .onTapGesture {
+                            rating = Double(number)
+                        }
+                }
+            }
+
+            Button(action: {
+                onSubmit()
+                presentationMode.wrappedValue.dismiss()
+            }) {
+                Text("Submit Rating")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color("AccentColor"))
+                    .foregroundColor(Color("NeutralLight"))
+                    .cornerRadius(16)
+            }
+        }
+        .padding()
     }
 }

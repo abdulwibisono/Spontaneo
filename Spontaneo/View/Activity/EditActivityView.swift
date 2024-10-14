@@ -299,7 +299,7 @@ struct EditActivityView: View {
             currentParticipants: activity.currentParticipants,
             maxParticipants: maxParticipants,
             hostId: activity.hostId,
-            hostName: activity.hostName,
+            hostName: activity.hostName, hostRating: activity.hostRating,
             description: description,
             tags: activity.tags,
             receiveUpdates: activity.receiveUpdates,
