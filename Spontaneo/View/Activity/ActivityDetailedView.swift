@@ -16,6 +16,7 @@ struct ActivityDetailedView: View {
         @State private var selectedImageIndex: Int = 0
         @State private var showingEditActivity = false
         @State private var isJoined = false
+        @State private var showFireworks = false
         @Environment(\.presentationMode) var presentationMode
         
         let placeholderImages = [
@@ -54,6 +55,16 @@ struct ActivityDetailedView: View {
                     .offset(y: -30)
                     .padding(.bottom, 36)
                 }
+                .overlay(
+                                ZStack {
+                                    if showFireworks {
+                                        FireworkView()
+                                            .frame(width: 400, height: 400)
+                                            .transition(.opacity)
+                                            .zIndex(1)
+                                    }
+                                }
+                            )
             }
             .edgesIgnoringSafeArea(.top)
             .navigationBarTitleDisplayMode(.inline)
@@ -227,27 +238,6 @@ struct ActivityDetailedView: View {
                         .foregroundColor(Color("NeutralDark"))
                 }
                 
-                VStack {
-                    ForEach(0..<min(5, activity.currentParticipants), id: \.self) { index in
-                        Image("user_placeholder")
-                            .resizable()
-                            .frame(width: 40, height: 40)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(Color("NeutralLight"), lineWidth: 2))
-                            .offset(x: CGFloat(index * -15))
-                    }
-                    
-                    if activity.currentParticipants > 5 {
-                        Text("+\(activity.currentParticipants - 5)")
-                            .font(.subheadline)
-                            .padding(8)
-                            .background(Color("AccentColor"))
-                            .foregroundColor(Color("NeutralLight"))
-                            .clipShape(Circle())
-                            .offset(x: CGFloat(-5 * 15))
-                    }
-                }
-                .padding(.bottom, -30)
             }
             .padding()
             .background(Color("NeutralLight"))
@@ -309,27 +299,36 @@ struct ActivityDetailedView: View {
             }
         }
 
-        private var joinLeaveButton: some View {
+    private var joinLeaveButton: some View {
             Group {
                 if let currentUser = authService.user {
                     if activity.hostId != currentUser.id {
                         Button(action: {
-                            if isJoined {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
+                                isJoined.toggle()
+                            }
+                            if !isJoined {
                                 leaveActivity()
                             } else {
                                 joinActivity()
+                                showFireworks = true
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                    withAnimation {
+                                        showFireworks = false
+                                    }
+                                }
                             }
                         }) {
                             Text(isJoined ? "Leave Activity" : "Join Activity")
                                 .font(.headline)
                                 .frame(maxWidth: .infinity)
                                 .padding()
-                                .background(
-                                    LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .leading, endPoint: .trailing)
-                                )
+                                .background(isJoined ? Color.red : Color("AccentColor"))
                                 .foregroundColor(Color("NeutralLight"))
                                 .cornerRadius(16)
                         }
+                        .scaleEffect(isJoined ? 1.05 : 1.0)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0), value: isJoined)
                     }
                 }
             }

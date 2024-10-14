@@ -122,12 +122,14 @@ struct ActivityView: View {
             .shadow(color: Color("NeutralDark").opacity(0.1), radius: 5, x: 0, y: 2)
             
             HStack {
-                Button(action: { showLocationPicker.toggle() }) {
-                    HStack {
-                        Image(systemName: "mappin.and.ellipse")
-                        Text(selectedLocation)
+                activeFiltersView
+                
+                if !filters.isEmpty {
+                    Button(action: clearAllFilters) {
+                        Text("Clear all filters")
+                            .font(.subheadline)
+                            .foregroundColor(Color("AccentColor"))
                     }
-                    .foregroundColor(Color("AccentColor"))
                 }
                 Spacer()
                 Button(action: { showSortOptions.toggle() }) {
@@ -143,16 +145,6 @@ struct ActivityView: View {
                 }
             }
             .font(.subheadline)
-            
-            activeFiltersView
-            
-            if !filters.isEmpty {
-                Button(action: clearAllFilters) {
-                    Text("Clear all filters")
-                        .font(.subheadline)
-                        .foregroundColor(Color("AccentColor"))
-                }
-            }
         }
         .padding()
         .background(Color("NeutralLight"))
@@ -467,28 +459,32 @@ struct ActivityCard: View {
                 Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
                     .font(.caption)
                     .foregroundColor(Color("NeutralDark"))
-                Spacer()
-                if let currentUser = authService.user, activity.hostId != currentUser.id {
-                    Button(action: {
-                        if isJoined {
-                            leaveActivity()
-                        } else {
-                            joinActivity()
-                        }
-                    }) {
-                        Text(isJoined ? "Leave" : "Join")
-                            .fontWeight(.semibold)
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .background(
-                                LinearGradient(gradient: Gradient(colors: [Color("AccentColor"), Color("SecondaryColor")]), startPoint: .leading, endPoint: .trailing)
-                            )
-                            .foregroundColor(Color("NeutralLight"))
-                            .cornerRadius(20)
-                    }
-                }
             }
-            
+                Spacer()
+                
+            if let currentUser = authService.user, activity.hostId != currentUser.id {
+                Button(action: {
+                    withAnimation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0)) {
+                        isJoined.toggle()
+                    }
+                    if isJoined {
+                        joinActivity()
+                    } else {
+                        leaveActivity()
+                    }
+                }) {
+                    Text(isJoined ? "Leave Activity" : "Join Activity")
+                        .fontWeight(.semibold)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 12)
+                        .background(isJoined ? Color.red : Color("AccentColor"))
+                        .foregroundColor(Color("NeutralLight"))
+                        .cornerRadius(10)
+                }
+                .scaleEffect(isJoined ? 1.05 : 1.0)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6, blendDuration: 0), value: isJoined)
+            }
+                
             if activity.hostId == authService.user?.id {
                 Button(action: {
                     showingEditActivity = true
