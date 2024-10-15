@@ -41,15 +41,33 @@ class ActivityService: ObservableObject {
         }
     }
     
-    func deleteActivity(id: String, imageUrls: [URL]) {
-        deleteImages(imageUrls) { [weak self] success in // Capture self weakly
-            guard let self = self else { return } // Safely unwrap self
-            if success {
+    func deleteActivity(id: String, imageUrls: [URL], completion: @escaping (Bool) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var allDeletionsSuccessful = true
+
+        for url in imageUrls {
+            dispatchGroup.enter()
+            deleteImage(url) { success in
+                if !success {
+                    allDeletionsSuccessful = false
+                }
+                dispatchGroup.leave()
+            }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            if allDeletionsSuccessful {
                 self.db.collection("activities").document(id).delete() { error in
                     if let error = error {
                         print("Error deleting activity: \(error)")
+                        completion(false)
+                    } else {
+                        completion(true)
                     }
                 }
+            } else {
+                print("Error deleting one or more images")
+                completion(false)
             }
         }
     }
@@ -197,23 +215,16 @@ class ActivityService: ObservableObject {
             completion(uploadedUrls)
         }
     }
-
-    func deleteImages(_ urls: [URL], completion: @escaping (Bool) -> Void) {
-        let dispatchGroup = DispatchGroup()
-
-        for url in urls {
-            dispatchGroup.enter()
-            let imageRef = Storage.storage().reference(forURL: url.absoluteString)
-            imageRef.delete { error in
-                if let error = error {
-                    print("Error deleting image: \(error.localizedDescription)")
-                }
-                dispatchGroup.leave()
+    
+    func deleteImage(_ url: URL, completion: @escaping (Bool) -> Void) {
+        let imageRef = Storage.storage().reference(forURL: url.absoluteString)
+        imageRef.delete { error in
+            if let error = error {
+                print("Error deleting image: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                completion(true)
             }
-        }
-
-        dispatchGroup.notify(queue: .main) {
-            completion(true)
         }
     }
 }

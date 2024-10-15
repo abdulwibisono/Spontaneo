@@ -80,45 +80,50 @@ struct CreateActivityView: View {
     // MARK: - Sections
     
     private var imageSection: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Photos")
+                .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
+            
             ScrollView(.horizontal, showsIndicators: false) {
-                VStack {
+                HStack(spacing: 12) {
+                    ForEach(inputImages.indices, id: \.self) { index in
+                        ZStack(alignment: .topTrailing) {
+                            Image(uiImage: inputImages[index])
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 100, height: 100)
+                                .clipped()
+                                .cornerRadius(8)
+                            
+                            Button(action: {
+                                deleteImage(at: index)
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.red)
+                                    .background(Color.white)
+                                    .clipShape(Circle())
+                            }
+                            .padding(4)
+                        }
+                    }
+                    
                     Button(action: {
                         showingImagePicker = true
                     }) {
-                        HStack {
-                            Text("Add Image")
-                                .font(.system(size: 36))
-                                .foregroundStyle(Color(.black))
+                        VStack {
                             Image(systemName: "plus.circle.fill")
-                                .font(.system(size: 40))
-                                .foregroundColor(Color("AccentColor"))
-                        }.padding(.leading, 30)
-                    }
-                    
-                    HStack {
-                        ForEach(inputImages.indices, id: \.self) { index in
-                            
-                                ZStack(alignment: .topTrailing) {
-                                    Image(uiImage: inputImages[index])
-                                        .resizable()
-                                        .scaledToFill()
-                                        .frame(width: 100, height: 100)
-                                        .clipped()
-                                        .cornerRadius(8)
-                                    
-                                    Button(action: {
-                                        deleteImage(at: index)
-                                    }) {
-                                        Image(systemName: "xmark.circle.fill")
-                                            .foregroundColor(.red)
-                                            .padding(5)
-                                    }
-                                }
-                            
+                                .font(.system(size: 30))
+                            Text("Add Photo")
+                                .font(.caption)
                         }
+                        .frame(width: 100, height: 100)
+                        .background(Color("NeutralLight"))
+                        .foregroundColor(Color("AccentColor"))
+                        .cornerRadius(8)
                     }
                 }
+                .padding(.vertical, 8)
             }
         }
     }
@@ -332,13 +337,7 @@ struct CreateActivityView: View {
     }
     
     private func deleteImage(at index: Int) {
-        let url = imageUrls[index]
-        activityService.deleteImages([url]) { success in
-            if success {
-                inputImages.remove(at: index)
-                imageUrls.remove(at: index)
-            }
-        }
+        inputImages.remove(at: index)
     }
 }
 

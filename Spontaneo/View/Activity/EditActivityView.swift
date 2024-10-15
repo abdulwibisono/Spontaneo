@@ -95,29 +95,54 @@ struct EditActivityView: View {
     // MARK: - Sections
     
     private var imageSection: some View {
-        VStack {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Photos")
+                .font(.headline)
+                .foregroundColor(Color("NeutralDark"))
+            
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack {
+                HStack(spacing: 12) {
                     ForEach(imageUrls, id: \.self) { url in
-                        AsyncImage(url: url) { image in
-                            image
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 100, height: 100)
-                                .clipped()
-                                .cornerRadius(8)
-                        } placeholder: {
-                            ProgressView()
+                        ZStack(alignment: .topTrailing) {
+                            AsyncImage(url: url) { image in
+                                image
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 100, height: 100)
+                                    .clipped()
+                                    .cornerRadius(8)
+                            } placeholder: {
+                                ProgressView()
+                            }
+                            
+                            Button(action: {
+                                deleteImage(url: url)
+                            }) {
+                                Image(systemName: "xmark.circle.fill")
+                                    .foregroundColor(.red)
+                                    .background(Color.white)
+                                    .clipShape(Circle())
+                            }
+                            .padding(4)
                         }
                     }
+                    
                     Button(action: {
                         showingImagePicker = true
                     }) {
-                        Image(systemName: "plus.circle.fill")
-                            .font(.system(size: 40))
-                            .foregroundColor(Color("AccentColor"))
+                        VStack {
+                            Image(systemName: "plus.circle.fill")
+                                .font(.system(size: 30))
+                            Text("Add Photo")
+                                .font(.caption)
+                        }
+                        .frame(width: 100, height: 100)
+                        .background(Color("NeutralLight"))
+                        .foregroundColor(Color("AccentColor"))
+                        .cornerRadius(8)
                     }
                 }
+                .padding(.vertical, 8)
             }
         }
     }
@@ -277,7 +302,7 @@ struct EditActivityView: View {
     
     private func loadImage() {
         guard let inputImage = inputImage else { return }
-        image = Image(uiImage: inputImage)
+        addImages([inputImage])
     }
     
     private func saveActivity() {
@@ -299,7 +324,8 @@ struct EditActivityView: View {
             currentParticipants: activity.currentParticipants,
             maxParticipants: maxParticipants,
             hostId: activity.hostId,
-            hostName: activity.hostName, hostRating: activity.hostRating,
+            hostName: activity.hostName,
+            hostRating: activity.hostRating,
             description: description,
             tags: activity.tags,
             receiveUpdates: activity.receiveUpdates,
@@ -316,6 +342,22 @@ struct EditActivityView: View {
             case .failure(let error):
                 print("Error updating activity: \(error.localizedDescription)")
             }
+        }
+    }
+    
+    private func deleteImage(url: URL) {
+        activityService.deleteImage(url) { success in
+            if success {
+                if let index = imageUrls.firstIndex(of: url) {
+                    imageUrls.remove(at: index)
+                }
+            }
+        }
+    }
+    
+    private func addImages(_ images: [UIImage]) {
+        activityService.uploadImages(images) { urls in
+            imageUrls.append(contentsOf: urls)
         }
     }
 }
