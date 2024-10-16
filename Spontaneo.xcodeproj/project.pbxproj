@@ -53,6 +53,7 @@
 		618CA41F2C9DCAAD007B3D79 /* CreateActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618CA41E2C9DCAAD007B3D79 /* CreateActivityView.swift */; };
 		619EA5252CAABDDF00742C7B /* SelectableLocation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619EA5242CAABDDF00742C7B /* SelectableLocation.swift */; };
 		619FEE262C958112008175F0 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 619FEE252C958112008175F0 /* SettingView.swift */; };
+		61D2A62E2CBE96D400C59D12 /* ChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61D2A62D2CBE96D400C59D12 /* ChatService.swift */; };
 		61E3460C2CBC00F50026F87E /* PhotoPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 61E3460B2CBC00F50026F87E /* PhotoPicker.swift */; };
 		61E3460F2CBC0D260026F87E /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 61E3460E2CBC0D260026F87E /* SDWebImageSwiftUI */; };
 		61E3461C2CBC2D6F0026F87E /* Brisbane.gpx in Resources */ = {isa = PBXBuildFile; fileRef = 61E3461B2CBC2D6F0026F87E /* Brisbane.gpx */; };
@@ -122,6 +123,7 @@
 		618CA41E2C9DCAAD007B3D79 /* CreateActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateActivityView.swift; sourceTree = "<group>"; };
 		619EA5242CAABDDF00742C7B /* SelectableLocation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectableLocation.swift; sourceTree = "<group>"; };
 		619FEE252C958112008175F0 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
+		61D2A62D2CBE96D400C59D12 /* ChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatService.swift; sourceTree = "<group>"; };
 		61E3460B2CBC00F50026F87E /* PhotoPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPicker.swift; sourceTree = "<group>"; };
 		61E3461B2CBC2D6F0026F87E /* Brisbane.gpx */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Brisbane.gpx; sourceTree = "<group>"; };
 		61FC18B62CAAD3AD00E2AAB8 /* SearchCompleterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchCompleterDelegate.swift; sourceTree = "<group>"; };
@@ -219,6 +221,7 @@
 		43EFC1F72C9D51B400F01213 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				61D2A62D2CBE96D400C59D12 /* ChatService.swift */,
 				43EFC1F82C9D51C300F01213 /* AuthenticationService.swift */,
 				43E95A7C2CA3F87F00233A1F /* ActivityService.swift */,
 			);
@@ -548,6 +551,7 @@
 				43EFC2302C9D559600F01213 /* LoginView.swift in Sources */,
 				43EFC2312C9D559600F01213 /* SignUpView.swift in Sources */,
 				93B5186F2C8CA37D007EFF6C /* AppTabBarView.swift in Sources */,
+				61D2A62E2CBE96D400C59D12 /* ChatService.swift in Sources */,
 				43A8B0AD2CBCB20400B68598 /* FireworkView.swift in Sources */,
 				619EA5252CAABDDF00742C7B /* SelectableLocation.swift in Sources */,
 				4376A8062CAA9F0C00F661CA /* JoinedUsersListView.swift in Sources */,

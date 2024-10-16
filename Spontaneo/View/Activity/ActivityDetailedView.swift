@@ -93,15 +93,18 @@ struct ActivityDetailedView: View {
                                     .foregroundColor(Color("AccentColor"))
                             }
                         }
-                        Button(action: { showChat = true }) {
-                            Image(systemName: "bubble.left.and.bubble.right.fill")
-                                .foregroundColor(Color("AccentColor"))
+                        if isJoined {
+                            Button(action: { showChat = true }) {
+                                Image(systemName: "bubble.left.and.bubble.right.fill")
+                                    .foregroundColor(Color("AccentColor"))
+                            }
                         }
                     }
                 }
             }
             .sheet(isPresented: $showChat) {
                 ChatView(activity: activity)
+                    .environmentObject(authService)
             }
             .sheet(isPresented: $showingEditActivity) {
                 EditActivityView(activity: activity)

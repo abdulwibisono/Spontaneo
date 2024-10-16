@@ -487,10 +487,17 @@ struct HomeView: View {
                 .foregroundColor(Color("NeutralDark"))
                 .padding()
             
-            if filteredActivities.isEmpty {
+            if activities.isEmpty {
                 emptyStateView
             } else {
-                activityList
+                ScrollView {
+                    LazyVStack(spacing: 16) {
+                        ForEach(activities) { activity in
+                            ActivityCardHome(activity: activity)
+                        }
+                    }
+                    .padding(.horizontal)
+                }
             }
         }
         .frame(maxWidth: .infinity)
@@ -514,23 +521,6 @@ struct HomeView: View {
         }
         .padding()
         .frame(height: 300)
-    }
-    
-    private var activityList: some View {
-        ScrollView {
-            LazyVStack(spacing: 16) {
-                ForEach(filteredActivities) { activity in
-                    NavigationLink(destination: ActivityDetailedView(activity: activity, activityService: activityService)) {
-                        ActivityCardHome(activity: activity)
-                    }
-                    .buttonStyle(PlainButtonStyle())
-                    .transition(.asymmetric(insertion: .scale.combined(with: .opacity),
-                                            removal: .scale.combined(with: .opacity)))
-                }
-            }
-            .padding(.horizontal)
-            .padding(.top)
-        }
     }
     
     private var filterButton: some View {
@@ -895,13 +885,26 @@ struct ActivityCardHome: View {
     
     var body: some View {
         HStack(spacing: 16) {
-            Image(systemName: "photo")
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 80, height: 80)
-                .cornerRadius(8)
-                .background(Color("NeutralDark").opacity(0.1))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
+            if let firstImageUrl = activity.imageUrls.first {
+                AsyncImage(url: firstImageUrl) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 80, height: 80)
+                        .cornerRadius(8)
+                } placeholder: {
+                    ProgressView()
+                        .frame(width: 80, height: 80)
+                }
+            } else {
+                Image(systemName: "photo")
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 80, height: 80)
+                    .cornerRadius(8)
+                    .background(Color("NeutralDark").opacity(0.1))
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
+            }
             
             VStack(alignment: .leading, spacing: 8) {
                 Text(activity.category)
@@ -925,7 +928,7 @@ struct ActivityCardHome: View {
                 
                 HStack {
                     Image(systemName: "mappin.circle.fill")
-                    Text("1.2 km away")
+                    Text(formatDistance(for: activity))
                     Spacer()
                     Image(systemName: "person.2.fill")
                     Text("\(activity.currentParticipants)/\(activity.maxParticipants)")
@@ -942,6 +945,21 @@ struct ActivityCardHome: View {
         .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isHovered)
         .onHover { hovering in
             isHovered = hovering
+        }
+    }
+    
+    private func formatDistance(for activity: Activity) -> String {
+        guard let userLocation = LocationManager.shared.location else {
+            return "Unknown distance"
+        }
+        
+        let activityLocation = CLLocation(latitude: activity.location.latitude, longitude: activity.location.longitude)
+        let distance = userLocation.distance(from: activityLocation)
+        
+        if distance < 1000 {
+            return String(format: "%.0f m away", distance)
+        } else {
+            return String(format: "%.1f km away", distance / 1000)
         }
     }
 }

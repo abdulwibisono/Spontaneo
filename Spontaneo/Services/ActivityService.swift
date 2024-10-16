@@ -41,15 +41,33 @@ class ActivityService: ObservableObject {
         }
     }
     
-    func deleteActivity(id: String, imageUrls: [URL]) {
-        deleteImages(imageUrls) { [weak self] success in // Capture self weakly
-            guard let self = self else { return } // Safely unwrap self
-            if success {
+    func deleteActivity(id: String, imageUrls: [URL], completion: @escaping (Bool) -> Void) {
+        let dispatchGroup = DispatchGroup()
+        var allDeletionsSuccessful = true
+
+        for url in imageUrls {
+            dispatchGroup.enter()
+            deleteImage(url) { success in
+                if !success {
+                    allDeletionsSuccessful = false
+                }
+                dispatchGroup.leave()
+            }
+        }
+
+        dispatchGroup.notify(queue: .main) {
+            if allDeletionsSuccessful {
                 self.db.collection("activities").document(id).delete() { error in
                     if let error = error {
                         print("Error deleting activity: \(error)")
+                        completion(false)
+                    } else {
+                        completion(true)
                     }
                 }
+            } else {
+                print("Error deleting one or more images")
+                completion(false)
             }
         }
     }
@@ -89,76 +107,76 @@ class ActivityService: ObservableObject {
     }
     
     func joinActivity(activityId: String, user: User) async throws {
-            let activityRef = db.collection("activities").document(activityId)
-            
-            try await db.runTransaction { (transaction, errorPointer) -> Any? in
-                let activityDocument: DocumentSnapshot
-                do {
-                    try activityDocument = transaction.getDocument(activityRef)
-                } catch let fetchError as NSError {
-                    errorPointer?.pointee = fetchError
-                    return nil
-                }
-                
-                guard var activity = try? activityDocument.data(as: Activity.self) else {
-                    let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Activity does not exist"])
-                    errorPointer?.pointee = error
-                    return nil
-                }
-                
-                if activity.currentParticipants >= activity.maxParticipants {
-                    let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Activity is full"])
-                    errorPointer?.pointee = error
-                    return nil
-                }
-                
-                let joinedUser = Activity.JoinedUser(id: user.id, username: user.username, fullName: user.fullName)
-                if !activity.joinedUsers.contains(where: { $0.id == user.id }) {
-                    activity.joinedUsers.append(joinedUser)
-                    activity.currentParticipants += 1
-                    
-                    do {
-                        try transaction.setData(from: activity, forDocument: activityRef)
-                    } catch let error as NSError {
-                        errorPointer?.pointee = error
-                        return nil
-                    }
-                }
-                
+        let activityRef = db.collection("activities").document(activityId)
+        
+        try await db.runTransaction { (transaction, errorPointer) -> Any? in
+            let activityDocument: DocumentSnapshot
+            do {
+                try activityDocument = transaction.getDocument(activityRef)
+            } catch let fetchError as NSError {
+                errorPointer?.pointee = fetchError
                 return nil
             }
-        }
-        
-    func leaveActivity(activityId: String, userId: String) async throws {
-            let activityRef = db.collection("activities").document(activityId)
             
-            try await db.runTransaction { (transaction, errorPointer) -> Any? in
-                let activityDocument: DocumentSnapshot
-                do {
-                    try activityDocument = transaction.getDocument(activityRef)
-                } catch let fetchError as NSError {
-                    errorPointer?.pointee = fetchError
-                    return nil
-                }
+            guard var activity = try? activityDocument.data(as: Activity.self) else {
+                let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Activity does not exist"])
+                errorPointer?.pointee = error
+                return nil
+            }
+            
+            if activity.currentParticipants >= activity.maxParticipants {
+                let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Activity is full"])
+                errorPointer?.pointee = error
+                return nil
+            }
+            
+            let joinedUser = Activity.JoinedUser(id: user.id, username: user.username, fullName: user.fullName)
+            if !activity.joinedUsers.contains(where: { $0.id == user.id }) {
+                activity.joinedUsers.append(joinedUser)
+                activity.currentParticipants += 1
                 
-                guard var activity = try? activityDocument.data(as: Activity.self) else {
-                    let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Activity does not exist"])
+                do {
+                    try transaction.setData(from: activity, forDocument: activityRef)
+                } catch let error as NSError {
                     errorPointer?.pointee = error
                     return nil
                 }
+            }
+            
+            return nil
+        }
+    }
+    
+    func leaveActivity(activityId: String, userId: String) async throws {
+        let activityRef = db.collection("activities").document(activityId)
+        
+        try await db.runTransaction { (transaction, errorPointer) -> Any? in
+            let activityDocument: DocumentSnapshot
+            do {
+                try activityDocument = transaction.getDocument(activityRef)
+            } catch let fetchError as NSError {
+                errorPointer?.pointee = fetchError
+                return nil
+            }
+            
+            guard var activity = try? activityDocument.data(as: Activity.self) else {
+                let error = NSError(domain: "AppErrorDomain", code: -1, userInfo: [NSLocalizedDescriptionKey: "Activity does not exist"])
+                errorPointer?.pointee = error
+                return nil
+            }
+            
+            if let index = activity.joinedUsers.firstIndex(where: { $0.id == userId }) {
+                activity.joinedUsers.remove(at: index)
+                activity.currentParticipants -= 1
                 
-                if let index = activity.joinedUsers.firstIndex(where: { $0.id == userId }) {
-                    activity.joinedUsers.remove(at: index)
-                    activity.currentParticipants -= 1
-                    
-                    do {
-                        try transaction.setData(from: activity, forDocument: activityRef)
-                    } catch let error as NSError {
-                        errorPointer?.pointee = error
-                        return nil
-                    }
+                do {
+                    try transaction.setData(from: activity, forDocument: activityRef)
+                } catch let error as NSError {
+                    errorPointer?.pointee = error
+                    return nil
                 }
-                
+            }
+            
             return nil
         }
     }
@@ -197,23 +215,16 @@ class ActivityService: ObservableObject {
             completion(uploadedUrls)
         }
     }
-
-    func deleteImages(_ urls: [URL], completion: @escaping (Bool) -> Void) {
-        let dispatchGroup = DispatchGroup()
-
-        for url in urls {
-            dispatchGroup.enter()
-            let imageRef = Storage.storage().reference(forURL: url.absoluteString)
-            imageRef.delete { error in
-                if let error = error {
-                    print("Error deleting image: \(error.localizedDescription)")
-                }
-                dispatchGroup.leave()
+    
+    func deleteImage(_ url: URL, completion: @escaping (Bool) -> Void) {
+        let imageRef = Storage.storage().reference(forURL: url.absoluteString)
+        imageRef.delete { error in
+            if let error = error {
+                print("Error deleting image: \(error.localizedDescription)")
+                completion(false)
+            } else {
+                completion(true)
             }
-        }
-
-        dispatchGroup.notify(queue: .main) {
-            completion(true)
         }
     }
 }

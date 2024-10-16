@@ -1,55 +1,74 @@
 import SwiftUI
 
 struct ChatView: View {
-    var activity: Activity
-    @State private var messages: [Message] = []
+    @ObservedObject var chatService = ChatService()
+    @EnvironmentObject var authService: AuthenticationService
+    let activity: Activity
     @State private var newMessage: String = ""
-
+    
     var body: some View {
         VStack {
-            List(messages) { message in
-                HStack {
-                    if message.isCurrentUser {
-                        Spacer()
-                        Text(message.text)
-                            .padding()
-                            .background(Color.blue)
-                            .foregroundColor(.white)
-                            .cornerRadius(10)
-                    } else {
-                        Text(message.text)
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(10)
-                        Spacer()
+            ScrollView {
+                LazyVStack(spacing: 12) {
+                    ForEach(chatService.messages) { message in
+                        MessageBubble(message: message)
                     }
                 }
+                .padding()
             }
+            
             HStack {
                 TextField("Type a message", text: $newMessage)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-                Button(action: {
-                    sendMessage()
-                }) {
-                    Text("Send")
+                    .padding(.horizontal)
+                
+                Button(action: sendMessage) {
+                    Image(systemName: "paperplane.fill")
+                        .foregroundColor(Color("AccentColor"))
                 }
+                .padding(.trailing)
             }
-            .padding()
+            .padding(.vertical)
         }
         .navigationTitle("Chat")
+        .onAppear {
+            if let currentUser = authService.user {
+                chatService.listenForMessages(activityId: activity.id!, currentUserId: currentUser.id)
+            }
+        }
     }
-
+    
     private func sendMessage() {
-        let message = Message(id: UUID(), text: newMessage, isCurrentUser: true)
-        messages.append(message)
+        guard let currentUser = authService.user, !newMessage.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
+        
+        chatService.sendMessage(activityId: activity.id!, text: newMessage, senderId: currentUser.id, senderName: currentUser.username)
         newMessage = ""
     }
 }
 
-struct Message: Identifiable {
-    let id: UUID
-    let text: String
-    let isCurrentUser: Bool
+struct MessageBubble: View {
+    let message: Message
+    
+    var body: some View {
+        HStack {
+            if message.isCurrentUser {
+                Spacer()
+            }
+            VStack(alignment: message.isCurrentUser ? .trailing : .leading) {
+                Text(message.senderName)
+                    .font(.caption)
+                    .foregroundColor(.gray)
+                Text(message.text)
+                    .padding(10)
+                    .background(message.isCurrentUser ? Color("AccentColor") : Color.gray.opacity(0.2))
+                    .foregroundColor(message.isCurrentUser ? .white : Color("NeutralDark"))
+                    .cornerRadius(10)
+            }
+            if !message.isCurrentUser {
+                Spacer()
+            }
+        }
+    }
 }
 
 struct ChatView_Previews: PreviewProvider {
