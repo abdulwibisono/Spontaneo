@@ -20,7 +20,6 @@ struct EditActivityView: View {
     
     @State private var region: MKCoordinateRegion
     
-    // Autocomplete Properties
     @StateObject private var searchCompleter = SearchCompleter()
     @FocusState private var isLocationFieldFocused: Bool
     
@@ -43,7 +42,7 @@ struct EditActivityView: View {
         _date = State(initialValue: activity.date)
         _location = State(initialValue: activity.location.name)
         _maxParticipants = State(initialValue: activity.maxParticipants)
-        _isPublic = State(initialValue: true) // Assuming all activities are public by default
+        _isPublic = State(initialValue: true)
         _region = State(initialValue: MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: activity.location.latitude, longitude: activity.location.longitude),
             span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
@@ -68,7 +67,7 @@ struct EditActivityView: View {
                     .padding(.horizontal, 20)
                 }
                 .padding(.vertical, 20)
-                .padding(.bottom, 80) // Extra padding at the bottom
+                .padding(.bottom, 80)
             }
             .background(Color("NeutralLight"))
             .navigationTitle("Edit Activity")
@@ -91,8 +90,6 @@ struct EditActivityView: View {
             ImagePicker(image: $inputImage)
         }
     }
-    
-    // MARK: - Sections
     
     private var imageSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -277,8 +274,6 @@ struct EditActivityView: View {
         }
     }
     
-    // MARK: - Helpers
-    
     private var selectedLocationAnnotation: [SelectableLocation] {
         if location.isEmpty {
             return []
@@ -361,8 +356,3 @@ struct EditActivityView: View {
         }
     }
 }
-
-// Add the SearchCompleter class here if it's not already in a separate file
-// class SearchCompleter: NSObject, ObservableObject, MKLocalSearchCompleterDelegate {
-//     // ... (same as in CreateActivityView)
-// }

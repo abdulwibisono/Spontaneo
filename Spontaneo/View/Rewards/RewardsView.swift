@@ -4,8 +4,8 @@ struct RewardsView: View {
     @State private var rewards = sampleRewards
     @State private var selectedReward: Reward?
     @State private var showingRewardDetail = false
-    @State private var totalPoints = 1250 // Example total points
-    @State private var nextRewardPoints = 2000 // Example points needed for next reward
+    @State private var totalPoints = 1250
+    @State private var nextRewardPoints = 2000
     
     var body: some View {
         NavigationView {

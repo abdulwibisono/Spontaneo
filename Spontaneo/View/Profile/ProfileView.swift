@@ -56,8 +56,6 @@ struct ProfileView: View {
             }
         }
         .onReceive(viewModel.$user) { _ in
-            // This line is not needed as SwiftUI automatically updates the view
-            // self.objectWillChange.send()
         }
     }
     

@@ -90,7 +90,7 @@ struct ChatView_Previews: PreviewProvider {
             updates: [],
             rating: 4.5,
             joinedUsers: [Activity.JoinedUser(id: "1", username: "User1", fullName: "FullName")],
-            imageUrls: [] // Provide an empty array or sample URLs
+            imageUrls: []
         )
         return ChatView(activity: sampleActivity)
     }

@@ -26,7 +26,7 @@ class AuthenticationViewModel: ObservableObject {
             .eraseToAnyPublisher()
     }
     
-    private var isUsernameValidPublisher: AnyPublisher<Bool, Never> {  // Add this publisher
+    private var isUsernameValidPublisher: AnyPublisher<Bool, Never> { 
         $username
             .map { !$0.isEmpty }
             .eraseToAnyPublisher()

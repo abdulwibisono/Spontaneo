@@ -113,7 +113,7 @@ class ProfileViewModel: ObservableObject {
                 }
             } receiveValue: { [weak self] updatedUser in
                 self?.user = updatedUser
-                self?.profileImage = nil // Clear the temporary image
+                self?.profileImage = nil
             }
             .store(in: &cancellables)
     }

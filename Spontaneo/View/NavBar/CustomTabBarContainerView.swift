@@ -19,7 +19,6 @@ struct CustomTabBarContainerView<Content: View>: View {
                 .ignoresSafeArea()
             
             ZStack {
-                // Non-floating tab bar (always present)
                 CustomTabBarView(tabs: tabs, selection: $selection, localSelection: localSelection, namespace: namespace, isFloating: false)
             }
             .animation(.easeInOut, value: selection)

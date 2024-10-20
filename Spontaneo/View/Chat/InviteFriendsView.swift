@@ -13,7 +13,7 @@ struct InviteFriendsView: View {
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Invite") {
-                        // Handle invite action
+                       
                     }
                 }
             }

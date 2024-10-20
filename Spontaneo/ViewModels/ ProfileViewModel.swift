@@ -72,10 +72,9 @@ class ProfileViewModel: ObservableObject {
                 }
             } receiveValue: { [weak self] updatedUser in
                 self?.user = updatedUser
-                self?.objectWillChange.send() // Notify observers that the user object has changed
+                self?.objectWillChange.send()
             }
             .store(in: &cancellables)
     }
 
-    // ... (keep other existing methods)
 }

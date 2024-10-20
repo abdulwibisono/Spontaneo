@@ -50,7 +50,6 @@ struct HomeView: View {
     @State private var categories: [CategoryModel] = getCategoryList()
     @State private var isFilterExpanded = false
 
-    // Add this to the existing state variables
     @State private var mapStyle: MapStyle = .standard
     @State private var showNearbyActivityAlert = false
     @State private var nearbyActivity: Activity?
@@ -59,7 +58,6 @@ struct HomeView: View {
     
     @State private var searchResults: [Activity] = []
     
-    // Add these to the existing state variables
     @State private var nearbyHotspot: Hotspot?
     @State private var showHotspotNotification = false
     @State private var isInsideHotspot = false
@@ -82,7 +80,6 @@ struct HomeView: View {
         return activities.filter { $0.category == selectedCategory.title }
     }
     
-    // Change this from private to static
     static func iconForCategory(_ category: String) -> String {
         switch category {
         case "Coffee":
@@ -133,7 +130,6 @@ struct HomeView: View {
                         setupInitialState(geometry: geometry)
                         checkNearbyActivities()
                         
-                        // Add this timer to periodically check for nearby hotspots
                         Timer.scheduledTimer(withTimeInterval: 30, repeats: true) { _ in
                             checkNearbyHotspots()
                         }
@@ -418,8 +414,8 @@ struct HomeView: View {
     }
     
     func calculateHotspots() {
-        let epsilon: Double = 0.001 // Approximately 100 meters
-        let minPoints = 2 // Minimum number of points to form a cluster
+        let epsilon: Double = 0.001
+        let minPoints = 2
 
         var clusters: [[Activity]] = []
         var visited = Set<String>()
@@ -464,7 +460,7 @@ struct HomeView: View {
     private func calculateDistance(from location1: CLLocationCoordinate2D, to location2: CLLocationCoordinate2D) -> Double {
         let location1 = CLLocation(latitude: location1.latitude, longitude: location1.longitude)
         let location2 = CLLocation(latitude: location2.latitude, longitude: location2.longitude)
-        return location1.distance(from: location2) / 1000 // Convert to kilometers
+        return location1.distance(from: location2) / 1000
     }
 
     private func calculateClusterCenter(_ cluster: [Activity]) -> CLLocationCoordinate2D {
@@ -576,7 +572,6 @@ struct HomeView: View {
         }
     }
     
-    // Add this to the body, near the other buttons in the top bar
     private var mapStyleButton: some View {
         Menu {
             Button("Standard") { mapStyle = .standard }
@@ -592,7 +587,6 @@ struct HomeView: View {
         }
     }
     
-    // Add this function to check for nearby activities
     private func checkNearbyActivities() {
         guard let userLocation = locationManager.location else { return }
         
@@ -600,7 +594,7 @@ struct HomeView: View {
             let activityLocation = CLLocation(latitude: activity.location.latitude, longitude: activity.location.longitude)
             let distance = userLocation.distance(from: activityLocation)
             
-            if distance <= 1000 { // Within 1km
+            if distance <= 1000 {
                 nearbyActivity = activity
                 showNearbyActivityAlert = true
                 break
@@ -697,7 +691,6 @@ struct HomeView: View {
         isSearching = false
     }
     
-    // Add this function to check for nearby hotspots
     private func checkNearbyHotspots() {
         guard let userLocation = locationManager.location else { return }
         
@@ -708,16 +701,15 @@ struct HomeView: View {
             let hotspotLocation = CLLocation(latitude: hotspot.coordinate.latitude, longitude: hotspot.coordinate.longitude)
             let distance = userLocation.distance(from: hotspotLocation)
             
-            if distance <= 200 && !dismissedHotspots.contains(hotspot.id) { // Within 200 meters and not dismissed
+            if distance <= 200 && !dismissedHotspots.contains(hotspot.id) {
                 if let lastTime = lastNotificationTime,
                    let lastHotspotId = lastNotifiedHotspotId,
                    now.timeIntervalSince(lastTime) < cooldownPeriod && lastHotspotId == hotspot.id {
-                    // Skip notification if cooldown period hasn't passed for this hotspot
                     continue
                 }
                 
                 nearbyHotspot = hotspot
-                isInsideHotspot = distance <= 50 // Consider inside if within 50 meters
+                isInsideHotspot = distance <= 50
                 showHotspotNotification = true
                 lastNotificationTime = now
                 lastNotifiedHotspotId = hotspot.id
@@ -734,7 +726,7 @@ struct HomeView: View {
         }
         
         let distance = newLocation.distance(from: lastLocation)
-        if distance > 500 { // Recalculate if the user has moved more than 500 meters
+        if distance > 500 {
             calculateHotspots()
             lastRecalculationLocation = newLocation
         }
@@ -744,7 +736,7 @@ struct HomeView: View {
         return filteredActivities.filter { activity in
             let activityLocation = CLLocation(latitude: activity.location.latitude, longitude: activity.location.longitude)
             let hotspotLocation = CLLocation(latitude: hotspot.coordinate.latitude, longitude: hotspot.coordinate.longitude)
-            return activityLocation.distance(from: hotspotLocation) <= 200 // Activities within 200 meters of the hotspot
+            return activityLocation.distance(from: hotspotLocation) <= 200
         }
     }
     
@@ -876,7 +868,7 @@ struct HotspotAnnotationView: View {
     private var size: CGFloat {
         let baseSize = CGFloat(hotspot.activityCount * 3)
         let zoomFactor = 1 / zoomLevel
-        return min(max(baseSize * zoomFactor, 20), 60) // Limit size between 20 and 60
+        return min(max(baseSize * zoomFactor, 20), 60)
     }
 }
 struct ActivityCardHome: View {
@@ -992,7 +984,6 @@ struct EmptyStateAnimation: View {
     }
 }
 
-// Add this struct at the bottom of the file
 struct HotspotNotificationView: View {
     let hotspot: Hotspot
     let isInside: Bool
@@ -1026,7 +1017,6 @@ struct HotspotNotificationView: View {
                 .foregroundColor(Color("NeutralDark").opacity(0.7))
             
             Button(action: {
-                // Action to view hotspot details
             }) {
                 Text("View Activities")
                     .font(.subheadline)
@@ -1109,7 +1099,6 @@ struct ActivityRowView: View {
     }
     
     private func iconForCategory(_ category: String) -> String {
-        // Use the existing iconForCategory function from HomeView
         HomeView.iconForCategory(category)
     }
 }

@@ -176,14 +176,12 @@ struct EditProfileView: View {
     private func loadImage() {
         guard let inputImage = inputImage else { return }
         
-        // Delete the old image if it exists
         if let oldImageUrl = viewModel.user.profileImageURL {
             viewModel.deleteProfileImage()
         }
         
-        // Upload the new image
         viewModel.uploadProfileImage(inputImage)
-        viewModel.profileImage = inputImage // Update the local image
+        viewModel.profileImage = inputImage
     }
 }
 

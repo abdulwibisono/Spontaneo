@@ -1,7 +1,7 @@
 import SwiftUI
 import MapKit
 import CoreLocation
-import SDWebImageSwiftUI // Add this import for image caching
+import SDWebImageSwiftUI
 
 struct ActivityView: View {
     @State private var searchText = ""
@@ -93,7 +93,7 @@ struct ActivityView: View {
         .onChange(of: searchText) { newValue in
             searchTask?.cancel()
             searchTask = Task {
-                try? await Task.sleep(nanoseconds: 300_000_000) // 0.3 seconds debounce
+                try? await Task.sleep(nanoseconds: 300_000_000)
                 if !Task.isCancelled {
                     await MainActor.run {
                         debouncedSearchText = newValue
@@ -254,12 +254,12 @@ struct ActivityView: View {
     
     private func calculateDistance(to location: Activity.Location) -> Double {
         guard let userLocation = locationManager.location else {
-            return Double.infinity // Return a large value if user location is not available
+            return Double.infinity
         }
         
         let activityLocation = CLLocation(latitude: location.latitude, longitude: location.longitude)
         let distanceInMeters = userLocation.distance(from: activityLocation)
-        return distanceInMeters / 1000 // Convert to kilometers
+        return distanceInMeters / 1000
     }
     
     private var loadingOverlay: some View {
@@ -286,16 +286,11 @@ struct ActivityView: View {
     
     private func applyFilters(_ newFilters: ActivityFilters) {
         filters = newFilters
-        // Here you would typically make an API call with the new filters
-        // For now, we'll just update the filtered activities
-        // activities = fetchFilteredActivities(filters: filters)
     }
     
     private func refreshActivities() async {
         isLoading = true
-        // Simulate network request
-        try? await Task.sleep(nanoseconds: 2 * 1_000_000_000) // 2 seconds
-        // Refresh activities here
+        try? await Task.sleep(nanoseconds: 2 * 1_000_000_000)
         isLoading = false
     }
     
@@ -323,7 +318,6 @@ struct ActivityView: View {
         searchText = ""
     }
     
-    // Add this computed property to check if any filters are active
     private var filtersActive: Bool {
         return !filters.categories.isEmpty || filters.minRating > 0 || filters.maxDistance < 50 || filters.dateRange != nil || !debouncedSearchText.isEmpty
     }
@@ -583,7 +577,7 @@ enum SortOption: String, CaseIterable {
     var sortingClosure: (Activity, Activity) -> Bool {
         switch self {
         case .relevance:
-            return { _, _ in true } // No specific sorting
+            return { _, _ in true }
         case .dateAscending:
             return { $0.date < $1.date }
         case .dateDescending:
@@ -793,7 +787,7 @@ struct FeaturedActivityCard: View {
         VStack(alignment: .leading, spacing: 8) {
             ZStack(alignment: .topTrailing) {
                 if let firstImageUrl = activity.imageUrls.first {
-                    WebImage(url: firstImageUrl) // Use WebImage for caching
+                    WebImage(url: firstImageUrl)
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 200, height: 120)

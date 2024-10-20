@@ -1,6 +1,6 @@
 import SwiftUI
 import MapKit
-import SDWebImageSwiftUI // Add this import for image caching
+import SDWebImageSwiftUI
 
 struct ActivityDetailedView: View {
     @ObservedObject var activityService: ActivityService
@@ -179,7 +179,7 @@ struct ActivityDetailedView: View {
             
             TabView(selection: $selectedImageIndex) {
                 ForEach(activity.imageUrls, id: \.self) { url in
-                    WebImage(url: url) // Use WebImage for caching
+                    WebImage(url: url)
                         .resizable()
                         .scaledToFill()
                         .frame(height: 200)
@@ -446,7 +446,7 @@ struct ActivityDetailedView_Previews: PreviewProvider {
             updates: [],
             rating: 4.5,
             joinedUsers: [Activity.JoinedUser(id: "1", username: "User1", fullName: "FullName")],
-            imageUrls: [] // Provide an empty array or sample URLs
+            imageUrls: []
         )
         
         return NavigationView {

@@ -19,7 +19,7 @@ struct Activity: Identifiable, Codable {
     let updates: [String]
     let rating: Double
     var joinedUsers: [JoinedUser]
-    var imageUrls: [URL] // Add this line to store image URLs
+    var imageUrls: [URL]
     
     struct Location: Codable, Hashable {
         let name: String

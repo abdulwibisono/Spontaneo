@@ -15,8 +15,8 @@ struct CreateActivityView: View {
     @State private var maxParticipants = 10
     @State private var isPublic = true
     @State private var showingImagePicker = false
-    @State private var inputImages: [UIImage] = [] // Store selected images
-    @State private var imageUrls: [URL] = [] // Store uploaded image URLs
+    @State private var inputImages: [UIImage] = []
+    @State private var imageUrls: [URL] = []
     @State private var image: Image?
     
     @State private var region = MKCoordinateRegion(
@@ -53,7 +53,7 @@ struct CreateActivityView: View {
                     .padding(.horizontal, 20)
                 }
                 .padding(.vertical, 20)
-                .padding(.bottom, 80) // Extra padding at the bottom
+                .padding(.bottom, 80)
             }
             .background(Color("NeutralLight"))
             .navigationTitle("Create Activity")
@@ -76,8 +76,6 @@ struct CreateActivityView: View {
             PhotoPicker(selectedImages: $inputImages)
         }
     }
-    
-    // MARK: - Sections
     
     private var imageSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -258,8 +256,6 @@ struct CreateActivityView: View {
         }
     }
     
-    // MARK: - Helpers
-    
     private var selectedLocationAnnotation: [SelectableLocation] {
         if location.isEmpty {
             return []
@@ -282,9 +278,6 @@ struct CreateActivityView: View {
     }
     
     private func loadImage() {
-        // This function will be called after image picker is dismissed
-        // Implement logic to handle multiple images if needed
-        // For example, you can update the UI to show the selected images
         if let newImage = inputImages.last {
             image = Image(uiImage: newImage)
         }
@@ -349,7 +342,7 @@ class SearchCompleter: NSObject, ObservableObject, MKLocalSearchCompleterDelegat
         completer = MKLocalSearchCompleter()
         super.init()
         completer.delegate = self
-        completer.resultTypes = [.address, .pointOfInterest] // Add .address type
+        completer.resultTypes = [.address, .pointOfInterest]
         
     }
 
